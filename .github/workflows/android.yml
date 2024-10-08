@@ -36,6 +36,6 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: app-release
-        path: app/build/outputs/apk/release/app-release.apk
+        path: app/build/outputs/apk/release/app-release-unsigned.apk # Updated to the correct path
         if-no-files-found: warn
         include-hidden-files: false
