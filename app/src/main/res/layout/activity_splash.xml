@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- activity_splash.xml-->
+<!-- This is the layout file for the splash screen activity.-->
+<!-- It contains a single ImageView that displays the app logo.-->
+<!-- The ImageView is centered in the layout using the layout_gravity attribute.-->
+<!-- The ImageView's src attribute is set to the app logo drawable resource.-->
+<!-- The ImageView's layout_width and layout_height attributes are set to wrap_content to match the size of the logo.-->
+<!-- The ImageView's scaleType attribute is set to centerInside to ensure the logo is displayed at its original size.-->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".SplashActivity">
+
+    <!-- Tag line for the app-->
+
+    <ImageView
+        android:id="@+id/logoImageView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:rotationX="0"
+        android:scaleType="centerInside"
+        android:src="@drawable/splash_screen_logo" />
+
+    <TextView
+        android:id="@+id/tagLineTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/logoImageView"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="60dp"
+        android:layout_marginEnd="68dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginBottom="1dp"
+        android:gravity="center"
+        android:text="@string/tag_line"
+        android:textColor="@color/black"
+        android:textSize="16sp" />
+    <!--        // center the text-->
+
+
+</RelativeLayout>
+
