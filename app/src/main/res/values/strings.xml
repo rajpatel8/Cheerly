@@ -2,4 +2,5 @@
     <string name="app_name">Cheerly</string>
     <string name="tag_line">Uplift Your Mood in a Tap</string>
     <string name="title_activity_splash">SplashActivity</string>
+    <string name="title_activity_user_preference">UserPreference</string>
 </resources>
