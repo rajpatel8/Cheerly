@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -50,27 +51,42 @@
 
             <Button
                 android:id="@+id/btn_rock"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:background="@drawable/rounded_button"
+                android:textColor="#0D0D0D"
                 android:text="Rock"
-                android:layout_marginHorizontal="4dp" />
+                android:layout_marginHorizontal="4dp"
+                android:padding="5dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:textSize="16sp"/>
 
             <Button
                 android:id="@+id/btn_jazz"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:background="@drawable/rounded_button"
+                android:textColor="#0D0D0D"
                 android:text="Jazz"
-                android:layout_marginHorizontal="4dp" />
+                android:layout_marginHorizontal="4dp"
+                android:padding="5dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:textSize="16sp"/>
 
             <Button
                 android:id="@+id/btn_classical"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:background="@drawable/rounded_button"
+                android:textColor="#0D0D0D"
                 android:text="Classical"
-                android:layout_marginHorizontal="4dp" />
+                android:layout_marginHorizontal="4dp"
+                android:padding="5dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:textSize="16sp"/>
 
         </LinearLayout>
 
@@ -83,19 +99,29 @@
 
             <Button
                 android:id="@+id/btn_hip_hop"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Hip-Hop"
-                android:layout_marginHorizontal="4dp" />
+                android:background="@drawable/rounded_button"
+                android:textColor="#0D0D0D"
+                android:text="Hip Hop"
+                android:layout_marginHorizontal="4dp"
+                android:padding="5dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:textSize="16sp"/>
 
             <Button
                 android:id="@+id/btn_country"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:background="@drawable/rounded_button"
+                android:textColor="#0D0D0D"
                 android:text="Country"
-                android:layout_marginHorizontal="4dp" />
+                android:layout_marginHorizontal="4dp"
+                android:padding="5dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:textSize="16sp"/>
 
         </LinearLayout>
 
@@ -118,27 +144,42 @@
 
             <Button
                 android:id="@+id/btn_action"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:background="@drawable/rounded_button"
+                android:textColor="#0D0D0D"
                 android:text="Action"
-                android:layout_marginHorizontal="4dp" />
+                android:layout_marginHorizontal="4dp"
+                android:padding="5dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:textSize="16sp"/>
 
             <Button
                 android:id="@+id/btn_comedy"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:background="@drawable/rounded_button"
+                android:textColor="#0D0D0D"
                 android:text="Comedy"
-                android:layout_marginHorizontal="4dp" />
+                android:layout_marginHorizontal="4dp"
+                android:padding="5dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:textSize="16sp"/>
 
             <Button
                 android:id="@+id/btn_sci_fi"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:background="@drawable/rounded_button"
+                android:textColor="#0D0D0D"
                 android:text="Sci-Fi"
-                android:layout_marginHorizontal="4dp" />
+                android:layout_marginHorizontal="4dp"
+                android:padding="5dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:textSize="16sp"/>
 
         </LinearLayout>
 
@@ -151,19 +192,29 @@
 
             <Button
                 android:id="@+id/btn_thriller"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:background="@drawable/rounded_button"
+                android:textColor="#0D0D0D"
                 android:text="Thriller"
-                android:layout_marginHorizontal="4dp" />
+                android:layout_marginHorizontal="4dp"
+                android:padding="5dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:textSize="16sp"/>
 
             <Button
                 android:id="@+id/btn_horror"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:background="@drawable/rounded_button"
+                android:textColor="#0D0D0D"
                 android:text="Horror"
-                android:layout_marginHorizontal="4dp" />
+                android:layout_marginHorizontal="4dp"
+                android:padding="5dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:textSize="16sp"/>
 
         </LinearLayout>
 
@@ -186,27 +237,42 @@
 
             <Button
                 android:id="@+id/btn_technology"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Technology"
-                android:layout_marginHorizontal="4dp" />
+                android:background="@drawable/rounded_button"
+                android:textColor="#0D0D0D"
+                android:text="Tech"
+                android:layout_marginHorizontal="4dp"
+                android:padding="5dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:textSize="16sp"/>
 
             <Button
                 android:id="@+id/btn_health"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:background="@drawable/rounded_button"
+                android:textColor="#0D0D0D"
                 android:text="Health"
-                android:layout_marginHorizontal="4dp" />
+                android:layout_marginHorizontal="4dp"
+                android:padding="5dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:textSize="16sp"/>
 
             <Button
                 android:id="@+id/btn_sports"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:background="@drawable/rounded_button"
+                android:textColor="#0D0D0D"
                 android:text="Sports"
-                android:layout_marginHorizontal="4dp" />
+                android:layout_marginHorizontal="4dp"
+                android:padding="5dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:textSize="16sp"/>
 
         </LinearLayout>
 
@@ -219,19 +285,29 @@
 
             <Button
                 android:id="@+id/btn_business"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:background="@drawable/rounded_button"
+                android:textColor="#0D0D0D"
                 android:text="Business"
-                android:layout_marginHorizontal="4dp" />
+                android:layout_marginHorizontal="4dp"
+                android:padding="5dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:textSize="16sp"/>
 
             <Button
                 android:id="@+id/btn_education"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:background="@drawable/rounded_button"
+                android:textColor="#0D0D0D"
                 android:text="Education"
-                android:layout_marginHorizontal="4dp" />
+                android:layout_marginHorizontal="4dp"
+                android:padding="5dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:textSize="16sp"/>
 
         </LinearLayout>
 
@@ -254,27 +330,42 @@
 
             <Button
                 android:id="@+id/btn_gym"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:background="@drawable/rounded_button"
+                android:textColor="#0D0D0D"
                 android:text="Gym"
-                android:layout_marginHorizontal="4dp" />
+                android:layout_marginHorizontal="4dp"
+                android:padding="5dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:textSize="16sp"/>
 
             <Button
                 android:id="@+id/btn_park"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:background="@drawable/rounded_button"
+                android:textColor="#0D0D0D"
                 android:text="Park"
-                android:layout_marginHorizontal="4dp" />
+                android:layout_marginHorizontal="4dp"
+                android:padding="5dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:textSize="16sp"/>
 
             <Button
                 android:id="@+id/btn_cafe"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:background="@drawable/rounded_button"
+                android:textColor="#0D0D0D"
                 android:text="Cafe"
-                android:layout_marginHorizontal="4dp" />
+                android:layout_marginHorizontal="4dp"
+                android:padding="5dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:textSize="16sp"/>
 
         </LinearLayout>
 
@@ -287,21 +378,52 @@
 
             <Button
                 android:id="@+id/btn_library"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:background="@drawable/rounded_button"
+                android:textColor="#0D0D0D"
                 android:text="Library"
-                android:layout_marginHorizontal="4dp" />
+                android:layout_marginHorizontal="4dp"
+                android:padding="5dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:textSize="16sp"
+                />
 
+<!--            add mall  button in the activities section and it should be rounded from both sides-->
             <Button
-                android:id="@+id/btn_mall"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Mall"
-                android:layout_marginHorizontal="4dp" />
+            android:id="@+id/btn_mall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_button"
+            android:textColor="#0D0D0D"
+            android:text="Mall"
+            android:layout_marginHorizontal="4dp"
+            android:padding="5dp"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:textSize="16sp"
+            />
 
+<!---->
         </LinearLayout>
 
+        <Button
+            android:id="@+id/btn_next"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Next"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:background="#6200EA"
+            android:layout_margin="16dp"
+            android:layout_gravity="end" />
+
     </LinearLayout>
+
+<!--   adding Next button for navigating to next screen in bottom right corner-->
+
+
+
 </ScrollView>
