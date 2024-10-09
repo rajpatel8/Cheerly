@@ -13,10 +13,27 @@
         android:theme="@style/Theme.Cheerly"
         tools:targetApi="31">
         <activity
-            android:name=".UserPreference"
+            android:name=".UserPrefrence"
             android:exported="false"
-            android:label="@string/title_activity_user_preference"
+            android:label="@string/title_activity_user_prefrence"
             android:theme="@style/Theme.Cheerly" />
+        <activity
+            android:name=".UserPreference"
+            android:exported="true"
+            android:label="@string/title_activity_user_prefrence"
+            android:theme="@style/Theme.Cheerly">
+
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
+        </activity> <!-- <activity -->
+        <!-- android:name=".UserPreference" -->
+        <!-- android:exported="false" -->
+        <!-- android:label="@string/title_activity_user_preference" -->
+        <!-- android:theme="@style/Theme.Cheerly" /> -->
         <activity
             android:name=".SplashActivity"
             android:exported="true"
