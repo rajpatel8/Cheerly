@@ -47,7 +47,7 @@ class UserPrefrence : ComponentActivity() {
         val option = button.text.toString()
         if (selectedOptions.contains(option)) {
             selectedOptions.remove(option)
-            button.setBackgroundResource(android.R.drawable.btn_default)
+            button.setBackgroundResource(R.drawable.rounded_button)
         } else {
             selectedOptions.add(option)
             button.setBackgroundResource(R.drawable.button_selected)
