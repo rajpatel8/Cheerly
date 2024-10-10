@@ -1,5 +1,6 @@
 package com.rajkumar.cheerly
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.Toast
@@ -18,6 +19,15 @@ class UserPrefrence : ComponentActivity() {
 
         setupButtons()
 
+        // Find the button by its ID
+        val btnNext = findViewById<Button>(R.id.btn_next)
+
+        // Set up a click listener to navigate to PromptActivity
+        btnNext.setOnClickListener {
+            // Navigate to PromptActivity using an Intent
+            val intent = Intent(this, PromptActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun setupButtons() {
