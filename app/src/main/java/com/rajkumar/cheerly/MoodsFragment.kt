@@ -10,6 +10,8 @@ import androidx.fragment.app.Fragment
 
 class MoodsFragment : Fragment() {
 
+    private val selectedOptions = mutableSetOf<String>()
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -23,22 +25,32 @@ class MoodsFragment : Fragment() {
         val btnExcited: Button = view.findViewById(R.id.btnExcited)
         val btnRelaxed: Button = view.findViewById(R.id.btnRelaxed)
 
-        btnHappy.setOnClickListener {
-            Toast.makeText(requireContext(), "Mood: Happy", Toast.LENGTH_SHORT).show()
-        }
-
-        btnSad.setOnClickListener {
-            Toast.makeText(requireContext(), "Mood: Sad", Toast.LENGTH_SHORT).show()
-        }
-
-        btnExcited.setOnClickListener {
-            Toast.makeText(requireContext(), "Mood: Excited", Toast.LENGTH_SHORT).show()
-        }
-
-        btnRelaxed.setOnClickListener {
-            Toast.makeText(requireContext(), "Mood: Relaxed", Toast.LENGTH_SHORT).show()
+        // event listener for all buttons in one place
+        val buttons = listOf(btnHappy, btnSad, btnExcited, btnRelaxed)
+        buttons.forEach { button ->
+            button.setOnClickListener {
+                toggleSelection(button)
+            }
         }
 
         return view
     }
+
+
+
+    // handel toggle selection
+    private fun toggleSelection(button: Button) {
+
+
+        val option = button.text.toString()
+        if (selectedOptions.contains(option)) {
+            selectedOptions.remove(option)
+            button.setBackgroundResource(R.drawable.rounded_button)
+        } else {
+            selectedOptions.add(option)
+            button.setBackgroundResource(R.drawable.button_selected)
+        }
+    }
+
 }
+

@@ -2,9 +2,9 @@ package com.rajkumar.cheerly
 
 import android.os.Bundle
 import android.widget.Button
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-
 
 class PromptActivity : FragmentActivity() {
 
@@ -19,18 +19,25 @@ class PromptActivity : FragmentActivity() {
         loadFragment(MoodsFragment())
 
         btnMoods.setOnClickListener {
-            loadFragment(MoodsFragment())
+            updateUI(MoodsFragment(), btnMoods, btnPrompt)
         }
 
         btnPrompt.setOnClickListener {
-            loadFragment(PromptFragment())
+            updateUI(PromptFragment(), btnPrompt, btnMoods)
         }
-
     }
 
     private fun loadFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragmentContainer, fragment)
             .commit()
+    }
+
+    private fun updateUI(fragment: Fragment, selectedButton: Button, unselectedButton: Button) {
+        loadFragment(fragment)
+        selectedButton.setBackgroundResource(R.drawable.button_selected)
+        unselectedButton.setBackgroundResource(R.drawable.rounded_button)
+        selectedButton.setTextColor(ContextCompat.getColor(this, R.color.white))
+        unselectedButton.setTextColor(ContextCompat.getColor(this, R.color.black))
     }
 }

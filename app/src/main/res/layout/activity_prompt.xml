@@ -20,7 +20,7 @@
             android:layout_weight="1"
             android:text="Moods"
             android:background="@drawable/rounded_button"
-            android:textColor="#FF5722"
+            android:textColor="@android:color/black"
             android:padding="10dp" />
 
         <Button
@@ -30,7 +30,7 @@
             android:layout_weight="1"
             android:text="Prompt"
             android:background="@drawable/rounded_button"
-            android:textColor="#FF5722"
+            android:textColor="@android:color/black"
             android:padding="10dp" />
 
     </LinearLayout>

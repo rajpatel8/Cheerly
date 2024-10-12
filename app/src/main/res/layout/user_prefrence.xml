@@ -58,7 +58,7 @@
                 android:textColor="#0D0D0D"
                 android:text="Rock"
                 android:layout_marginHorizontal="4dp"
-                android:padding="5dp"
+                
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -71,7 +71,6 @@
                 android:textColor="#0D0D0D"
                 android:text="Jazz"
                 android:layout_marginHorizontal="4dp"
-                android:padding="5dp"
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -84,7 +83,6 @@
                 android:textColor="#0D0D0D"
                 android:text="Classical"
                 android:layout_marginHorizontal="4dp"
-                android:padding="5dp"
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -106,7 +104,6 @@
                 android:textColor="#0D0D0D"
                 android:text="Hip Hop"
                 android:layout_marginHorizontal="4dp"
-                android:padding="5dp"
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -119,7 +116,7 @@
                 android:textColor="#0D0D0D"
                 android:text="Country"
                 android:layout_marginHorizontal="4dp"
-                android:padding="5dp"
+                
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -152,7 +149,7 @@
                 android:textColor="#0D0D0D"
                 android:text="Action"
                 android:layout_marginHorizontal="4dp"
-                android:padding="5dp"
+                
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -165,7 +162,7 @@
                 android:textColor="#0D0D0D"
                 android:text="Comedy"
                 android:layout_marginHorizontal="4dp"
-                android:padding="5dp"
+                
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -178,7 +175,7 @@
                 android:textColor="#0D0D0D"
                 android:text="Sci-Fi"
                 android:layout_marginHorizontal="4dp"
-                android:padding="5dp"
+                
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -200,7 +197,7 @@
                 android:textColor="#0D0D0D"
                 android:text="Thriller"
                 android:layout_marginHorizontal="4dp"
-                android:padding="5dp"
+                
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -213,7 +210,7 @@
                 android:textColor="#0D0D0D"
                 android:text="Horror"
                 android:layout_marginHorizontal="4dp"
-                android:padding="5dp"
+                
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -246,7 +243,7 @@
                 android:textColor="#0D0D0D"
                 android:text="Tech"
                 android:layout_marginHorizontal="4dp"
-                android:padding="5dp"
+                
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -259,7 +256,7 @@
                 android:textColor="#0D0D0D"
                 android:text="Health"
                 android:layout_marginHorizontal="4dp"
-                android:padding="5dp"
+                
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -272,7 +269,7 @@
                 android:textColor="#0D0D0D"
                 android:text="Sports"
                 android:layout_marginHorizontal="4dp"
-                android:padding="5dp"
+                
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -294,7 +291,7 @@
                 android:textColor="#0D0D0D"
                 android:text="Business"
                 android:layout_marginHorizontal="4dp"
-                android:padding="5dp"
+                
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -307,7 +304,7 @@
                 android:textColor="#0D0D0D"
                 android:text="Education"
                 android:layout_marginHorizontal="4dp"
-                android:padding="5dp"
+                
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -340,7 +337,7 @@
                 android:textColor="#0D0D0D"
                 android:text="Gym"
                 android:layout_marginHorizontal="4dp"
-                android:padding="5dp"
+                
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -353,7 +350,7 @@
                 android:textColor="#0D0D0D"
                 android:text="Park"
                 android:layout_marginHorizontal="4dp"
-                android:padding="5dp"
+                
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -366,7 +363,7 @@
                 android:textColor="#0D0D0D"
                 android:text="Cafe"
                 android:layout_marginHorizontal="4dp"
-                android:padding="5dp"
+                
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -388,7 +385,7 @@
                 android:textColor="#0D0D0D"
                 android:text="Library"
                 android:layout_marginHorizontal="4dp"
-                android:padding="5dp"
+                
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"
@@ -403,7 +400,7 @@
             android:textColor="#0D0D0D"
             android:text="Mall"
             android:layout_marginHorizontal="4dp"
-            android:padding="5dp"
+            
             android:minHeight="0dp"
             android:minWidth="0dp"
             android:textSize="16sp"
@@ -440,7 +437,7 @@
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="#FFFFFF"
-                android:backgroundTint="#FF5722"
+
                 android:paddingStart="32dp"
                 android:paddingEnd="32dp"
                 android:paddingTop="12dp"
