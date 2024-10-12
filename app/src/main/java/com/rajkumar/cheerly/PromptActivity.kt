@@ -17,6 +17,7 @@ class PromptActivity : FragmentActivity() {
 
         // Load default fragment (Moods Fragment)
         loadFragment(MoodsFragment())
+        updateUI(MoodsFragment(), btnMoods, btnPrompt)
 
         btnMoods.setOnClickListener {
             updateUI(MoodsFragment(), btnMoods, btnPrompt)
