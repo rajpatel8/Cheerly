@@ -46,7 +46,7 @@ class UserPrefrence : ComponentActivity() {
 
     private fun setupButtonGroup(options: List<String>) {
         options.forEach { option ->
-            val buttonId = resources.getIdentifier("btn_${option.toLowerCase().replace("-", "_")}", "id", packageName)
+            val buttonId = resources.getIdentifier("btn_${option.lowercase().replace("-", "_")}", "id", packageName)
             findViewById<Button>(buttonId)?.setOnClickListener { button ->
                 toggleSelection(button as Button)
             }
