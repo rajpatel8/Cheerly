@@ -4,4 +4,7 @@
     <string name="title_activity_splash">SplashActivity</string>
     <string name="title_activity_user_preference">UserPreference</string>
     <string name="title_activity_user_prefrence">UserPrefrence</string>
+    <string name="title_activity_prompt">PromptActivity</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
