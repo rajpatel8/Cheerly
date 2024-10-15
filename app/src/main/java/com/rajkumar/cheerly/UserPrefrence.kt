@@ -1,6 +1,7 @@
 package com.rajkumar.cheerly
 
 import android.content.Intent
+import android.opengl.Visibility
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -11,6 +12,8 @@ import androidx.activity.enableEdgeToEdge
 class UserPrefrence : ComponentActivity() {
 
     private var visibility = false
+
+
 
     // Track selected options for each group
     private val selectedOptionsMap = mutableMapOf<String, MutableList<String>>(
@@ -30,6 +33,7 @@ class UserPrefrence : ComponentActivity() {
 
     private fun setupNextButton() {
         val btnNext = findViewById<Button>(R.id.btn_next)
+        btnNext.setBackgroundResource(R.color.grey)
         btnNext.setOnClickListener {
             if (visibility) {
                 startActivity(Intent(this, PromptActivity::class.java))
@@ -72,7 +76,8 @@ class UserPrefrence : ComponentActivity() {
         val btnNext = findViewById<Button>(R.id.btn_next)
         val allGroupsSelected = selectedOptionsMap.values.all { it.isNotEmpty() }
         visibility = allGroupsSelected
-        btnNext.visibility = if (allGroupsSelected) View.VISIBLE else View.INVISIBLE
+//        btnNext.visibility = if (allGroupsSelected) View.VISIBLE else false
+
         btnNext.setBackgroundResource(if (allGroupsSelected) R.color.Cheerly_Orange else R.color.grey)
     }
 }
