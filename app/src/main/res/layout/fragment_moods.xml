@@ -1,0 +1,68 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select Your Mood"
+        android:textSize="20sp"
+        android:textColor="@android:color/black"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Mood Button 1 -->
+    <Button
+        android:id="@+id/btnHappy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Happy"
+        android:background="@drawable/rounded_button"
+        android:textColor="@android:color/black" />
+
+    <!-- Mood Button 2 -->
+    <Button
+        android:id="@+id/btnSad"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Sad"
+        android:background="@drawable/rounded_button"
+        android:textColor="@android:color/black" />
+
+    <!-- Mood Button 3 -->
+    <Button
+        android:id="@+id/btnExcited"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Excited"
+        android:background="@drawable/rounded_button"
+        android:textColor="@android:color/black" />
+
+    <!-- Mood Button 4 -->
+    <Button
+        android:id="@+id/btnRelaxed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Relaxed"
+        android:background="@drawable/rounded_button"
+        android:textColor="@android:color/black" />
+
+    <!-- Submit Button -->
+    <Button
+        android:id="@+id/btnNext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Next"
+        android:backgroundTint="#FF5722"
+        android:textColor="@android:color/white"
+        android:padding="16dp"
+        android:textSize="16sp"
+        android:layout_marginTop="16dp" />
+
+</LinearLayout>

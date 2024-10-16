@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/Cheerly_Orange" />
 
+    <!-- Transparent background -->
+    <solid android:color="@android:color/transparent" />
+
+    <!-- Border style -->
     <stroke
         android:width="2dp"
-        android:color="#FF5722" />
+        android:color="#FF5722" /> <!-- Change the border color as needed -->
 
+    <!-- Rounded corners for the button -->
     <corners android:radius="50dp" />
 
     <!-- Optional: Add padding to control the spacing around text -->
@@ -14,7 +18,4 @@
         android:right="8dp"
         android:top="4dp"
         android:bottom="4dp" />
-
-
-
 </shape>
