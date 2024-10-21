@@ -13,7 +13,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Cheerly"
+            android:text="@string/cheerly"
             android:textSize="28sp"
             android:textStyle="bold"
             android:textColor="#6200EA"
@@ -28,7 +28,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Please select your favorite genres for Music, Videos, Podcasts, and Activities."
+            android:text="@string/please_select_your_favorite_genres_for_music_videos_podcasts_and_activities"
             android:textSize="16sp"
             android:textAlignment="center"
             android:layout_marginBottom="16dp" />
@@ -37,7 +37,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Music"
+            android:text="@string/music"
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="#6200EA"
@@ -56,9 +56,9 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_button"
                 android:textColor="#0D0D0D"
-                android:text="Rock"
+                android:text="@string/rock"
                 android:layout_marginHorizontal="4dp"
-                
+
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -69,7 +69,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_button"
                 android:textColor="#0D0D0D"
-                android:text="Jazz"
+                android:text="@string/jazz"
                 android:layout_marginHorizontal="4dp"
                 android:minHeight="0dp"
                 android:minWidth="0dp"
@@ -81,7 +81,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_button"
                 android:textColor="#0D0D0D"
-                android:text="Classical"
+                android:text="@string/classical"
                 android:layout_marginHorizontal="4dp"
                 android:minHeight="0dp"
                 android:minWidth="0dp"
@@ -90,6 +90,7 @@
         </LinearLayout>
 
         <LinearLayout
+            style="?android:attr/buttonBarStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -98,25 +99,27 @@
 
             <Button
                 android:id="@+id/btn_hip_hop"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_button"
                 android:textColor="#0D0D0D"
-                android:text="Hip Hop"
+                android:text="@string/hip_hop"
                 android:layout_marginHorizontal="4dp"
                 android:minHeight="0dp"
                 android:minWidth="0dp"
-                android:textSize="16sp"/>
+                android:textSize="16sp" />
 
             <Button
                 android:id="@+id/btn_country"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_button"
                 android:textColor="#0D0D0D"
-                android:text="Country"
+                android:text="@string/country"
                 android:layout_marginHorizontal="4dp"
-                
+
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -127,7 +130,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Videos"
+            android:text="@string/videos"
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="#6200EA"
@@ -135,6 +138,7 @@
             android:layout_marginBottom="8dp" />
 
         <LinearLayout
+            style="?android:attr/buttonBarStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -143,39 +147,42 @@
 
             <Button
                 android:id="@+id/btn_action"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_button"
                 android:textColor="#0D0D0D"
-                android:text="Action"
+                android:text="@string/action"
                 android:layout_marginHorizontal="4dp"
-                
+
                 android:minHeight="0dp"
                 android:minWidth="0dp"
-                android:textSize="16sp"/>
+                android:textSize="16sp" />
 
             <Button
                 android:id="@+id/btn_comedy"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_button"
                 android:textColor="#0D0D0D"
                 android:text="Comedy"
                 android:layout_marginHorizontal="4dp"
-                
+
                 android:minHeight="0dp"
                 android:minWidth="0dp"
-                android:textSize="16sp"/>
+                android:textSize="16sp" />
 
             <Button
                 android:id="@+id/btn_sci_fi"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_button"
                 android:textColor="#0D0D0D"
                 android:text="Sci-Fi"
                 android:layout_marginHorizontal="4dp"
-                
+
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -197,7 +204,7 @@
                 android:textColor="#0D0D0D"
                 android:text="Thriller"
                 android:layout_marginHorizontal="4dp"
-                
+
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -210,7 +217,7 @@
                 android:textColor="#0D0D0D"
                 android:text="Horror"
                 android:layout_marginHorizontal="4dp"
-                
+
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -221,7 +228,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Podcasts"
+            android:text="@string/podcasts"
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="#6200EA"
@@ -243,7 +250,7 @@
                 android:textColor="#0D0D0D"
                 android:text="Tech"
                 android:layout_marginHorizontal="4dp"
-                
+
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -256,7 +263,7 @@
                 android:textColor="#0D0D0D"
                 android:text="Health"
                 android:layout_marginHorizontal="4dp"
-                
+
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -269,7 +276,7 @@
                 android:textColor="#0D0D0D"
                 android:text="Sports"
                 android:layout_marginHorizontal="4dp"
-                
+
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -289,9 +296,9 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_button"
                 android:textColor="#0D0D0D"
-                android:text="Business"
+                android:text="@string/business"
                 android:layout_marginHorizontal="4dp"
-                
+
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -302,9 +309,9 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_button"
                 android:textColor="#0D0D0D"
-                android:text="Education"
+                android:text="@string/education"
                 android:layout_marginHorizontal="4dp"
-                
+
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -315,7 +322,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Activities"
+            android:text="@string/activities"
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="#6200EA"
@@ -335,9 +342,9 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_button"
                 android:textColor="#0D0D0D"
-                android:text="Gym"
+                android:text="@string/gym"
                 android:layout_marginHorizontal="4dp"
-                
+
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -350,7 +357,7 @@
                 android:textColor="#0D0D0D"
                 android:text="Park"
                 android:layout_marginHorizontal="4dp"
-                
+
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -363,7 +370,7 @@
                 android:textColor="#0D0D0D"
                 android:text="Cafe"
                 android:layout_marginHorizontal="4dp"
-                
+
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -385,7 +392,7 @@
                 android:textColor="#0D0D0D"
                 android:text="Library"
                 android:layout_marginHorizontal="4dp"
-                
+
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"
@@ -400,7 +407,7 @@
             android:textColor="#0D0D0D"
             android:text="Mall"
             android:layout_marginHorizontal="4dp"
-            
+
             android:minHeight="0dp"
             android:minWidth="0dp"
             android:textSize="16sp"
@@ -411,7 +418,6 @@
         </LinearLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
