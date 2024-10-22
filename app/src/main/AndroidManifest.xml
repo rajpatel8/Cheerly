@@ -8,7 +8,7 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@drawable/cheerly"
         android:label="Cheerly"
-        android:roundIcon="@drawable/cheerly"
+        android:roundIcon="@drawable/cheerly_transparent"
         android:supportsRtl="true"
         android:theme="@style/Theme.Cheerly"
         tools:targetApi="31">
