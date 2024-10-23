@@ -4,7 +4,6 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.google.firebase.crashlytics)
-    id("jacoco")
 }
 
 android {
@@ -40,21 +39,6 @@ android {
     buildFeatures {
         compose = true
     }
-
-    testOptions {
-        unitTests.isIncludeAndroidResources = true
-    }
-
-    jacoco {
-        toolVersion = "0.8.7"
-    }
-
-    tasks.withType<Test> {
-        jacoco.includeNoLocationClasses = true
-        finalizedBy(tasks.jacocoTestReport)
-    }
-
-   
 }
 
 dependencies {
