@@ -54,24 +54,7 @@ android {
         finalizedBy(tasks.jacocoTestReport)
     }
 
-    tasks.register<JacocoReport>("jacocoTestReport") {
-        dependsOn(tasks.test)
-
-        reports {
-            xml.required.set(true)
-            html.required.set(true)
-        }
-
-        val fileFilter = listOf("**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*", "**/*Test*.*", "android/**/*.*")
-
-        val mainSrc = "${project.projectDir}/src/main/java"
-
-        sourceDirectories.setFrom(files(mainSrc))
-        classDirectories.setFrom(files("${buildDir}/intermediates/javac/debug/classes").asFileTree.matching {
-            exclude(fileFilter)
-        })
-        executionData.setFrom(files("${buildDir}/jacoco/testDebugUnitTest.exec"))
-    }
+   
 }
 
 dependencies {
