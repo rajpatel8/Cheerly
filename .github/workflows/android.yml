@@ -1,9 +1,5 @@
 name: Android CI
 
-permissions:
-  id-token: write
-  attestations: write
-
 on:
   push:
     branches: [ "master" , "Dev", "Feature" ]
@@ -43,8 +39,3 @@ jobs:
         path: app/build/outputs/apk/release/app-release-unsigned.apk # Updated to the correct path
         if-no-files-found: warn
         include-hidden-files: false
-             
-    - name: Attest Build Provenance
-      uses: actions/attest-build-provenance@v1.4.3
-      with:
-          subject-path: app/build/outputs/apk/release/app-release-unsigned.apk
