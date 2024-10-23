@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.google.firebase.crashlytics)
+    id("jacoco")
 }
 
 android {
@@ -38,6 +39,38 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+    }
+
+    jacoco {
+        toolVersion = "0.8.7"
+    }
+
+    tasks.withType<Test> {
+        jacoco.includeNoLocationClasses = true
+        finalizedBy(tasks.jacocoTestReport)
+    }
+
+    tasks.register<JacocoReport>("jacocoTestReport") {
+        dependsOn(tasks.test)
+
+        reports {
+            xml.required.set(true)
+            html.required.set(true)
+        }
+
+        val fileFilter = listOf("**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*", "**/*Test*.*", "android/**/*.*")
+
+        val mainSrc = "${project.projectDir}/src/main/java"
+
+        sourceDirectories.setFrom(files(mainSrc))
+        classDirectories.setFrom(files("${buildDir}/intermediates/javac/debug/classes").asFileTree.matching {
+            exclude(fileFilter)
+        })
+        executionData.setFrom(files("${buildDir}/jacoco/testDebugUnitTest.exec"))
     }
 }
 
