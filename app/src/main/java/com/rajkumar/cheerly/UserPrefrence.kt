@@ -1,6 +1,7 @@
 package com.rajkumar.cheerly
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Button
 import android.widget.Toast
@@ -32,6 +33,10 @@ class UserPrefrence : ComponentActivity() {
         btnNext.setBackgroundResource(R.color.grey)
         btnNext.setOnClickListener {
             if (visibility) {
+                val sharedPreferences: SharedPreferences = getSharedPreferences("AppPrefs", MODE_PRIVATE)
+                val editor = sharedPreferences.edit()
+                editor.putBoolean("isUserPreferenceSet", true)
+                editor.apply()
                 startActivity(Intent(this, PromptActivity::class.java))
             } else {
                 Toast.makeText(this, "Please select an option from each group", Toast.LENGTH_SHORT).show()
