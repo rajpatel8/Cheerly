@@ -36,6 +36,12 @@ class UserPrefrence : ComponentActivity() {
                 val sharedPreferences: SharedPreferences = getSharedPreferences("AppPrefs", MODE_PRIVATE)
                 val editor = sharedPreferences.edit()
                 editor.putBoolean("isUserPreferenceSet", true)
+                // TODO : add the preference selected by user and update the SPF file
+                // writing the options selected by user to the shared preference file
+                editor.putStringSet("selectedMusicOptions", selectedOptionsMap["Music"]?.toSet())
+                editor.putStringSet("selectedVideoOptions", selectedOptionsMap["Videos"]?.toSet())
+                editor.putStringSet("selectedPodcastOptions", selectedOptionsMap["Podcasts"]?.toSet())
+                editor.putStringSet("selectedActivityOptions", selectedOptionsMap["Activities"]?.toSet())
                 editor.apply()
                 startActivity(Intent(this, PromptActivity::class.java))
             } else {
