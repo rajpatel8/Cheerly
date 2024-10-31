@@ -1,5 +1,6 @@
 package com.rajkumar.cheerly
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -44,8 +45,20 @@ class MoodsFragment : Fragment() {
 
         // Select the new button
         button.setBackgroundResource(R.drawable.button_selected)
-        selectedButton = button // Update the selected button
-    }
+        selectedButton = button
+
+        // Get the mood text without emojis
+        val mood = button.text.toString().split(" ")[0]
+
+        try {
+            val intent = Intent(context, MoodRecommendationActivity::class.java).apply {
+    putExtra("selectedMood", mood)
 }
+startActivity(intent)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 
 
+}

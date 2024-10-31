@@ -1,35 +1,22 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
-    tools:context=".PromptFragment">
+    android:padding="16dp">
 
-    <!-- Text input for mood description -->
     <EditText
         android:id="@+id/etMoodDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Describe your mood here..."
-        android:background="@drawable/rounded_edittext"
-        android:padding="12dp"
-        android:textSize="16sp"
+        android:hint="How are you feeling today?"
         android:inputType="textMultiLine"
-        android:minLines="4"
-        android:maxLines="6"
-        android:gravity="top" />
+        android:minLines="3"
+        android:gravity="top|start"
+        android:padding="12dp"
+        android:background="@drawable/edit_text_background"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Submit Button -->
-    <Button
-        android:id="@+id/btnAnalyze"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Analyze"
-        android:backgroundTint="#FF5722"
-        android:textColor="@android:color/white"
-        android:padding="16dp"
-        android:textSize="16sp"
-        android:layout_marginTop="16dp" />
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
