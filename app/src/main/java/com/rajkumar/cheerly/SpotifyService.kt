@@ -1,6 +1,5 @@
 package com.rajkumar.cheerly
 
-import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -17,7 +16,7 @@ interface SpotifyApiService {
     @GET("recommendations")
     suspend fun getRecommendations(
         @Header("Authorization") auth: String,
-        @Query("limit") limit: Int = 20,
+        @Query("limit") limit: Int = 3, // Default to 3 songs
         @Query("market") market: String = "US",
         @Query("seed_genres") seedGenres: String,
         @Query("target_valence") targetValence: Float,
@@ -30,7 +29,7 @@ interface SpotifyApiService {
     ): Response<GenreSeedsResponse>
 }
 
-// Response Data Classes
+// Response Data Classes remain the same
 data class SpotifyTokenResponse(
     val access_token: String,
     val token_type: String,
