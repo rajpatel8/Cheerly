@@ -8,10 +8,10 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
-import kotlin.random.Random
+
 
 class YouTubeRepository {
-    private val API_KEY = "AIzaSyCnchEqbAfP8JfRyvNPYbjQQFj9gTNtQWo" // Replace with your API key
+    private val API_KEY = "AIzaSyARuNG3izYaKb5ao8nErJd9tKqupYrF3-A" // Replace with your API key
     private val BASE_URL = "https://www.googleapis.com/"
 
     private val youtubeService: YouTubeService
