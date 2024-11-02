@@ -57,7 +57,7 @@ jobs:
         # Install MobSFScan (assuming it's available via Python pip)
         pip install mobsfscan
         # Run MobSFScan on the downloaded APK and generate a JSON report
-        mobsfscan -f ./app-release/app-release-unsigned.apk -o mobsfscan_report.json
+        mobsfscan ./app-release/app-release-unsigned.apk --json -o mobsfscan_report.json
 
     - name: Upload MobSFScan Report
       uses: actions/upload-artifact@v3
