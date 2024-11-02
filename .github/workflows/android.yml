@@ -2,14 +2,14 @@ name: Android CI
 
 on:
   push:
-    branches: [ "master" , "Dev", "Feature" ]
+    branches: ["master", "Dev", "Feature"]
   pull_request:
-    branches: [ "master" , "Dev" , "Feature"  ]
+    branches: ["master", "Dev", "Feature"]
 
 jobs:
   build:
     runs-on: ubuntu-latest
- 
+
     steps:
     - uses: actions/checkout@v4
 
@@ -36,6 +36,32 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: app-release
-        path: app/build/outputs/apk/release/app-release-unsigned.apk # Updated to the correct path
+        path: app/build/outputs/apk/release/app-release-unsigned.apk
         if-no-files-found: warn
-        include-hidden-files: false
+
+  static_analysis:
+    runs-on: ubuntu-latest
+    needs: build  # Ensure this job runs after the build job completes
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download Release APK
+      uses: actions/download-artifact@v3
+      with:
+        name: app-release
+        path: ./app-release  # Download the APK to a local directory
+
+    - name: Run MobSFScan
+      run: |
+        # Install MobSFScan (assuming it's available via Python pip)
+        pip install mobsfscan
+        # Run MobSFScan on the downloaded APK and generate a JSON report
+        mobsfscan -f ./app-release/app-release-unsigned.apk -o mobsfscan_report.json
+
+    - name: Upload MobSFScan Report
+      uses: actions/upload-artifact@v3
+      with:
+        name: MobSFScan-Report
+        path: mobsfscan_report.json
+        if-no-files-found: warn
