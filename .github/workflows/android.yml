@@ -102,12 +102,18 @@ jobs:
         name: MobSFScan-Report
         path: mobsfscan_report.json
 
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Install APKiD
+      run: |
+        pip install --upgrade pip
+        pip install apkid
 
     - name: Run APKiD Analysis
       run: |
-        pip install apkid
         apkid ./app-release/app-release-unsigned.apk > apkid_report.txt
 
     - name: Upload APKiD Report
@@ -127,16 +133,21 @@ jobs:
         name: app-release
         path: ./app-release
 
-    - name: Run QARK
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Install and Run QARK
       run: |
         pip install qark
-        qark --apk ./app-release/app-release-unsigned.apk --report-type json --report-path qark_report.json
+        qark --apk ./app-release/app-release-unsigned.apk --report-type json
 
     - name: Upload QARK Report
       uses: actions/upload-artifact@v3
       with:
         name: QARK-Report
-        path: qark_report.json
+        path: report.json
 
     - name: Run AndroBugs
       run: |
