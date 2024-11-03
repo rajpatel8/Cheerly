@@ -39,9 +39,48 @@ jobs:
         path: app/build/outputs/apk/release/app-release-unsigned.apk
         if-no-files-found: warn
 
+  code_analysis:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+      
+    - name: Run Android Lint
+      run: ./gradlew lint
+
+    - name: Upload Lint Results
+      uses: actions/upload-artifact@v3
+      with:
+        name: lint-results
+        path: app/build/reports/lint-results-debug.xml
+
+    - name: OWASP Dependency Check
+      uses: dependency-check/Dependency-Check_Action@main
+      with:
+        project: 'Android-App'
+        path: '.'
+        format: 'HTML'
+        args: >
+          --failOnCVSS 7
+          --enableExperimental
+          --scan .
+
+    - name: Upload Dependency Check Results
+      uses: actions/upload-artifact@v3
+      with:
+        name: dependency-check-report
+        path: reports
+
   static_analysis:
     runs-on: ubuntu-latest
-    needs: build  # Ensure this job runs after the build job completes
+    needs: build
 
     steps:
     - uses: actions/checkout@v4
@@ -50,13 +89,11 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: app-release
-        path: ./app-release  # Download the APK to a local directory
+        path: ./app-release
 
     - name: Run MobSFScan
       run: |
-        # Install MobSFScan (assuming it's available via Python pip)
         pip install mobsfscan
-        # Run MobSFScan on the downloaded APK and generate a JSON report
         mobsfscan ./app-release/app-release-unsigned.apk --json -o mobsfscan_report.json
 
     - name: Upload MobSFScan Report
@@ -64,4 +101,51 @@ jobs:
       with:
         name: MobSFScan-Report
         path: mobsfscan_report.json
-        if-no-files-found: warn
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Run APKiD Analysis
+      run: |
+        pip install apkid
+        apkid ./app-release/app-release-unsigned.apk > apkid_report.txt
+
+    - name: Upload APKiD Report
+      uses: actions/upload-artifact@v3
+      with:
+        name: APKiD-Report
+        path: apkid_report.txt
+
+  security_scan:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - name: Download Release APK
+      uses: actions/download-artifact@v3
+      with:
+        name: app-release
+        path: ./app-release
+
+    - name: Run QARK
+      run: |
+        pip install qark
+        qark --apk ./app-release/app-release-unsigned.apk --report-type json --report-path qark_report.json
+
+    - name: Upload QARK Report
+      uses: actions/upload-artifact@v3
+      with:
+        name: QARK-Report
+        path: qark_report.json
+
+    - name: Run AndroBugs
+      run: |
+        git clone https://github.com/AndroBugs/AndroBugs_Framework.git
+        cd AndroBugs_Framework
+        python3 androbugs.py -f ../app-release/app-release-unsigned.apk -o ../androbugs_report.txt
+
+    - name: Upload AndroBugs Report
+      uses: actions/upload-artifact@v3
+      with:
+        name: AndroBugs-Report
+        path: androbugs_report.txt
