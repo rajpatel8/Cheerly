@@ -23,7 +23,6 @@ class PromptActivity : FragmentActivity() {
             updateUI(MoodsFragment(), btnMoods, btnPrompt)
         }
 
-
         btnPrompt.setOnClickListener {
             updateUI(PromptFragment(), btnPrompt, btnMoods)
         }

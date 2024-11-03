@@ -28,7 +28,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/please_select_your_favorite_genres_for_music_videos_podcasts_and_activities"
+            android:text="@string/user_preference_description"
             android:textSize="16sp"
             android:textAlignment="center"
             android:layout_marginBottom="16dp" />
@@ -52,19 +52,20 @@
 
             <Button
                 android:id="@+id/btn_rock"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_button"
                 android:textColor="#0D0D0D"
                 android:text="@string/rock"
                 android:layout_marginHorizontal="4dp"
-
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
 
             <Button
                 android:id="@+id/btn_jazz"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_button"
@@ -77,6 +78,7 @@
 
             <Button
                 android:id="@+id/btn_classical"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_button"
@@ -182,7 +184,6 @@
                 android:textColor="#0D0D0D"
                 android:text="Sci-Fi"
                 android:layout_marginHorizontal="4dp"
-
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -198,6 +199,7 @@
 
             <Button
                 android:id="@+id/btn_thriller"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_button"
@@ -211,13 +213,13 @@
 
             <Button
                 android:id="@+id/btn_horror"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_button"
                 android:textColor="#0D0D0D"
                 android:text="Horror"
                 android:layout_marginHorizontal="4dp"
-
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -244,39 +246,39 @@
 
             <Button
                 android:id="@+id/btn_technology"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_button"
                 android:textColor="#0D0D0D"
                 android:text="Tech"
                 android:layout_marginHorizontal="4dp"
-
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
 
             <Button
                 android:id="@+id/btn_health"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_button"
                 android:textColor="#0D0D0D"
                 android:text="Health"
                 android:layout_marginHorizontal="4dp"
-
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
 
             <Button
                 android:id="@+id/btn_sports"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_button"
                 android:textColor="#0D0D0D"
                 android:text="Sports"
                 android:layout_marginHorizontal="4dp"
-
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -292,26 +294,26 @@
 
             <Button
                 android:id="@+id/btn_business"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_button"
                 android:textColor="#0D0D0D"
                 android:text="@string/business"
                 android:layout_marginHorizontal="4dp"
-
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
 
             <Button
                 android:id="@+id/btn_education"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_button"
                 android:textColor="#0D0D0D"
                 android:text="@string/education"
                 android:layout_marginHorizontal="4dp"
-
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -338,39 +340,39 @@
 
             <Button
                 android:id="@+id/btn_gym"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_button"
                 android:textColor="#0D0D0D"
                 android:text="@string/gym"
                 android:layout_marginHorizontal="4dp"
-
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
 
             <Button
                 android:id="@+id/btn_park"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_button"
                 android:textColor="#0D0D0D"
                 android:text="Park"
                 android:layout_marginHorizontal="4dp"
-
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
 
             <Button
                 android:id="@+id/btn_cafe"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_button"
                 android:textColor="#0D0D0D"
                 android:text="Cafe"
                 android:layout_marginHorizontal="4dp"
-
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"/>
@@ -386,31 +388,31 @@
 
             <Button
                 android:id="@+id/btn_library"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_button"
                 android:textColor="#0D0D0D"
                 android:text="Library"
                 android:layout_marginHorizontal="4dp"
-
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:textSize="16sp"
                 />
 
-<!--            add mall  button in the activities section and it should be rounded from both sides-->
-            <Button
-            android:id="@+id/btn_mall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/rounded_button"
-            android:textColor="#0D0D0D"
-            android:text="Mall"
-            android:layout_marginHorizontal="4dp"
 
-            android:minHeight="0dp"
-            android:minWidth="0dp"
-            android:textSize="16sp"
+            <Button
+                android:id="@+id/btn_mall"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_button"
+                android:textColor="#0D0D0D"
+                android:text="Mall"
+                android:layout_marginHorizontal="4dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:textSize="16sp"
             />
 
 
