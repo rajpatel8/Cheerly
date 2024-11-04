@@ -1,5 +1,6 @@
 package com.rajkumar.cheerly
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.widget.Button
 import androidx.core.content.ContextCompat
@@ -26,6 +27,11 @@ class PromptActivity : FragmentActivity() {
         btnPrompt.setOnClickListener {
             updateUI(PromptFragment(), btnPrompt, btnMoods)
         }
+    }
+
+    @SuppressLint("MissingSuperCall") //we are not using super.onBackPressed() because it is invoking the default behavior of the back button not necessary in this case
+    override fun onBackPressed() {
+        finishAffinity()
     }
 
     private fun loadFragment(fragment: Fragment) {

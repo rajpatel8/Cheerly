@@ -32,21 +32,7 @@ class UserPrefrence : ComponentActivity() {
 
     @SuppressLint("MissingSuperCall") //we are not using super.onBackPressed() because it is invoking the default behavior of the back button not necessary in this case
     override fun onBackPressed() {
-        // Create an AlertDialog to confirm the user's intent to exit
-        val exitDialog = AlertDialog.Builder(this)
-            .setMessage("Are you sure you want to exit?")
-            .setPositiveButton("Yes") { _, _ ->
-                // Close the app completely
-                finishAffinity()
-            }
-            .setNegativeButton("No") { dialog, _ ->
-                // Dismiss the dialog, keeping the user on the same screen
-                dialog.dismiss()
-            }
-            .create()
-
-        // Show the dialog to the user
-        exitDialog.show()
+        finishAffinity()
     }
 
     private fun setupNextButton() {
