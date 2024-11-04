@@ -13,6 +13,9 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
+import com.rajkumar.cheerly.Premium.PremiumManager
+import com.rajkumar.cheerly.Premium.SubscriptionState
+import com.rajkumar.cheerly.Premium.SubscriptionViewModel
 
 class PromptFragment : Fragment() {
     private lateinit var viewModel: SubscriptionViewModel

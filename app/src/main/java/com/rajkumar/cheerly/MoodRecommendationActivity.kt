@@ -9,6 +9,10 @@ import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.rajkumar.cheerly.Music.SongAdapter
+import com.rajkumar.cheerly.Music.SpotifyRepository
+import com.rajkumar.cheerly.Video.VideoAdapter
+import com.rajkumar.cheerly.Video.YouTubeRepository
 import kotlinx.coroutines.launch
 
 class MoodRecommendationActivity : ComponentActivity() {
