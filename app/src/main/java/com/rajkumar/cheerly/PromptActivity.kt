@@ -29,7 +29,7 @@ class PromptActivity : FragmentActivity() {
         }
     }
 
-    @SuppressLint("MissingSuperCall") //we are not using super.onBackPressed() because it is invoking the default behavior of the back button not necessary in this case
+    @SuppressLint("MissingSuperCall")
     override fun onBackPressed() {
         finishAffinity()
     }

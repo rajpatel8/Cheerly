@@ -33,6 +33,8 @@
         <activity
             android:name=".PromptActivity"
             android:exported="false"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.Cheerly" />
 
         <activity

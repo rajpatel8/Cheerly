@@ -13,13 +13,13 @@ class MoodsFragment : Fragment() {
     private var selectedButton: Button? = null
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_moods, container, false)
 
-        // Get button references and set click listeners
+        // Get button references
         val btnHappy: Button = view.findViewById(R.id.btnHappy)
         val btnSad: Button = view.findViewById(R.id.btnSad)
         val btnExcited: Button = view.findViewById(R.id.btnExcited)
@@ -38,7 +38,6 @@ class MoodsFragment : Fragment() {
         return view
     }
 
-    // Method to handle single selection
     private fun selectSingleOption(button: Button) {
         // Deselect the previously selected button, if any
         selectedButton?.setBackgroundResource(R.drawable.rounded_button)
@@ -52,13 +51,11 @@ class MoodsFragment : Fragment() {
 
         try {
             val intent = Intent(context, MoodRecommendationActivity::class.java).apply {
-    putExtra("selectedMood", mood)
-}
-startActivity(intent)
+                putExtra("selectedMood", mood)
+            }
+            startActivity(intent)
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
-
-
 }
