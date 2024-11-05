@@ -7,6 +7,6 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="grey"> #808080</color>
-    <color name="Cheerly_Orange">#E12F00</color>
+    <color name="grey">#808080</color>
+    <color name="Cheerly_Orange">#FF9B50</color>
 </resources>

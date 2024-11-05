@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "575113949986",
+    "project_id": "cheerly-dev",
+    "storage_bucket": "cheerly-dev.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:575113949986:android:bb96d7cbb847fb6b74ab7b",
+        "android_client_info": {
+          "package_name": "com.rajkumar.cheerly"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOHE2ZQOnB5SWg2Ww6NmxcgwfijtYoeCo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

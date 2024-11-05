@@ -1,16 +1,16 @@
 package com.rajkumar.cheerly
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 
 class MoodsFragment : Fragment() {
 
-    private val selectedOptions = mutableSetOf<String>()
+    private var selectedButton: Button? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -25,32 +25,40 @@ class MoodsFragment : Fragment() {
         val btnExcited: Button = view.findViewById(R.id.btnExcited)
         val btnRelaxed: Button = view.findViewById(R.id.btnRelaxed)
 
-        // event listener for all buttons in one place
+        // Add all buttons to a list
         val buttons = listOf(btnHappy, btnSad, btnExcited, btnRelaxed)
+
+        // Set click listener for each button
         buttons.forEach { button ->
             button.setOnClickListener {
-                toggleSelection(button)
+                selectSingleOption(button)
             }
         }
 
         return view
     }
 
+    // Method to handle single selection
+    private fun selectSingleOption(button: Button) {
+        // Deselect the previously selected button, if any
+        selectedButton?.setBackgroundResource(R.drawable.rounded_button)
 
+        // Select the new button
+        button.setBackgroundResource(R.drawable.button_selected)
+        selectedButton = button
 
-    // handel toggle selection
-    private fun toggleSelection(button: Button) {
+        // Get the mood text without emojis
+        val mood = button.text.toString().split(" ")[0]
 
-
-        val option = button.text.toString()
-        if (selectedOptions.contains(option)) {
-            selectedOptions.remove(option)
-            button.setBackgroundResource(R.drawable.rounded_button)
-        } else {
-            selectedOptions.add(option)
-            button.setBackgroundResource(R.drawable.button_selected)
+        try {
+            val intent = Intent(context, MoodRecommendationActivity::class.java).apply {
+    putExtra("selectedMood", mood)
+}
+startActivity(intent)
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
-}
 
+}

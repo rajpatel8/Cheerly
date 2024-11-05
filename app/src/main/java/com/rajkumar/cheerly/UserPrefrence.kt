@@ -1,9 +1,10 @@
 package com.rajkumar.cheerly
 
+import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Intent
-import android.opengl.Visibility
+import android.content.SharedPreferences
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -12,8 +13,6 @@ import androidx.activity.enableEdgeToEdge
 class UserPrefrence : ComponentActivity() {
 
     private var visibility = false
-
-
 
     // Track selected options for each group
     private val selectedOptionsMap = mutableMapOf<String, MutableList<String>>(
@@ -31,11 +30,26 @@ class UserPrefrence : ComponentActivity() {
         setupNextButton()
     }
 
+    @SuppressLint("MissingSuperCall") //we are not using super.onBackPressed() because it is invoking the default behavior of the back button not necessary in this case
+    override fun onBackPressed() {
+        finishAffinity()
+    }
+
     private fun setupNextButton() {
         val btnNext = findViewById<Button>(R.id.btn_next)
         btnNext.setBackgroundResource(R.color.grey)
         btnNext.setOnClickListener {
             if (visibility) {
+                val sharedPreferences: SharedPreferences = getSharedPreferences("AppPrefs", MODE_PRIVATE)
+                val editor = sharedPreferences.edit()
+                editor.putBoolean("isUserPreferenceSet", true)
+                // TODO : add the preference selected by user and update the SPF file
+                // writing the options selected by user to the shared preference file
+                editor.putStringSet("selectedMusicOptions", selectedOptionsMap["Music"]?.toSet())
+                editor.putStringSet("selectedVideoOptions", selectedOptionsMap["Videos"]?.toSet())
+                editor.putStringSet("selectedPodcastOptions", selectedOptionsMap["Podcasts"]?.toSet())
+                editor.putStringSet("selectedActivityOptions", selectedOptionsMap["Activities"]?.toSet())
+                editor.apply()
                 startActivity(Intent(this, PromptActivity::class.java))
             } else {
                 Toast.makeText(this, "Please select an option from each group", Toast.LENGTH_SHORT).show()
