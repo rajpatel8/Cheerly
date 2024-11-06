@@ -18,7 +18,10 @@ class SplashActivity : ComponentActivity() {
 
             // Check if user has completed initial setup
             val sharedPreferences = getSharedPreferences("AppPrefs", MODE_PRIVATE)
-            val isUserPreferenceSet = sharedPreferences.getBoolean("isUserPreferenceSet", false)
+            // Use this flag
+            // - true to open the login page
+            // - false to open the user preference page
+            val isUserPreferenceSet = sharedPreferences.getBoolean("isUserPreferenceSet", true)
 
             // Determine which activity to launch
             val intent = when {
