@@ -22,4 +22,6 @@
     <string name="education">Education</string>
     <string name="gym">Gym</string>
     <string name="title_activity_premium_manager.kt">PremiumManager.kt</string>
+    <string name="welcome_to_cheerly">Welcome to Cheerly!</string>
+    <string name="connect_services_description">Connect your Spotify and YouTube accounts to get personalized mood-based recommendations.</string>
 </resources>

@@ -1,29 +1,40 @@
 package com.rajkumar.cheerly
+
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
-/**
- * SplashActivity is the entry point of the application which displays a splash screen
- * for 2 seconds before navigating to the MainActivity.
- */
 class SplashActivity : ComponentActivity() {
-    /**
-     * Called when the activity is first created.
-     * @param savedInstanceState If the activity is being re-initialized after previously being shut down then this Bundle contains the data it most recently supplied in onSaveInstanceState(Bundle).
-     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
-        // giving a delay of 2 seconds before moving to the MainActivity
-        lifecycleScope.launchWhenCreated {
+        lifecycleScope.launch {
+            // Show splash for 2 seconds
             delay(2000)
-            startActivity(Intent(this@SplashActivity, MainActivity::class.java))
+
+            // Check if user has completed initial setup
+            val sharedPreferences = getSharedPreferences("AppPrefs", MODE_PRIVATE)
+            val isUserPreferenceSet = sharedPreferences.getBoolean("isUserPreferenceSet", false)
+
+            // Determine which activity to launch
+            val intent = when {
+                !isUserPreferenceSet -> Intent(this@SplashActivity, UserPrefrence::class.java)
+                !isServicesAuthenticated() -> Intent(this@SplashActivity, LoginActivity::class.java)
+                else -> Intent(this@SplashActivity, MainActivity::class.java)
+            }
+
+            startActivity(intent)
             finish()
         }
     }
-}
 
+    private fun isServicesAuthenticated(): Boolean {
+        // This will be implemented once we create AuthManager
+        // For now, always return false to force login flow
+        return false
+    }
+}

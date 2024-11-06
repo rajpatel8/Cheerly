@@ -9,4 +9,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="grey">#808080</color>
     <color name="Cheerly_Orange">#FF9B50</color>
+    <color name="green">#4CAF50</color>
+    <color name="spotify_green">#1DB954</color>
+    <color name="youtube_red">#FF0000</color>
 </resources>
