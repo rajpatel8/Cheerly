@@ -49,6 +49,8 @@ class LoginActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
+        window.statusBarColor = ContextCompat.getColor(this, R.color.orange_dark)
+
         // Initialize services and managers
         authService = AuthorizationService(this)
         spotifyAuthManager = SpotifyAuthManager(this)
@@ -311,7 +313,7 @@ class LoginActivity : ComponentActivity() {
     @SuppressLint("NewApi")
     private fun showError(message: String) {
         Snackbar.make(btnSpotifyLogin, message, Snackbar.LENGTH_LONG)
-            .setBackgroundTint(getColor(R.color.error_red))
+            .setBackgroundTint(getColor(R.color.youtube_red))
             .setTextColor(getColor(android.R.color.white))
             .show()
     }
@@ -319,7 +321,7 @@ class LoginActivity : ComponentActivity() {
     @SuppressLint("NewApi")
     private fun showSuccess(message: String) {
         Snackbar.make(btnSpotifyLogin, message, Snackbar.LENGTH_LONG)
-            .setBackgroundTint(getColor(R.color.success_green))
+            .setBackgroundTint(getColor(R.color.green))
             .setTextColor(getColor(android.R.color.white))
             .show()
     }
