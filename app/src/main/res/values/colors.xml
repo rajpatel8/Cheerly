@@ -8,10 +8,11 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="grey">#808080</color>
-    <color name="Cheerly_Orange">#FF3F00</color>
+    <color name="Cheerly_Orange">#FF9B50</color>
     <color name="green">#4CAF50</color>
     <color name="spotify_green">#1DB954</color>
     <color name="youtube_red">#FF0000</color>
-    <color name="error_red">#D32F2F</color>
-    <color name="success_green">#4CAF50</color>
+    <color name="gray_light">#E0E0E0</color>
+    <color name="gray_dark">#757575</color>
+    <color name="orange_dark">#FF5722</color>
 </resources>

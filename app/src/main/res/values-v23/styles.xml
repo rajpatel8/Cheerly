@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+        <style name="Theme.Cheerly" parent="Theme.Material3.Light.NoActionBar">
+                <item name="colorPrimary">@color/Cheerly_Orange</item>
+                <item name="colorOnPrimary">@android:color/white</item>
+                <item name="android:statusBarColor">@android:color/transparent</item>
+                <item name="android:navigationBarColor">@android:color/transparent</item>
+                <item name="android:windowLightStatusBar">true</item>
+        </style>
+</resources>
