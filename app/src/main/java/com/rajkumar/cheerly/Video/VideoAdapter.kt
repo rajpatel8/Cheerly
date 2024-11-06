@@ -26,7 +26,8 @@ class VideoAdapter(private val videos: List<Video>) :
             cardView.setOnClickListener {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
-                    openVideo(videos[position].videoUrl, itemView)
+                    val videoId = videos[position].id
+                    openVideo("https://www.youtube.com/watch?v=$videoId", itemView)
                 }
             }
         }
@@ -41,11 +42,19 @@ class VideoAdapter(private val videos: List<Video>) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val video = videos[position]
 
-        // Set video title
-        holder.videoTitle.text = video.title
+        // Set video title with ellipsis if too long
+        holder.videoTitle.apply {
+            text = video.title
+            maxLines = 2
+            ellipsize = android.text.TextUtils.TruncateAt.END
+        }
 
         // Set channel name
-        holder.channelName.text = video.channelName
+        holder.channelName.apply {
+            text = video.channelName
+            maxLines = 1
+            ellipsize = android.text.TextUtils.TruncateAt.END
+        }
 
         // Load thumbnail using Coil
         holder.thumbnail.load(video.thumbnailUrl) {
@@ -54,15 +63,25 @@ class VideoAdapter(private val videos: List<Video>) :
             error(R.drawable.error_image)
         }
 
+        // Show play icon
+        holder.playIcon.visibility = View.VISIBLE
+
         // Add slight dark overlay to make play button more visible
         holder.thumbnail.colorFilter = android.graphics.ColorMatrixColorFilter(
             floatArrayOf(
                 0.8f, 0f, 0f, 0f, 0f,
                 0f, 0.8f, 0f, 0f, 0f,
                 0f, 0f, 0.8f, 0f, 0f,
-                0f, 0f, 0f, 1f, 0f
+                0f, 0f, 0f, 0.7f, 0f // Increased darkness for better contrast
             )
         )
+
+        // Add ripple effect to card
+        holder.cardView.apply {
+            isClickable = true
+            isFocusable = true
+            foreground = context.getDrawable(R.drawable.ripple_effect)
+        }
     }
 
     override fun getItemCount() = videos.size
@@ -73,11 +92,16 @@ class VideoAdapter(private val videos: List<Video>) :
             val intent = Intent(Intent.ACTION_VIEW).apply {
                 setPackage("com.google.android.youtube")
                 data = Uri.parse(videoUrl)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             }
             view.context.startActivity(intent)
         } catch (e: Exception) {
             // If YouTube app is not installed, open in browser
-            val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse(videoUrl))
+            val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse(videoUrl)).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            }
             view.context.startActivity(webIntent)
         }
     }

@@ -12,17 +12,15 @@ interface YouTubeService {
         @Query("q") query: String,
         @Query("type") type: String = "video",
         @Query("videoCategoryId") videoCategoryId: String? = null,
-        @Query("videoDuration") videoDuration: String? = null,
-        @Query("order") order: String? = null,
         @Query("key") apiKey: String
     ): Response<YouTubeSearchResponse>
 }
 
 data class YouTubeSearchResponse(
-    val items: List<YouTubeVideo> = emptyList()
+    val items: List<YouTubeVideoItem> = emptyList()
 )
 
-data class YouTubeVideo(
+data class YouTubeVideoItem(
     val id: VideoId,
     val snippet: VideoSnippet
 )
@@ -38,11 +36,9 @@ data class VideoSnippet(
 )
 
 data class Thumbnails(
-    val medium: ThumbnailInfo
+    val high: ThumbnailDetail
 )
 
-data class ThumbnailInfo(
-    val url: String,
-    val width: Int,
-    val height: Int
+data class ThumbnailDetail(
+    val url: String
 )

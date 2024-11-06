@@ -9,9 +9,8 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
-
 class YouTubeRepository {
-    private val API_KEY = "AIzaSyARuNG3izYaKb5ao8nErJd9tKqupYrF3-A" // Replace with your API key
+    private val API_KEY = "952927675552-f5sa80ckj41lemttj3cr59kfpmu0rupg.apps.googleusercontent.com" // Replace with your API key
     private val BASE_URL = "https://www.googleapis.com/"
 
     private val youtubeService: YouTubeService
@@ -39,120 +38,44 @@ class YouTubeRepository {
                 Log.d("YouTubeRepository", "Getting videos for mood: $mood")
 
                 // Dynamic query parameters based on mood
-                val queryParams = when (mood.lowercase()) {
-                    "happy" -> listOf(
-                        "upbeat positive songs ${getRandomGenre()}",
-                        "happy ${getRandomGenre()} playlist",
-                        "feel good ${getRandomLanguage()} songs",
-                        "motivational ${getRandomGenre()} mix",
-                        "cheerful ${getRandomDecade()} hits"
-                    )
-                    "sad" -> listOf(
-                        "calming ${getRandomGenre()} songs",
-                        "peaceful ${getRandomLanguage()} music",
-                        "soothing ${getRandomDecade()} playlist",
-                        "relaxing ${getRandomGenre()} mix",
-                        "gentle acoustic songs"
-                    )
-                    "excited" -> listOf(
-                        "energetic ${getRandomGenre()} mix",
-                        "pump up ${getRandomLanguage()} songs",
-                        "workout ${getRandomGenre()} playlist",
-                        "party ${getRandomDecade()} hits",
-                        "high energy ${getRandomGenre()} music"
-                    )
-                    "relaxed" -> listOf(
-                        "chill ${getRandomGenre()} vibes",
-                        "ambient ${getRandomLanguage()} songs",
-                        "meditation ${getRandomGenre()} music",
-                        "lofi ${getRandomDecade()} mix",
-                        "peaceful instrumental playlist"
-                    )
-                    else -> listOf("mood music playlist")
+                val query = when (mood.lowercase()) {
+                    "happy" -> "happy upbeat music videos"
+                    "sad" -> "calming music videos"
+                    "excited" -> "energetic pump up music videos"
+                    "relaxed" -> "chill lofi music videos"
+                    else -> "music videos"
                 }
 
-                val allVideos = mutableListOf<Video>()
+                val response = youtubeService.searchVideos(
+                    part = "snippet",
+                    maxResults = 3,
+                    query = query,
+                    type = "video",
+                    videoCategoryId = "10", // Music category
+                    apiKey = API_KEY
+                )
 
-                // Randomly select and shuffle queries
-                val shuffledQueries = queryParams.shuffled()
-
-                for (query in shuffledQueries) {
-                    val response = youtubeService.searchVideos(
-                        part = "snippet",
-                        maxResults = 5,
-                        query = "$query official",
-                        type = "video",
-                        videoCategoryId = "10", // Music category
-                        videoDuration = "medium",
-                        order = getRandomOrder(), // Random sort order
-                        apiKey = API_KEY
-                    )
-
-                    if (response.isSuccessful) {
-                        val videos = response.body()?.items?.map { youtubeVideo ->
-                            Video(
-                                id = youtubeVideo.id.videoId,
-                                title = youtubeVideo.snippet.title,
-                                channelName = youtubeVideo.snippet.channelTitle,
-                                thumbnailUrl = youtubeVideo.snippet.thumbnails.medium.url,
-                                videoUrl = "https://www.youtube.com/watch?v=${youtubeVideo.id.videoId}"
-                            )
-                        } ?: emptyList()
-
-                        // Filter videos
-                        val filteredVideos = videos.filter { video ->
-                            !video.title.contains(Regex("(tutorial|lesson|how to|review|unboxing)", RegexOption.IGNORE_CASE)) &&
-                                    !video.title.contains(Regex("(\\!{2,}|\\?{2,}|BEST EVER|100%|\\[.*\\])", RegexOption.IGNORE_CASE))
-                        }
-
-                        allVideos.addAll(filteredVideos)
-                    }
-
-                    if (allVideos.size >= 10) break
+                if (response.isSuccessful) {
+                    response.body()?.items?.map { youtubeVideo ->
+                        val videoId = youtubeVideo.id.videoId
+                        Video(
+                            id = videoId,
+                            title = youtubeVideo.snippet.title,
+                            channelName = youtubeVideo.snippet.channelTitle,
+                            thumbnailUrl = youtubeVideo.snippet.thumbnails.high.url,
+                            videoUrl = "https://www.youtube.com/watch?v=$videoId"
+                        )
+                    } ?: emptyList()
+                } else {
+                    Log.e("YouTubeRepository", "API call failed: ${response.code()}")
+                    emptyList()
                 }
-
-                // Return random selection of videos
-                allVideos.distinctBy { it.id }
-                    .shuffled()
-                    .take(3)
-                    .also { videos ->
-                        Log.d("YouTubeRepository", "Returning ${videos.size} videos")
-                    }
 
             } catch (e: Exception) {
                 Log.e("YouTubeRepository", "Error fetching videos", e)
                 emptyList()
             }
         }
-    }
-
-    private fun getRandomGenre(): String {
-        return listOf(
-            "pop", "rock", "indie", "electronic", "hip hop",
-            "jazz", "classical", "acoustic", "folk", "r&b"
-        ).random()
-    }
-
-    private fun getRandomLanguage(): String {
-        return listOf(
-            "English", "Hindi", "Spanish",
-            "Japanese", "French", "International"
-        ).random()
-    }
-
-    private fun getRandomDecade(): String {
-        return listOf(
-            "2020s", "2010s", "2000s", "90s", "80s"
-        ).random()
-    }
-
-    private fun getRandomOrder(): String {
-        return listOf(
-            "relevance",
-            "viewCount",
-            "rating",
-            "date"
-        ).random()
     }
 
     companion object {

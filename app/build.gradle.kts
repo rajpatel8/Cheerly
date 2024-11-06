@@ -18,8 +18,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
         manifestPlaceholders["appAuthRedirectScheme"] = "cheerly"
+        manifestPlaceholders["appAuthRedirectUri"] = "cheerly://callback"
     }
 
     buildTypes {
@@ -31,6 +31,25 @@ android {
             )
         }
     }
+
+    packaging {
+        resources {
+            excludes += listOf(
+                "META-INF/DEPENDENCIES",
+                "META-INF/LICENSE",
+                "META-INF/LICENSE.txt",
+                "META-INF/NOTICE",
+                "META-INF/NOTICE.txt",
+                "META-INF/INDEX.LIST",
+                "META-INF/*.kotlin_module",
+                "META-INF/MANIFEST.MF",
+                "META-INF/AL2.0",
+                "META-INF/LGPL2.1"
+            )
+        }
+    }
+
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -43,98 +62,91 @@ android {
     }
 }
 
+
+
 dependencies {
 
-    // Existing dependencies...
 
-    // OAuth and Authentication
-    implementation("net.openid:appauth:0.11.1")
-    implementation("androidx.browser:browser:1.5.0")
+// YouTube & Google APIs
+    implementation("com.google.apis:google-api-services-youtube:v3-rev20231011-2.0.0")
+    implementation("com.google.api-client:google-api-client-android:2.2.0")
+    implementation("com.google.http-client:google-http-client-android:1.42.3")
+    implementation("com.google.http-client:google-http-client-gson:1.42.3")
+    implementation("com.google.oauth-client:google-oauth-client:1.34.1")
 
-    // Retrofit for API calls
+    // Google Sign In
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
+
+    // Network & JSON
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
-
-    // Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
-
-    // Material Design
-    implementation("com.google.android.material:material:1.9.0")
-
-    // ConstraintLayout
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-
-    // ViewModels and LiveData
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
-
-    // AppAuth for OAuth
-    implementation("net.openid:appauth:0.11.1")
-    implementation("androidx.browser:browser:1.5.0")
-
-    // Material Design
-    implementation("com.google.android.material:material:1.9.0")
-
-    // ConstraintLayout
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-
-    // Lifecycle components
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
-
-    // Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
+    implementation("com.google.code.gson:gson:2.10.1")
 
 
-    implementation ("com.google.android.material:material:1.9.0")
+    implementation("com.google.apis:google-api-services-youtube:v3-rev20231011-2.0.0")
+    implementation("com.google.api-client:google-api-client-android:2.2.0")
+    implementation("com.google.http-client:google-http-client-android:1.42.3")
+    implementation("com.google.http-client:google-http-client-gson:1.42.3")
+    implementation("com.google.api-client:google-api-client:2.2.0")
 
-    implementation ("io.coil-kt:coil:2.4.0")
+    // JSON parsing
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
 
-    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
-
-    // OkHttp logging
-    implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
-
-    // Coroutines
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
-
-        implementation ("androidx.constraintlayout:constraintlayout:2.1.4")
-        implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
-        implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
-        implementation ("io.coil-kt:coil:2.4.0")
-        implementation (libs.material.v190)
-    implementation( libs.converter.gson.v200beta4)
-
-
-    // Existing dependencies
+    // Core dependencies
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.fragment.ktx)
+    implementation(libs.androidx.recyclerview)
+    implementation(libs.androidx.cardview)
+
+    // Compose
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.constraintlayout)
+
+    // Google Services & Auth
+    implementation("com.google.android.gms:play-services-auth:20.7.0") {
+        exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib-jdk8")
+    }
+    implementation("com.google.android.gms:play-services-base:18.3.0")
+
+    // YouTube API
+    implementation("com.google.apis:google-api-services-youtube:v3-rev20231011-2.0.0")
+    implementation("com.google.api-client:google-api-client-android:2.2.0")
+    implementation("com.google.http-client:google-http-client-android:1.42.3")
+
+    // OAuth
+    implementation("net.openid:appauth:0.11.1")
+    implementation(libs.androidx.browser)
+
+    // Network
+    implementation(libs.retrofit)
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
+
+    // UI Components
+    implementation(libs.material)
+    implementation("com.google.android.material:material:1.10.0")
+
+    // Image Loading
+    implementation("io.coil-kt:coil:2.4.0")
+
+    // Firebase
     implementation(libs.firebase.crashlytics)
 
-    // Added dependencies for Spotify integration
-    implementation(libs.androidx.fragment.ktx)
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.retrofit)
-//    implementation(libs.retrofit.converter.gson)
+    // Coroutines
     implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.androidx.recyclerview)
-    implementation(libs.androidx.cardview)
-    implementation(libs.material)
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
 
-    // Testing dependencies
+    // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
