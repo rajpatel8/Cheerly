@@ -41,6 +41,10 @@ class LoginActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
+        // Set a color from your gradient as the status bar color
+        window.statusBarColor = ContextCompat.getColor(this, R.color.orange_dark)
+
+
         // Initialize AuthorizationService
         authService = AuthorizationService(this)
         spotifyAuthManager = SpotifyAuthManager(this)
