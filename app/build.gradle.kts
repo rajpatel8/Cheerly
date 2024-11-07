@@ -18,8 +18,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
         manifestPlaceholders["appAuthRedirectScheme"] = "cheerly"
-        manifestPlaceholders["appAuthRedirectUri"] = "cheerly"
+//        manifestPlaceholders["appAuthRedirectUri"] = "cheerly"
     }
 
     buildTypes {
