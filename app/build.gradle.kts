@@ -18,9 +18,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
         manifestPlaceholders["appAuthRedirectScheme"] = "cheerly"
-//        manifestPlaceholders["appAuthRedirectUri"] = "cheerly"
+        manifestPlaceholders["appAuthRedirectUri"] = "cheerly"
     }
 
     buildTypes {
@@ -69,23 +68,30 @@ dependencies {
 
 
 // YouTube & Google APIs
-    implementation(libs.google.api.services.youtube)
-    implementation(libs.google.api.client.android)
-    implementation(libs.google.http.client.android)
-    implementation(libs.google.http.client.gson)
-    implementation(libs.google.oauth.client)
+    implementation("com.google.apis:google-api-services-youtube:v3-rev20231011-2.0.0")
+    implementation("com.google.api-client:google-api-client-android:2.2.0")
+    implementation("com.google.http-client:google-http-client-android:1.42.3")
+    implementation("com.google.http-client:google-http-client-gson:1.42.3")
+    implementation("com.google.oauth-client:google-oauth-client:1.34.1")
 
     // Google Sign In
-    implementation(libs.play.services.auth)
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
 
     // Network & JSON
-    implementation(libs.retrofit)
-    implementation(libs.converter.gson)
-    implementation(libs.logging.interceptor)
-    implementation(libs.gson)
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
+    implementation("com.google.code.gson:gson:2.10.1")
+
+
+    implementation("com.google.apis:google-api-services-youtube:v3-rev20231011-2.0.0")
+    implementation("com.google.api-client:google-api-client-android:2.2.0")
+    implementation("com.google.http-client:google-http-client-android:1.42.3")
+    implementation("com.google.http-client:google-http-client-gson:1.42.3")
+    implementation("com.google.api-client:google-api-client:2.2.0")
 
     // JSON parsing
-    implementation(libs.jackson.databind)
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
 
     // Core dependencies
     implementation(libs.androidx.core.ktx)
@@ -108,32 +114,37 @@ dependencies {
     implementation("com.google.android.gms:play-services-auth:20.7.0") {
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib-jdk8")
     }
-    implementation(libs.play.services.base)
+    implementation("com.google.android.gms:play-services-base:18.3.0")
+
+    // YouTube API
+    implementation("com.google.apis:google-api-services-youtube:v3-rev20231011-2.0.0")
+    implementation("com.google.api-client:google-api-client-android:2.2.0")
+    implementation("com.google.http-client:google-http-client-android:1.42.3")
 
     // OAuth
-    implementation(libs.appauth)
+    implementation("net.openid:appauth:0.11.1")
     implementation(libs.androidx.browser)
 
     // Network
     implementation(libs.retrofit)
-    implementation(libs.converter.gson)
-    implementation(libs.logging.interceptor)
-    implementation(libs.okhttp)
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
 
     // UI Components
     implementation(libs.material)
-    implementation(libs.material.v1100)
+    implementation("com.google.android.material:material:1.10.0")
 
     // Image Loading
-    implementation(libs.coil)
+    implementation("io.coil-kt:coil:2.4.0")
 
     // Firebase
     implementation(libs.firebase.crashlytics)
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.androidx.lifecycle.viewmodel.ktx.v287)
-    implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
 
     // Testing
     testImplementation(libs.junit)
