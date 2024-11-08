@@ -4,8 +4,11 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
+import com.google.android.gms.auth.api.signin.GoogleSignIn
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import net.openid.appauth.AuthState
+import org.json.JSONException
 
 class SplashActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,8 +39,28 @@ class SplashActivity : ComponentActivity() {
     }
 
     private fun isServicesAuthenticated(): Boolean {
-        // This will be implemented once we create AuthManager
-        // For now, always return false to force login flow
-        return false
+        // Check Spotify authentication
+        val spotifyAuthState = getSpotifyAuthState()
+        val isSpotifyAuthenticated = spotifyAuthState?.isAuthorized == true
+
+        // Check YouTube/Google authentication
+        val isGoogleAuthenticated = GoogleSignIn.getLastSignedInAccount(this) != null
+
+        // Return true only if both services are authenticated
+        return isSpotifyAuthenticated && isGoogleAuthenticated
+    }
+
+    private fun getSpotifyAuthState(): AuthState? {
+        val prefs = getSharedPreferences("SpotifyAuthPrefs", MODE_PRIVATE)
+        val jsonString = prefs.getString("auth_state", null)
+        return if (jsonString != null) {
+            try {
+                AuthState.jsonDeserialize(jsonString)
+            } catch (e: JSONException) {
+                null
+            }
+        } else {
+            null
+        }
     }
 }

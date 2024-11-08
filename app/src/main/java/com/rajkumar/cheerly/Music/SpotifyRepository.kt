@@ -1,23 +1,21 @@
 package com.rajkumar.cheerly.Music
 
+import android.content.Context
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okhttp3.Credentials
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
+import net.openid.appauth.AuthState
 
-class SpotifyRepository {
-    private val CLIENT_ID = "e4350e0b977f4e589509378a28cebffa"  // Replace with your client ID
-    private val CLIENT_SECRET = "0f0f9f8717af45319dca07497937ef54"  // Replace with your client secret
-    private val BASE_AUTH_URL = "https://accounts.spotify.com/"
+class SpotifyRepository(private val context: Context) {
     private val BASE_API_URL = "https://api.spotify.com/v1/"
+    private val PREFS_NAME = "SpotifyAuthPrefs"
+    private val KEY_AUTH_STATE = "auth_state"
 
-    private val authService: SpotifyAuthService
     private val apiService: SpotifyApiService
-    private var accessToken: String? = null
 
     init {
         val okHttpClient = OkHttpClient.Builder()
@@ -28,13 +26,6 @@ class SpotifyRepository {
             .readTimeout(30, TimeUnit.SECONDS)
             .build()
 
-        authService = Retrofit.Builder()
-            .baseUrl(BASE_AUTH_URL)
-            .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(SpotifyAuthService::class.java)
-
         apiService = Retrofit.Builder()
             .baseUrl(BASE_API_URL)
             .client(okHttpClient)
@@ -43,42 +34,94 @@ class SpotifyRepository {
             .create(SpotifyApiService::class.java)
     }
 
-    private suspend fun getAccessToken(): String {
-        return accessToken ?: withContext(Dispatchers.IO) {
-            val credentials = Credentials.basic(CLIENT_ID, CLIENT_SECRET)
-            val response = authService.getAccessToken(credentials)
+    private fun getStoredAuthToken(): String? {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val authStateJson = prefs.getString(KEY_AUTH_STATE, null)
+        return if (authStateJson != null) {
+            try {
+                val authState = AuthState.jsonDeserialize(authStateJson)
+                authState.accessToken
+            } catch (e: Exception) {
+                null
+            }
+        } else null
+    }
+
+    suspend fun getUserTopTracks(): List<Track> = withContext(Dispatchers.IO) {
+        try {
+            val token = getStoredAuthToken() ?: return@withContext emptyList()
+
+            val response = apiService.getTopTracks(
+                auth = "Bearer $token",
+                limit = 5,
+                timeRange = "medium_term"
+            )
 
             if (response.isSuccessful) {
-                response.body()?.access_token?.also {
-                    accessToken = it
-                } ?: throw Exception("Token response was null")
+                response.body()?.items ?: emptyList()
             } else {
-                throw Exception("Failed to get access token: ${response.code()}")
+                throw Exception("Failed to get top tracks: ${response.code()}")
             }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
+        }
+    }
+
+    suspend fun getUserRecentTracks(): List<Track> = withContext(Dispatchers.IO) {
+        try {
+            val token = getStoredAuthToken() ?: return@withContext emptyList()
+
+            val response = apiService.getRecentlyPlayed(
+                auth = "Bearer $token",
+                limit = 10
+            )
+
+            if (response.isSuccessful) {
+                response.body()?.items?.map { it.track } ?: emptyList()
+            } else {
+                throw Exception("Failed to get recent tracks: ${response.code()}")
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
         }
     }
 
     suspend fun getRecommendations(mood: String): List<Track> {
         return withContext(Dispatchers.IO) {
             try {
-                // Get access token
-                val token = getAccessToken()
+                val token = getStoredAuthToken() ?: throw Exception("No auth token available")
+
+                // Get user's personalization data
+                val topTracks = getUserTopTracks()
+                val recentTracks = getUserRecentTracks()
+
+                // Get seed tracks from user's history
+                val seedTracks = (topTracks + recentTracks)
+                    .distinctBy { it.id }
+                    .take(2)
+                    .map { it.id }
+                    .joinToString(",")
 
                 // Define mood parameters
                 val (valence, energy, genres) = when (mood.lowercase()) {
-                    "happy" -> Triple(0.8f, 0.7f, "pop,happy")
-                    "sad" -> Triple(0.2f, 0.3f, "acoustic,sad")
-                    "excited" -> Triple(0.6f, 0.9f, "dance,party")
-                    "relaxed" -> Triple(0.5f, 0.2f, "ambient,chill")
+                    "happy" -> Triple(0.8f, 0.7f, "pop,happy,dance")
+                    "sad" -> Triple(0.2f, 0.3f, "acoustic,sad,indie")
+                    "excited" -> Triple(0.6f, 0.9f, "dance,edm,party")
+                    "relaxed" -> Triple(0.5f, 0.2f, "ambient,chill,study")
                     else -> Triple(0.5f, 0.5f, "pop")
                 }
 
-                // Make API call
+                // Get personalized recommendations
                 val response = apiService.getRecommendations(
                     auth = "Bearer $token",
+                    seedTracks = if (seedTracks.isNotEmpty()) seedTracks else null,
                     seedGenres = genres,
                     targetValence = valence,
-                    targetEnergy = energy
+                    targetEnergy = energy,
+                    limit = 3,
+                    market = "US"
                 )
 
                 if (response.isSuccessful) {
@@ -97,10 +140,15 @@ class SpotifyRepository {
         @Volatile
         private var instance: SpotifyRepository? = null
 
-        fun getInstance(): SpotifyRepository {
+        fun getInstance(context: Context): SpotifyRepository {
             return instance ?: synchronized(this) {
-                instance ?: SpotifyRepository().also { instance = it }
+                instance ?: SpotifyRepository(context).also { instance = it }
             }
         }
     }
 }
+
+// Updated service interface
+
+// Add new response data classes
+

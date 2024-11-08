@@ -11,7 +11,8 @@ data class Track(
 data class Artist(
     val id: String,
     val name: String,
-    val external_urls: ExternalUrls
+    val external_urls: ExternalUrls,
+    val genres: List<String> = emptyList()
 )
 
 data class Album(

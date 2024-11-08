@@ -29,7 +29,7 @@ class MoodRecommendationActivity : ComponentActivity() {
     private lateinit var videoSectionTitle: TextView
     private lateinit var podcastSectionTitle: TextView
 
-    private val spotifyRepository = SpotifyRepository.getInstance()
+    private lateinit var spotifyRepository: SpotifyRepository
     private val youtubeRepository = YouTubeRepository.getInstance()
     private val podcastRepository = PodcastRepository.getInstance()
 
@@ -37,7 +37,26 @@ class MoodRecommendationActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_mood_recommendation)
 
+        // Initialize repositories
+        spotifyRepository = SpotifyRepository.getInstance(this)
+
         // Initialize views
+        initializeViews()
+
+        // Get selected mood from intent
+        val selectedMood = intent.getStringExtra("selectedMood") ?: "Happy"
+
+        // Set title text
+        titleText.text = "Recommendations for ${selectedMood.lowercase()} mood"
+
+        // Setup RecyclerViews
+        setupRecyclerViews()
+
+        // Load recommendations
+        loadRecommendations(selectedMood)
+    }
+
+    private fun initializeViews() {
         musicRecyclerView = findViewById(R.id.musicRecyclerView)
         videoRecyclerView = findViewById(R.id.videoRecyclerView)
         podcastRecyclerView = findViewById(R.id.podcastRecyclerView)
@@ -47,88 +66,102 @@ class MoodRecommendationActivity : ComponentActivity() {
         videoSectionTitle = findViewById(R.id.videoSectionTitle)
         podcastSectionTitle = findViewById(R.id.podcastSectionTitle)
 
-        // Initially hide video and podcast sections
+        // Initially hide sections
+        setInitialVisibility()
+    }
+
+    private fun setInitialVisibility() {
         videoSectionTitle.visibility = View.GONE
         videoRecyclerView.visibility = View.GONE
         podcastSectionTitle.visibility = View.GONE
         podcastRecyclerView.visibility = View.GONE
+        musicSectionTitle.visibility = View.GONE
+        musicRecyclerView.visibility = View.GONE
+    }
 
-        // Get selected mood from intent
-        val selectedMood = intent.getStringExtra("selectedMood") ?: "Happy"
-
-        // Set title text
-        titleText.text = "Recommendations for ${selectedMood.lowercase()} mood"
-
-        // Setup RecyclerViews with layoutManagers
+    private fun setupRecyclerViews() {
         musicRecyclerView.layoutManager = LinearLayoutManager(this)
         videoRecyclerView.layoutManager = LinearLayoutManager(this)
         podcastRecyclerView.layoutManager = LinearLayoutManager(this)
-
-        // Load recommendations
-        loadRecommendations(selectedMood)
     }
 
     private fun loadRecommendations(mood: String) {
         progressBar.visibility = View.VISIBLE
+        setInitialVisibility()
 
         lifecycleScope.launch {
             try {
-                // First load music recommendations
-                val tracks = spotifyRepository.getRecommendations(mood)
-                if (tracks.isNotEmpty()) {
-                    musicRecyclerView.adapter = SongAdapter(tracks)
-                    musicSectionTitle.visibility = View.VISIBLE
-                    musicRecyclerView.visibility = View.VISIBLE
-                } else {
-                    musicSectionTitle.visibility = View.GONE
-                    musicRecyclerView.visibility = View.GONE
+                // Load all recommendations in parallel
+                var musicLoaded = false
+                var videosLoaded = false
+                var podcastsLoaded = false
+
+                try {
+                    // Music recommendations
+                    val tracks = spotifyRepository.getRecommendations(mood)
+                    if (tracks.isNotEmpty()) {
+                        musicRecyclerView.adapter = SongAdapter(tracks)
+                        musicSectionTitle.visibility = View.VISIBLE
+                        musicRecyclerView.visibility = View.VISIBLE
+                        musicLoaded = true
+                    }
+                } catch (e: Exception) {
+                    Log.e("MoodRecommendation", "Error loading music", e)
                 }
 
-                // Load video recommendations
-                val videos = youtubeRepository.getVideoRecommendations(mood)
-                if (videos.isNotEmpty()) {
-                    videoRecyclerView.adapter = VideoAdapter(videos)
-                    videoSectionTitle.visibility = View.VISIBLE
-                    videoRecyclerView.visibility = View.VISIBLE
-                } else {
-                    videoSectionTitle.visibility = View.GONE
-                    videoRecyclerView.visibility = View.GONE
+                try {
+                    // Video recommendations
+                    val videos = youtubeRepository.getVideoRecommendations(mood)
+                    if (videos.isNotEmpty()) {
+                        videoRecyclerView.adapter = VideoAdapter(videos)
+                        videoSectionTitle.visibility = View.VISIBLE
+                        videoRecyclerView.visibility = View.VISIBLE
+                        videosLoaded = true
+                    }
+                } catch (e: Exception) {
+                    Log.e("MoodRecommendation", "Error loading videos", e)
                 }
 
-                // Load podcast recommendations
-                val podcasts = podcastRepository.getPodcastRecommendations(mood)
-                if (podcasts.isNotEmpty()) {
-                    podcastRecyclerView.adapter = PodcastAdapter(podcasts)
-                    podcastSectionTitle.visibility = View.VISIBLE
-                    podcastRecyclerView.visibility = View.VISIBLE
-                } else {
-                    podcastSectionTitle.visibility = View.GONE
-                    podcastRecyclerView.visibility = View.GONE
+                try {
+                    // Podcast recommendations
+                    val podcasts = podcastRepository.getPodcastRecommendations(mood)
+                    if (podcasts.isNotEmpty()) {
+                        podcastRecyclerView.adapter = PodcastAdapter(podcasts)
+                        podcastSectionTitle.visibility = View.VISIBLE
+                        podcastRecyclerView.visibility = View.VISIBLE
+                        podcastsLoaded = true
+                    }
+                } catch (e: Exception) {
+                    Log.e("MoodRecommendation", "Error loading podcasts", e)
                 }
 
-                // Log for debugging
-                Log.d("MoodRecommendation", """
-                    Content Loaded:
-                    Music Tracks: ${tracks.size}
-                    Videos: ${videos.size}
-                    Podcasts: ${podcasts.size}
-                """.trimIndent())
+                // Check if at least one type of content was loaded
+                if (!musicLoaded && !videosLoaded && !podcastsLoaded) {
+                    showError("No recommendations found for your mood")
+                } else {
+                    Log.d("MoodRecommendation", """
+                        Content Loading Status:
+                        Music: $musicLoaded
+                        Videos: $videosLoaded
+                        Podcasts: $podcastsLoaded
+                    """.trimIndent())
+                }
 
             } catch (e: Exception) {
-                Toast.makeText(
-                    this@MoodRecommendationActivity,
-                    "Error: ${e.message}",
-                    Toast.LENGTH_LONG
-                ).show()
-                Log.e("MoodRecommendation", "Error loading recommendations", e)
+                Log.e("MoodRecommendation", "Error in recommendation loading", e)
+                showError("Error loading recommendations: ${e.message}")
             } finally {
                 progressBar.visibility = View.GONE
             }
         }
     }
 
+    private fun showError(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
-        // Cleanup if needed
+        // Clean up resources if needed
     }
 }

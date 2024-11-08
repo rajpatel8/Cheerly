@@ -82,7 +82,7 @@ class LoginActivity : ComponentActivity() {
         progressYouTube = findViewById(R.id.progressYouTube)
 
         // Initially disable continue button and hide progress indicators
-        btnContinue.isEnabled = false
+        btnContinue.isEnabled = true
         progressSpotify.visibility = View.GONE
         progressYouTube.visibility = View.GONE
     }
@@ -180,7 +180,7 @@ class LoginActivity : ComponentActivity() {
                             persistAuthState()
                             runOnUiThread {
                                 updateSpotifyStatus(true)
-                                btnSpotifyLogin.text = getString(R.string.disconnect_spotify)
+                                btnSpotifyLogin.text = getString(R.string.disconnect)
                                 showSuccess("Successfully connected to Spotify!")
                             }
                         }
@@ -216,7 +216,7 @@ class LoginActivity : ComponentActivity() {
                 }
 
                 updateYouTubeStatus(true)
-                btnYouTubeLogin.text = getString(R.string.disconnect_youtube)
+                btnYouTubeLogin.text = getString(R.string.disconnect)
                 showSuccess("Successfully connected to YouTube!")
             } ?: run {
                 showError("Failed to get Google account")
@@ -293,7 +293,7 @@ class LoginActivity : ComponentActivity() {
         // Check Spotify status
         if (authState?.isAuthorized == true) {
             updateSpotifyStatus(true)
-            btnSpotifyLogin.text = getString(R.string.disconnect_spotify)
+            btnSpotifyLogin.text = getString(R.string.disconnect)
         } else {
             updateSpotifyStatus(false)
             btnSpotifyLogin.text = getString(R.string.connect_spotify)
@@ -303,7 +303,7 @@ class LoginActivity : ComponentActivity() {
         val googleAccount = GoogleSignIn.getLastSignedInAccount(this)
         if (googleAccount != null) {
             updateYouTubeStatus(true)
-            btnYouTubeLogin.text = getString(R.string.disconnect_youtube)
+            btnYouTubeLogin.text = getString(R.string.disconnect)
         } else {
             updateYouTubeStatus(false)
             btnYouTubeLogin.text = getString(R.string.connect_youtube)
