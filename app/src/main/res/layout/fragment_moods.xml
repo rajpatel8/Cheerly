@@ -3,75 +3,191 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    android:background="@color/white">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="24dp">
 
+        <!-- Welcoming header -->
+        <TextView
+            android:id="@+id/tvWelcome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Welcome back!"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- Mood question with softer styling -->
         <TextView
             android:id="@+id/tvMoodTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="How are you feeling today?"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:gravity="center"
-            app:layout_constraintBottom_toTopOf="@+id/moodButtonsLayout"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="packed" />
+            android:textSize="20sp"
+            android:textColor="#666666"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@id/tvWelcome"
+            app:layout_constraintStart_toStartOf="parent" />
 
-        <LinearLayout
+        <!-- Grid layout for mood buttons -->
+        <androidx.gridlayout.widget.GridLayout
             android:id="@+id/moodButtonsLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            app:columnCount="2"
+            app:rowCount="4"
+            app:layout_constraintTop_toBottomOf="@id/tvMoodTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:layout_columnWeight="1">
+
+                <Button
+                    android:id="@+id/btnHappy"
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:text="Happy 😊"
+                    android:textSize="16sp"
+                    android:textAllCaps="false" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:layout_columnWeight="1">
+
+                <Button
+                    android:id="@+id/btnSad"
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:text="Sad 😢"
+                    android:textSize="16sp"
+                    android:textAllCaps="false" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:layout_columnWeight="1">
+
+                <Button
+                    android:id="@+id/btnExcited"
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:text="Excited 🎉"
+                    android:textSize="16sp"
+                    android:textAllCaps="false" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:layout_columnWeight="1">
+
+                <Button
+                    android:id="@+id/btnRelaxed"
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:text="Relaxed 😌"
+                    android:textSize="16sp"
+                    android:textAllCaps="false" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:layout_columnWeight="1">
+
+                <Button
+                    android:id="@+id/btnBored"
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:text="Bored 😑"
+                    android:textSize="16sp"
+                    android:textAllCaps="false" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:layout_columnWeight="1">
+
+                <Button
+                    android:id="@+id/btnAnxious"
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:text="Anxious 😰"
+                    android:textSize="16sp"
+                    android:textAllCaps="false" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:layout_columnWeight="1"
+                app:layout_columnSpan="2">
+
+                <Button
+                    android:id="@+id/btnFocused"
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:text="Focused 🎯"
+                    android:textSize="16sp"
+                    android:textAllCaps="false" />
+            </com.google.android.material.card.MaterialCardView>
+
+        </androidx.gridlayout.widget.GridLayout>
+
+        <!-- Optional subtitle -->
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:text="Select your mood to get personalized recommendations"
+            android:textColor="#888888"
+            android:textSize="14sp"
+            android:layout_marginTop="24dp"
             android:gravity="center"
-            android:layout_marginTop="16dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/moodButtonsLayout"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvMoodTitle">
-
-            <Button
-                android:id="@+id/btnHappy"
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:background="@drawable/rounded_button"
-                android:text="Happy 😊"
-                android:textAllCaps="false" />
-
-            <Button
-                android:id="@+id/btnSad"
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:background="@drawable/rounded_button"
-                android:text="Sad 😢"
-                android:textAllCaps="false" />
-
-            <Button
-                android:id="@+id/btnExcited"
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:background="@drawable/rounded_button"
-                android:text="Excited 🎉"
-                android:textAllCaps="false" />
-
-            <Button
-                android:id="@+id/btnRelaxed"
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
-                android:background="@drawable/rounded_button"
-                android:text="Relaxed 😌"
-                android:textAllCaps="false" />
-
-        </LinearLayout>
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

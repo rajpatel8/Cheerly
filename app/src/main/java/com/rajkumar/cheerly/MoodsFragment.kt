@@ -9,7 +9,6 @@ import android.widget.Button
 import androidx.fragment.app.Fragment
 
 class MoodsFragment : Fragment() {
-
     private var selectedButton: Button? = null
 
     override fun onCreateView(
@@ -24,18 +23,40 @@ class MoodsFragment : Fragment() {
         val btnSad: Button = view.findViewById(R.id.btnSad)
         val btnExcited: Button = view.findViewById(R.id.btnExcited)
         val btnRelaxed: Button = view.findViewById(R.id.btnRelaxed)
+        val btnBored: Button = view.findViewById(R.id.btnBored)
+        val btnAnxious: Button = view.findViewById(R.id.btnAnxious)
+        val btnFocused: Button = view.findViewById(R.id.btnFocused)
 
         // Add all buttons to a list
-        val buttons = listOf(btnHappy, btnSad, btnExcited, btnRelaxed)
+        val buttons = listOf(btnHappy, btnSad, btnExcited, btnRelaxed,
+            btnBored, btnAnxious, btnFocused)
 
         // Set click listener for each button
         buttons.forEach { button ->
             button.setOnClickListener {
-                selectSingleOption(button)
+                animateButtonSelection(button)
             }
         }
 
         return view
+    }
+
+    private fun animateButtonSelection(button: Button) {
+        // Animate button scale
+        button.animate()
+            .scaleX(0.95f)
+            .scaleY(0.95f)
+            .setDuration(100)
+            .withEndAction {
+                button.animate()
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(100)
+                    .withEndAction {
+                        selectSingleOption(button)
+                    }
+            }
+            .start()
     }
 
     private fun selectSingleOption(button: Button) {
