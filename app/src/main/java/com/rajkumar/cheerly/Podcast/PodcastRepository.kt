@@ -85,6 +85,54 @@ class PodcastRepository {
             includeKeywords = listOf("relaxation", "calm", "peace", "meditation", "mindfulness"),
             excludeKeywords = listOf("motivation", "workout", "high-energy"),
             sortBy = "relevance"
+        ),
+        // New mood: Bored
+        "bored" to MoodParameters(
+            queries = listOf(
+                "interesting facts",
+                "true crime stories",
+                "adventure tales",
+                "comedy shows",
+                "fascinating history"
+            ),
+            genres = listOf("comedy", "entertainment", "storytelling", "history", "science"),
+            minLength = 20,
+            maxLength = 60,
+            includeKeywords = listOf("fascinating", "interesting", "entertaining", "fun", "adventure"),
+            excludeKeywords = listOf("meditation", "sleep", "routine"),
+            sortBy = "popular"
+        ),
+        // New mood: Anxious
+        "anxious" to MoodParameters(
+            queries = listOf(
+                "anxiety relief",
+                "calming techniques",
+                "stress management",
+                "breathing exercises",
+                "anxiety support"
+            ),
+            genres = listOf("mental-health", "meditation", "self-help", "health"),
+            minLength = 10,
+            maxLength = 30,
+            includeKeywords = listOf("calm", "relief", "anxiety", "breathing", "grounding"),
+            excludeKeywords = listOf("panic", "trauma", "crisis", "emergency"),
+            sortBy = "relevance"
+        ),
+        // New mood: Focused
+        "focused" to MoodParameters(
+            queries = listOf(
+                "productivity tips",
+                "focus music",
+                "concentration improvement",
+                "deep work",
+                "study techniques"
+            ),
+            genres = listOf("education", "business", "self-improvement", "technology"),
+            minLength = 15,
+            maxLength = 45,
+            includeKeywords = listOf("focus", "productivity", "concentration", "efficiency", "study"),
+            excludeKeywords = listOf("distraction", "entertainment", "relaxation"),
+            sortBy = "relevance"
         )
     )
 
