@@ -70,7 +70,7 @@ dependencies {
 // YouTube & Google APIs
     implementation("com.google.apis:google-api-services-youtube:v3-rev20231011-2.0.0")
     implementation("com.google.api-client:google-api-client-android:2.2.0")
-    implementation("com.google.http-client:google-http-client-android:1.42.3")
+//    implementation("com.google.http-client:google-http-client-android:1.42.3")
     implementation("com.google.http-client:google-http-client-gson:1.42.3")
     implementation("com.google.oauth-client:google-oauth-client:1.34.1")
 
@@ -80,14 +80,11 @@ dependencies {
     // Network & JSON
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
     implementation("com.google.code.gson:gson:2.10.1")
 
 
     implementation("com.google.apis:google-api-services-youtube:v3-rev20231011-2.0.0")
     implementation("com.google.api-client:google-api-client-android:2.2.0")
-    implementation("com.google.http-client:google-http-client-android:1.42.3")
-    implementation("com.google.http-client:google-http-client-gson:1.42.3")
     implementation("com.google.api-client:google-api-client:2.2.0")
 
     // JSON parsing
