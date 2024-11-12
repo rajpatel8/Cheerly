@@ -62,8 +62,6 @@ android {
     }
 }
 
-
-
 dependencies {
     // Location
     implementation ("com.google.android.gms:play-services-location:21.0.1")
@@ -86,11 +84,7 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.google.code.gson:gson:2.10.1")
-
-
-    implementation("com.google.apis:google-api-services-youtube:v3-rev20231011-2.0.0")
-    implementation("com.google.api-client:google-api-client-android:2.2.0")
-    implementation("com.google.api-client:google-api-client:2.2.0")
+    implementation("com.squareup.okhttp3:okhttp:4.11.0") // Use okhttp
 
     // JSON parsing
     implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
@@ -129,7 +123,6 @@ dependencies {
     // Network
     implementation(libs.retrofit)
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("com.squareup.okhttp3:okhttp:4.11.0")
 
     // UI Components
     implementation(libs.material)
@@ -155,5 +148,4 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-
 }
