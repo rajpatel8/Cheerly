@@ -7,102 +7,124 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.google.android.material.card.MaterialCardView
 import com.rajkumar.cheerly.R
 
 class VideoAdapter(private val videos: List<Video>) :
-    RecyclerView.Adapter<VideoAdapter.ViewHolder>() {
+    RecyclerView.Adapter<VideoAdapter.VideoViewHolder>() {
 
-    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    inner class VideoViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val cardView: MaterialCardView = view.findViewById(R.id.cardView)
-        val videoTitle: TextView = view.findViewById(R.id.videoTitle)
-        val channelName: TextView = view.findViewById(R.id.channelName)
-        val thumbnail: ImageView = view.findViewById(R.id.videoThumbnail)
+        val thumbnailImage: ImageView = view.findViewById(R.id.videoThumbnail)
         val playIcon: ImageView = view.findViewById(R.id.playIcon)
+        val titleText: TextView = view.findViewById(R.id.videoTitle)
+        val channelText: TextView = view.findViewById(R.id.channelName)
 
         init {
             cardView.setOnClickListener {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
-                    val videoId = videos[position].id
-                    openVideo("https://www.youtube.com/watch?v=$videoId", itemView)
+                    openVideo(videos[position])
                 }
             }
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_video, parent, false)
-        return ViewHolder(view)
+        return VideoViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: VideoViewHolder, position: Int) {
         val video = videos[position]
 
-        // Set video title with ellipsis if too long
-        holder.videoTitle.apply {
+        // Set title
+        holder.titleText.apply {
             text = video.title
             maxLines = 2
             ellipsize = android.text.TextUtils.TruncateAt.END
         }
 
         // Set channel name
-        holder.channelName.apply {
+        holder.channelText.apply {
             text = video.channelName
             maxLines = 1
             ellipsize = android.text.TextUtils.TruncateAt.END
         }
 
-        // Load thumbnail using Coil
-        holder.thumbnail.load(video.thumbnailUrl) {
+        // Load thumbnail
+        holder.thumbnailImage.load(video.thumbnailUrl) {
             crossfade(true)
             placeholder(R.drawable.placeholder_image)
             error(R.drawable.error_image)
         }
 
-        // Show play icon
-        holder.playIcon.visibility = View.VISIBLE
-
-        // Add slight dark overlay to make play button more visible
-        holder.thumbnail.colorFilter = android.graphics.ColorMatrixColorFilter(
+        // Add dark overlay for better play icon visibility
+        holder.thumbnailImage.colorFilter = android.graphics.ColorMatrixColorFilter(
             floatArrayOf(
                 0.8f, 0f, 0f, 0f, 0f,
                 0f, 0.8f, 0f, 0f, 0f,
                 0f, 0f, 0.8f, 0f, 0f,
-                0f, 0f, 0f, 0.7f, 0f // Increased darkness for better contrast
+                0f, 0f, 0f, 0.7f, 0f
             )
         )
 
-        // Add ripple effect to card
+        // Show play icon
+        holder.playIcon.visibility = View.VISIBLE
+
+        // Add ripple effect
         holder.cardView.apply {
             isClickable = true
             isFocusable = true
-            foreground = context.getDrawable(R.drawable.ripple_effect)
+            foreground = ContextCompat.getDrawable(context, R.drawable.ripple_effect)
         }
     }
 
     override fun getItemCount() = videos.size
 
-    private fun openVideo(videoUrl: String, view: View) {
+    private fun openVideo(video: Video) {
+        val context = currentView?.context ?: return
         try {
-            // First try to open in YouTube app
+            // Try to open in YouTube app
             val intent = Intent(Intent.ACTION_VIEW).apply {
                 setPackage("com.google.android.youtube")
-                data = Uri.parse(videoUrl)
+                data = Uri.parse(video.videoUrl)
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             }
-            view.context.startActivity(intent)
+            context.startActivity(intent)
         } catch (e: Exception) {
-            // If YouTube app is not installed, open in browser
-            val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse(videoUrl)).apply {
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            }
-            view.context.startActivity(webIntent)
+            // Fallback to browser
+            val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse(video.videoUrl))
+            context.startActivity(webIntent)
+        }
+    }
+
+    private val currentView: View?
+        get() = if (itemCount > 0) {
+            (0 until itemCount)
+                .firstOrNull { position ->
+                    getViewHolderForPosition(position)?.itemView != null
+                }
+                ?.let { getViewHolderForPosition(it)?.itemView }
+        } else null
+
+    private fun getViewHolderForPosition(position: Int): VideoViewHolder? {
+        return itemCount.takeIf { it > position }?.let {
+            getViewHolderForAdapterPosition(position)
+        }
+    }
+
+    private fun getViewHolderForAdapterPosition(position: Int): VideoViewHolder? {
+        return try {
+            val recyclerView = currentView?.parent as? RecyclerView
+            recyclerView?.findViewHolderForAdapterPosition(position) as? VideoViewHolder
+        } catch (e: Exception) {
+            null
         }
     }
 }

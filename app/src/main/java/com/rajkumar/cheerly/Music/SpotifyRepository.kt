@@ -51,7 +51,7 @@ class SpotifyRepository(private val context: Context) {
             val response = apiService.getTopTracks(
                 auth = "Bearer $token",
                 limit = 5,
-                timeRange = "medium_term"
+                timeRange = "long_term"
             )
 
             if (response.isSuccessful) {
@@ -118,7 +118,7 @@ class SpotifyRepository(private val context: Context) {
                     targetValence = valence,
                     targetEnergy = energy,
                     limit = 3,
-                    market = "US"
+                    market = "IN"
                 )
 
                 if (response.isSuccessful) {

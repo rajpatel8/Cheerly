@@ -334,5 +334,6 @@ class LoginActivity : ComponentActivity() {
     override fun onDestroy() {
         super.onDestroy()
         authService.dispose()
+        spotifyAuthManager.dispose()
     }
 }

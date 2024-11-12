@@ -21,7 +21,7 @@ import com.rajkumar.cheerly.Music.SpotifyRepository
 import com.rajkumar.cheerly.Podcast.PodcastAdapter
 import com.rajkumar.cheerly.Podcast.PodcastRepository
 import com.rajkumar.cheerly.Video.VideoAdapter
-import com.rajkumar.cheerly.Video.YouTubeRepository
+import com.rajkumar.cheerly.Video.VideoRepository
 import com.rajkumar.cheerly.Activity.ActivityAdapter
 import com.rajkumar.cheerly.Activity.ActivityRepository
 import com.rajkumar.cheerly.Activity.Models.ActivityLocation
@@ -42,10 +42,11 @@ class MoodRecommendationActivity : ComponentActivity() {
     private lateinit var locationProgressBar: ProgressBar
     private lateinit var locationStatusText: TextView
 
+    // Initialize repositories
     private lateinit var spotifyRepository: SpotifyRepository
-    private val youtubeRepository = YouTubeRepository.getInstance()
-    private val podcastRepository = PodcastRepository.getInstance()
-    private val activityRepository = ActivityRepository.getInstance()
+    private lateinit var youtubeRepository: VideoRepository
+    private lateinit var podcastRepository: PodcastRepository
+    private lateinit var activityRepository: ActivityRepository
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationRequest: LocationRequest
@@ -59,8 +60,12 @@ class MoodRecommendationActivity : ComponentActivity() {
 
         window.statusBarColor = ContextCompat.getColor(this, R.color.orange_dark)
 
-        // Initialize repositories and location client
+        // Initialize repositories with context
         spotifyRepository = SpotifyRepository.getInstance(this)
+        youtubeRepository = VideoRepository.getInstance(this)
+        podcastRepository = PodcastRepository.getInstance()
+        activityRepository = ActivityRepository.getInstance()
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         // Initialize views and setup
@@ -156,26 +161,6 @@ class MoodRecommendationActivity : ComponentActivity() {
         activityRecyclerView.layoutManager = LinearLayoutManager(this)
     }
 
-    private fun startLocationUpdates() {
-        try {
-            if (checkLocationPermission()) {
-                fusedLocationClient.requestLocationUpdates(
-                    locationRequest,
-                    locationCallback,
-                    Looper.getMainLooper()
-                )
-            }
-        } catch (e: Exception) {
-            Log.e("Location", "Error starting location updates", e)
-            locationStatusText.text = "Error getting location: ${e.message}"
-            locationProgressBar.visibility = View.GONE
-        }
-    }
-
-    private fun stopLocationUpdates() {
-        fusedLocationClient.removeLocationUpdates(locationCallback)
-    }
-
     private fun loadNonLocationContent(mood: String) {
         lifecycleScope.launch {
             progressBar.visibility = View.VISIBLE
@@ -254,25 +239,24 @@ class MoodRecommendationActivity : ComponentActivity() {
         }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            LOCATION_PERMISSION_REQUEST_CODE -> {
-                if (grantResults.isNotEmpty() &&
-                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    locationStatusText.text = "Finding nearby activities..."
-                    locationProgressBar.visibility = View.VISIBLE
-                    startLocationUpdates()
-                } else {
-                    locationStatusText.text = "Location permission denied"
-                    locationProgressBar.visibility = View.GONE
-                }
+    private fun startLocationUpdates() {
+        try {
+            if (checkLocationPermission()) {
+                fusedLocationClient.requestLocationUpdates(
+                    locationRequest,
+                    locationCallback,
+                    Looper.getMainLooper()
+                )
             }
+        } catch (e: Exception) {
+            Log.e("Location", "Error starting location updates", e)
+            locationStatusText.text = "Error getting location: ${e.message}"
+            locationProgressBar.visibility = View.GONE
         }
+    }
+
+    private fun stopLocationUpdates() {
+        fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 
     private fun checkLocationPermission(): Boolean {
@@ -288,6 +272,28 @@ class MoodRecommendationActivity : ComponentActivity() {
             arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
             LOCATION_PERMISSION_REQUEST_CODE
         )
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            LOCATION_PERMISSION_REQUEST_CODE -> {
+                if (grantResults.isNotEmpty() &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED
+                ) {
+                    locationStatusText.text = "Finding nearby activities..."
+                    locationProgressBar.visibility = View.VISIBLE
+                    startLocationUpdates()
+                } else {
+                    locationStatusText.text = "Location permission denied"
+                    locationProgressBar.visibility = View.GONE
+                }
+            }
+        }
     }
 
     private fun showError(message: String) {
