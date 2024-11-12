@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -9,29 +10,36 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
 
-        <!-- Existing title text -->
         <TextView
             android:id="@+id/titleText"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:textColor="@color/Cheerly_Orange"
-            android:layout_marginBottom="16dp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/titleText"/>
 
         <!-- Music Section -->
         <TextView
             android:id="@+id/musicSectionTitle"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Music Recommendations"
+            android:layout_marginTop="24dp"
+            android:text="Music"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:layout_marginTop="16dp"
-            android:textColor="@android:color/black"
-            app:layout_constraintTop_toBottomOf="@id/titleText" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/titleText"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/musicRecyclerView"
@@ -39,19 +47,19 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:nestedScrollingEnabled="false"
-            app:layout_constraintTop_toBottomOf="@id/musicSectionTitle" />
+            app:layout_constraintTop_toBottomOf="@id/musicSectionTitle"/>
 
-        <!-- Video Section -->
+        <!-- Videos Section -->
         <TextView
             android:id="@+id/videoSectionTitle"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Video Recommendations"
+            android:layout_marginTop="24dp"
+            android:text="Videos"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:layout_marginTop="24dp"
-            android:textColor="@android:color/black"
-            app:layout_constraintTop_toBottomOf="@id/musicRecyclerView" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/musicRecyclerView"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/videoRecyclerView"
@@ -59,19 +67,19 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:nestedScrollingEnabled="false"
-            app:layout_constraintTop_toBottomOf="@id/videoSectionTitle" />
+            app:layout_constraintTop_toBottomOf="@id/videoSectionTitle"/>
 
-        <!-- Podcast Section -->
+        <!-- Podcasts Section -->
         <TextView
             android:id="@+id/podcastSectionTitle"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Podcast Recommendations"
+            android:layout_marginTop="24dp"
+            android:text="Podcasts"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:layout_marginTop="24dp"
-            android:textColor="@android:color/black"
-            app:layout_constraintTop_toBottomOf="@id/videoRecyclerView" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/videoRecyclerView"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/podcastRecyclerView"
@@ -79,17 +87,27 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:nestedScrollingEnabled="false"
-            app:layout_constraintTop_toBottomOf="@id/podcastSectionTitle" />
+            app:layout_constraintTop_toBottomOf="@id/podcastSectionTitle"/>
 
-        <ProgressBar
-            android:id="@+id/progressBar"
+        <!-- Activities Section -->
+        <TextView
+            android:id="@+id/activitySectionTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:layout_marginTop="32dp"
-            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="24dp"
+            android:text="Activities"
+            android:textSize="20sp"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/podcastRecyclerView"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/activityRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:nestedScrollingEnabled="false"
+            app:layout_constraintTop_toBottomOf="@id/activitySectionTitle"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
