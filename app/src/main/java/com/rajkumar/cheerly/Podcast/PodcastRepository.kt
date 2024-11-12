@@ -9,7 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 class PodcastRepository {
-    private val API_KEY = "e3bdb4b10c1142eb99de1b3ef03213c0"  // Replace with actual key
+    private val API_KEY = "e3bdb4b10c1142eb99de1b3ef03213c0"
     private val BASE_URL = "https://listen-api.listennotes.com/"
 
     private val podcastService: PodcastService

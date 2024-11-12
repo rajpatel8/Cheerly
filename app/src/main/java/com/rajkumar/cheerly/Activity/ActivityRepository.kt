@@ -1,18 +1,78 @@
 package com.rajkumar.cheerly.Activity
 
+import android.net.Uri
 import android.util.Log
+import com.rajkumar.cheerly.Activity.Models.ActivityLocation
+import com.rajkumar.cheerly.Activity.Models.ActivityParameters
+import com.rajkumar.cheerly.Activity.Models.Event
+import com.rajkumar.cheerly.Activity.Models.EventImage
+import com.rajkumar.cheerly.Activity.Models.NearbyActivity
+import com.rajkumar.cheerly.Activity.Models.Venue
+import com.rajkumar.cheerly.Activity.Models.WeatherInfo
 import com.rajkumar.cheerly.config.ApiKeys
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
-import okhttp3.OkHttpClient
 import kotlin.math.*
 
-class ActivityRepository {
+class ActivityRepository private constructor() {
     private val ticketmasterService: TicketmasterService
     private val weatherService: OpenWeatherService
+
+    private val moodParameters = mapOf(
+        "happy" to ActivityParameters(
+            categories = listOf("music", "comedy", "food", "family", "attractions"),
+            keywords = listOf("festival", "carnival", "concert", "amusement", "party"),
+            maxDistance = 30.0,
+            preferIndoor = false,
+            preferPopular = true
+        ),
+        "sad" to ActivityParameters(
+            categories = listOf("nature", "art", "wellness", "spa", "museum"),
+            keywords = listOf("peaceful", "quiet", "relaxing", "healing", "therapeutic"),
+            maxDistance = 15.0,
+            preferIndoor = true,
+            preferPopular = false
+        ),
+        "excited" to ActivityParameters(
+            categories = listOf("sports", "adventure", "music", "dance", "fitness"),
+            keywords = listOf("high-energy", "extreme", "adventure", "competition", "active"),
+            maxDistance = 40.0,
+            preferIndoor = false,
+            preferPopular = true
+        ),
+        "relaxed" to ActivityParameters(
+            categories = listOf("parks", "gardens", "cafe", "library", "gallery"),
+            keywords = listOf("calm", "serene", "peaceful", "quiet", "nature"),
+            maxDistance = 20.0,
+            preferIndoor = false,
+            preferPopular = false
+        ),
+        "bored" to ActivityParameters(
+            categories = listOf("entertainment", "gaming", "sports", "shopping", "attractions"),
+            keywords = listOf("exciting", "interactive", "unique", "fun", "entertaining"),
+            maxDistance = 25.0,
+            preferIndoor = true,
+            preferPopular = true
+        ),
+        "anxious" to ActivityParameters(
+            categories = listOf("wellness", "nature", "yoga", "meditation", "cafe"),
+            keywords = listOf("calming", "peaceful", "quiet", "therapeutic", "soothing"),
+            maxDistance = 10.0,
+            preferIndoor = true,
+            preferPopular = false
+        ),
+        "focused" to ActivityParameters(
+            categories = listOf("library", "cafe", "coworking", "museum", "study"),
+            keywords = listOf("quiet", "productive", "studious", "learning", "concentration"),
+            maxDistance = 15.0,
+            preferIndoor = true,
+            preferPopular = false
+        )
+    )
 
     init {
         val okHttpClient = OkHttpClient.Builder()
@@ -37,79 +97,51 @@ class ActivityRepository {
 
     suspend fun getActivityRecommendations(
         mood: String,
-        location: Location
+        location: ActivityLocation,
+        accuracy: Float
     ): List<NearbyActivity> = withContext(Dispatchers.IO) {
         try {
             Log.d("ActivityRepository", "Getting recommendations for $mood at $location")
 
-            // Get weather information
+            val parameters = moodParameters[mood.lowercase()] ?: moodParameters["happy"]!!
+            val searchRadius = calculateSearchRadius(accuracy, parameters.maxDistance)
             val weather = getWeatherInfo(location)
-            Log.d("ActivityRepository", "Weather info: $weather")
+            val events = getEvents(location, searchRadius)
 
-            // Get events from Ticketmaster
-            val events = getEvents(location, mood)
-            Log.d("ActivityRepository", "Found ${events.size} events")
-
-            // Create activities list combining all sources
-            val activities = mutableListOf<NearbyActivity>()
-
-            // Add events as activities
-            activities.addAll(events.mapNotNull { event ->
-                val venue = event._embedded?.venues?.firstOrNull()
-                val location = venue?.location
-
-                if (location != null) {
-                    try {
-                        NearbyActivity(
-                            id = event.id,
-                            name = event.name,
-                            type = "event",
-                            category = getMoodCategory(mood),
-                            distance = calculateDistance(
-                                lat1 = location.latitude,
-                                lon1 = location.longitude,
-                                lat2 = location.latitude,
-                                lon2 = location.longitude
-                            ),
-                            address = buildAddress(venue),
-                            imageUrl = event.images.firstOrNull()?.url,
-                            openNow = true,
-                            weather = weather,
-                            externalLink = event.url
-                        )
-                    } catch (e: Exception) {
-                        Log.e("ActivityRepository", "Error mapping event to activity", e)
-                        null
-                    }
-                } else null
-            })
-
-            // Return filtered and sorted list
-            activities.sortedBy { it.distance }.take(3)
-
+            processEvents(events, location, weather, parameters, searchRadius)
         } catch (e: Exception) {
             Log.e("ActivityRepository", "Error getting recommendations", e)
             emptyList()
         }
     }
-    private fun buildAddress(venue: Venue): String {
-        return listOfNotNull(
-            venue.name,
-            venue.address?.line1,
-            venue.address?.city,
-            venue.address?.state,
-            venue.address?.postalCode
-        ).filter { it.isNotBlank() }
-            .joinToString(", ")
+
+    private suspend fun getEvents(location: ActivityLocation, radius: Double): List<Event> {
+        return try {
+            val response = ticketmasterService.searchEvents(
+                apiKey = ApiKeys.TICKETMASTER_API_KEY,
+                latLong = "${location.latitude},${location.longitude}",
+                radius = radius.toInt().toString()
+            )
+
+            if (response.isSuccessful) {
+                response.body()?._embedded?.events ?: emptyList()
+            } else {
+                Log.e("ActivityRepository", "Error getting events: ${response.code()}")
+                emptyList()
+            }
+        } catch (e: Exception) {
+            Log.e("ActivityRepository", "Error fetching events", e)
+            emptyList()
+        }
     }
 
-    private suspend fun getWeatherInfo(location: Location): WeatherInfo? {
+    private suspend fun getWeatherInfo(location: ActivityLocation): WeatherInfo? {
         return try {
             val response = weatherService.getWeather(
-                location.latitude,
-                location.longitude,
-                ApiKeys.OPENWEATHER_API_KEY,
-                "metric"
+                lat = location.latitude,
+                lon = location.longitude,
+                apiKey = ApiKeys.OPENWEATHER_API_KEY,
+                units = "metric"
             )
 
             if (response.isSuccessful) {
@@ -119,7 +151,7 @@ class ActivityRepository {
                         temperature = weatherResponse.main.temp,
                         description = weather?.description ?: "",
                         icon = weather?.icon ?: "",
-                        isGoodForActivity = isWeatherGoodForActivity(weather?.description ?: "")
+                        isGoodForActivity = isWeatherGoodForActivity(weather?.description)
                     )
                 }
             } else null
@@ -129,46 +161,92 @@ class ActivityRepository {
         }
     }
 
-    private suspend fun getEvents(location: Location, mood: String): List<Event> {
-        return try {
-            val response = ticketmasterService.searchEvents(
-                apiKey = ApiKeys.TICKETMASTER_API_KEY,
-                latLong = "${location.latitude},${location.longitude}",
-                radius = "30", // 30 mile radius
-                size = 10
-            )
+    private fun processEvents(
+        events: List<Event>,
+        location: ActivityLocation,
+        weather: WeatherInfo?,
+        parameters: ActivityParameters,
+        searchRadius: Double
+    ): List<NearbyActivity> {
+        return events.mapNotNull { event ->
+            createNearbyActivity(event, location, weather, parameters)
+        }.filter { activity ->
+            // Filter based on distance and weather conditions
+            val weatherSuitable = if (!parameters.preferIndoor) {
+                activity.weather?.isGoodForActivity == true
+            } else true
 
-            if (response.isSuccessful) {
-                response.body()?._embedded?.events?.filter { event ->
-                    // Filter out events without proper location data
-                    event._embedded?.venues?.firstOrNull()?.location != null
-                } ?: emptyList()
-            } else emptyList()
-        } catch (e: Exception) {
-            Log.e("ActivityRepository", "Error getting events", e)
-            emptyList()
-        }
+            weatherSuitable && activity.distance <= searchRadius
+        }.sortedWith(
+            compareBy<NearbyActivity> { it.distance }
+                .thenByDescending { if (parameters.preferPopular) it.rating ?: 0f else 0f }
+        ).take(5)
     }
 
-    private fun isWeatherGoodForActivity(description: String): Boolean {
-        val goodConditions = listOf(
-            "clear",
-            "sunny",
-            "few clouds",
-            "scattered clouds",
-            "partly cloudy"
+    private fun createNearbyActivity(
+        event: Event,
+        location: ActivityLocation,
+        weather: WeatherInfo?,
+        parameters: ActivityParameters
+    ): NearbyActivity? {
+        val venue = event._embedded?.venues?.firstOrNull() ?: return null
+        val venueLocation = venue.location ?: return null
+
+        val distance = calculateDistance(
+            lat1 = location.latitude,
+            lon1 = location.longitude,
+            lat2 = venueLocation.latitude,
+            lon2 = venueLocation.longitude
         )
-        return goodConditions.any { description.lowercase().contains(it) }
+
+        val address = buildAddress(venue)
+
+        return NearbyActivity(
+            id = event.id,
+            name = event.name,
+            type = "event",
+            category = getCategoryByMood(event, parameters),
+            distance = distance,
+            address = address,
+            imageUrl = getBestImage(event.images),
+            openNow = true, // We'll assume events are "open" if they're returned by the API
+            weather = weather,
+            rating = null,
+            externalLink = buildMapsUrl(address),
+            placeId = null
+        )
     }
 
-    private fun getMoodCategory(mood: String): String {
-        return when (mood.lowercase()) {
-            "happy" -> "Entertainment"
-            "sad" -> "Relaxation"
-            "excited" -> "Active Events"
-            "relaxed" -> "Peaceful Places"
-            else -> "General Activities"
+    private fun calculateSearchRadius(accuracy: Float, maxDistance: Double): Double {
+        return when {
+            accuracy <= 50f -> maxDistance
+            accuracy <= 100f -> maxDistance * 0.8
+            else -> maxDistance * 0.6
         }
+    }
+
+    private fun buildAddress(venue: Venue): String {
+        return listOfNotNull(
+            venue.name,
+            venue.address?.line1,
+            venue.city?.name,
+            venue.state?.name
+        ).joinToString(", ")
+    }
+
+    private fun buildMapsUrl(address: String): String {
+        val encodedAddress = Uri.encode(address)
+        return "https://www.google.com/maps/search/?api=1&query=$encodedAddress"
+    }
+
+    private fun getBestImage(images: List<EventImage>): String? {
+        return images.maxByOrNull { it.width * it.height }?.url
+    }
+
+    private fun isWeatherGoodForActivity(description: String?): Boolean {
+        if (description == null) return true
+        val badConditions = listOf("rain", "snow", "storm", "thunder", "heavy")
+        return !badConditions.any { description.lowercase().contains(it) }
     }
 
     private fun calculateDistance(
@@ -190,10 +268,19 @@ class ActivityRepository {
 
         val c = 2 * atan2(sqrt(a), sqrt(1-a))
 
-        return round(R * c * 10) / 10 // Round to 1 decimal place
+        return round(R * c * 100) / 100 // Round to 2 decimal places
     }
 
     private fun Double.toRadians(): Double = this * PI / 180.0
+
+    private fun getCategoryByMood(event: Event, parameters: ActivityParameters): String {
+        return parameters.categories.firstOrNull { category ->
+            event.name.lowercase().contains(category) ||
+                    event.classifications?.any {
+                        it.segment.name.lowercase().contains(category)
+                    } == true
+        } ?: "Entertainment"
+    }
 
     companion object {
         @Volatile

@@ -1,5 +1,8 @@
 package com.rajkumar.cheerly.Activity
 
+import com.rajkumar.cheerly.Activity.Models.EventResponse
+import com.rajkumar.cheerly.Activity.Models.PlaceResponse
+import com.rajkumar.cheerly.Activity.Models.WeatherResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -17,6 +20,7 @@ interface TicketmasterService {
         @Query("apikey") apiKey: String,
         @Query("latlong") latLong: String,
         @Query("radius") radius: String,
+        @Query("unit") unit: String = "km",
         @Query("size") size: Int = 10,
         @Query("sort") sort: String = "date,asc"
     ): Response<EventResponse>

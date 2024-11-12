@@ -11,6 +11,8 @@ import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.rajkumar.cheerly.R
+import com.rajkumar.cheerly.Activity.Models.NearbyActivity
+import kotlin.math.roundToInt
 
 class ActivityAdapter(private val activities: List<NearbyActivity>) :
     RecyclerView.Adapter<ActivityAdapter.ViewHolder>() {
@@ -24,6 +26,7 @@ class ActivityAdapter(private val activities: List<NearbyActivity>) :
         val activityImage: ImageView = view.findViewById(R.id.activityImage)
         val weatherIcon: ImageView = view.findViewById(R.id.weatherIcon)
         val weatherText: TextView = view.findViewById(R.id.weatherText)
+        val mapsIcon: ImageView = view.findViewById(R.id.mapsIcon)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -35,19 +38,22 @@ class ActivityAdapter(private val activities: List<NearbyActivity>) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val activity = activities[position]
 
-        // Set activity title
         holder.activityTitle.text = activity.name
 
-        // Set category
-        holder.activityCategory.text = activity.category.replace("_", " ").capitalize()
+        holder.activityCategory.text = activity.category
+            .split("_")
+            .joinToString(" ") { it.capitalize() }
 
-        // Set distance
-        holder.activityDistance.text = String.format("%.1f km away", activity.distance)
+        // Format distance
+        val distanceText = when {
+            activity.distance < 1.0 -> "${(activity.distance * 1000).roundToInt()} m"
+            else -> String.format("%.1f km", activity.distance)
+        }
+        holder.activityDistance.text = "$distanceText away"
 
-        // Set address
         holder.activityAddress.text = activity.address
 
-        // Load activity image if available
+        // Load activity image
         activity.imageUrl?.let { url ->
             holder.activityImage.load(url) {
                 crossfade(true)
@@ -55,41 +61,60 @@ class ActivityAdapter(private val activities: List<NearbyActivity>) :
                 error(R.drawable.error_image)
             }
         } ?: run {
-            // Load a default image based on activity type
+            // Default image based on category
             val defaultImageRes = when {
-                activity.category.contains("park") -> R.drawable.ic_park
-                activity.category.contains("restaurant") -> R.drawable.ic_restaurant
-                activity.category.contains("event") -> R.drawable.ic_event
+                activity.category.contains("park", ignoreCase = true) -> R.drawable.ic_park
+                activity.category.contains("food", ignoreCase = true) -> R.drawable.ic_restaurant
+                activity.category.contains("event", ignoreCase = true) -> R.drawable.ic_event
                 else -> R.drawable.ic_activity
             }
             holder.activityImage.setImageResource(defaultImageRes)
         }
 
-        // Show weather information if available
+        // Weather information
         activity.weather?.let { weather ->
             holder.weatherIcon.visibility = View.VISIBLE
             holder.weatherText.visibility = View.VISIBLE
 
-            // Load weather icon
             holder.weatherIcon.load("https://openweathermap.org/img/w/${weather.icon}.png") {
                 crossfade(true)
                 placeholder(R.drawable.ic_weather)
             }
 
-            holder.weatherText.text = String.format("%.1f°C, %s",
+            val weatherStatus = if (weather.isGoodForActivity) "Good for visiting" else "Check before going"
+            holder.weatherText.text = String.format("%.1f°C, %s\n%s",
                 weather.temperature,
-                weather.description.capitalize()
+                weather.description.capitalize(),
+                weatherStatus
             )
         } ?: run {
             holder.weatherIcon.visibility = View.GONE
             holder.weatherText.visibility = View.GONE
         }
 
-        // Handle click events
+        // Click handler for Google Maps navigation
         holder.cardView.setOnClickListener {
-            activity.externalLink?.let { link ->
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
-                holder.itemView.context.startActivity(intent)
+            val context = holder.itemView.context
+            try {
+                // Try to open in Google Maps app
+                val gmmIntentUri = Uri.parse("geo:0,0?q=" + Uri.encode(activity.address))
+                val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri).apply {
+                    setPackage("com.google.android.apps.maps")
+                }
+
+                if (mapIntent.resolveActivity(context.packageManager) != null) {
+                    context.startActivity(mapIntent)
+                } else {
+                    // Fallback to browser using Google Maps URL
+                    val browserIntent = Intent(Intent.ACTION_VIEW,
+                        Uri.parse("https://www.google.com/maps/search/?api=1&query=${Uri.encode(activity.address)}"))
+                    context.startActivity(browserIntent)
+                }
+            } catch (e: Exception) {
+                // Final fallback - open address in browser
+                val browserIntent = Intent(Intent.ACTION_VIEW,
+                    Uri.parse("https://www.google.com/maps/search/?api=1&query=${Uri.encode(activity.address)}"))
+                context.startActivity(browserIntent)
             }
         }
     }

@@ -67,10 +67,13 @@ android {
 dependencies {
     // Location
     implementation ("com.google.android.gms:play-services-location:21.0.1")
+    implementation ("com.google.android.gms:play-services-maps:18.2.0")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.1")
 
     // For OpenStreetMap API
     implementation("org.osmdroid:osmdroid-android:6.1.16")
-// YouTube & Google APIs
+
+    // YouTube & Google APIs
     implementation("com.google.apis:google-api-services-youtube:v3-rev20231011-2.0.0")
     implementation("com.google.api-client:google-api-client-android:2.2.0")
     implementation("com.google.http-client:google-http-client-gson:1.42.3")

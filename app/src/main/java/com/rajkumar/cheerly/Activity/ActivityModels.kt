@@ -1,9 +1,15 @@
-package com.rajkumar.cheerly.Activity
+package com.rajkumar.cheerly.Activity.Models
+
+// Base Models
+data class ActivityLocation(
+    val latitude: Double,
+    val longitude: Double
+)
 
 data class NearbyActivity(
     val id: String,
     val name: String,
-    val type: String, // e.g., "event", "place", "venue"
+    val type: String,
     val category: String,
     val distance: Double,
     val address: String,
@@ -11,7 +17,8 @@ data class NearbyActivity(
     val imageUrl: String? = null,
     val openNow: Boolean? = null,
     val weather: WeatherInfo? = null,
-    val externalLink: String? = null
+    val externalLink: String? = null,
+    val placeId: String? = null
 )
 
 data class WeatherInfo(
@@ -21,25 +28,14 @@ data class WeatherInfo(
     val isGoodForActivity: Boolean
 )
 
-data class Location(
-    val latitude: Double,
-    val longitude: Double
+data class ActivityParameters(
+    val categories: List<String>,
+    val keywords: List<String>,
+    val maxDistance: Double,
+    val preferIndoor: Boolean,
+    val preferPopular: Boolean
 )
-
-// OpenStreetMap response models
-data class PlaceResponse(
-    val elements: List<PlaceElement>
-)
-
-data class PlaceElement(
-    val id: Long,
-    val type: String,
-    val lat: Double,
-    val lon: Double,
-    val tags: Map<String, String>
-)
-
-// Ticketmaster response models
+// Event Models
 data class EventResponse(
     val _embedded: EventEmbedded
 )
@@ -54,12 +50,30 @@ data class Event(
     val url: String,
     val images: List<EventImage>,
     val dates: EventDates,
-    val _embedded: EventVenueEmbedded? = null
+    val classifications: List<Classification>? = null,
+    val priceRanges: List<PriceRange>? = null,
+    val _embedded: EventVenueEmbedded? = null,
+    val info: String? = null
+)
+
+data class Classification(
+    val primary: Boolean,
+    val segment: Segment,
+    val genre: Genre? = null
+)
+
+data class Segment(
+    val id: String,
+    val name: String
+)
+
+data class Genre(
+    val id: String,
+    val name: String
 )
 
 data class EventImage(
     val url: String,
-    val ratio: String,
     val width: Int,
     val height: Int
 )
@@ -73,6 +87,13 @@ data class EventStart(
     val localTime: String
 )
 
+data class PriceRange(
+    val type: String,
+    val currency: String,
+    val min: Double,
+    val max: Double
+)
+
 data class EventVenueEmbedded(
     val venues: List<Venue>
 )
@@ -80,34 +101,87 @@ data class EventVenueEmbedded(
 data class Venue(
     val name: String,
     val address: Address,
-    val location: VenueLocation? = null
+    val city: City,
+    val state: State,
+    val location: VenueLocation?,
+    val url: String?
 )
 
 data class Address(
-    val line1: String,
-    val city: String,
-    val state: String,
-    val postalCode: String
+    val line1: String
+)
+
+data class City(
+    val name: String
+)
+
+data class State(
+    val name: String,
+    val stateCode: String
 )
 
 data class VenueLocation(
-    val latitude: Double = 0.0,
-    val longitude: Double = 0.0
+    val latitude: Double,
+    val longitude: Double
 )
 
-// OpenWeatherMap response models
+data class PlaceResponse(
+    val elements: List<PlaceElement>
+)
+
+data class PlaceElement(
+    val id: Long,
+    val type: String,
+    val lat: Double,
+    val lon: Double,
+    val tags: Map<String, String>
+)
+
+// Weather Models
 data class WeatherResponse(
     val main: WeatherMain,
-    val weather: List<WeatherDescription>
+    val weather: List<WeatherDescription>,
+    val wind: Wind,
+    val clouds: Clouds,
+    val visibility: Int
 )
 
 data class WeatherMain(
     val temp: Double,
     val feels_like: Double,
+    val temp_min: Double,
+    val temp_max: Double,
+    val pressure: Int,
     val humidity: Int
 )
 
 data class WeatherDescription(
+    val id: Int,
+    val main: String,
     val description: String,
     val icon: String
 )
+
+data class Wind(
+    val speed: Double,
+    val deg: Int
+)
+
+data class Clouds(
+    val all: Int
+)
+
+// Enums
+enum class PricePreference {
+    LOW,
+    MEDIUM,
+    HIGH,
+    ANY
+}
+
+enum class TimePreference {
+    MORNING,
+    AFTERNOON,
+    EVENING,
+    ANY
+}
