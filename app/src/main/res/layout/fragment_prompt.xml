@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".PromptFragment">
+    tools:context=".PromptFragment"
+    android:background="@android:color/transparent">
+    >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -37,6 +39,7 @@
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="8dp"
+                android:textColor="@android:color/white"
                 android:gravity="center" />
 
             <!-- Description for premium features -->
@@ -45,7 +48,7 @@
                 android:layout_height="wrap_content"
                 android:text="Get personalized AI-powered prompts to help you express your feelings more effectively. Premium members receive unlimited custom prompts tailored to their mood and situation."
                 android:textSize="14sp"
-                android:textColor="#808080"
+                android:textColor="@android:color/white"
                 android:gravity="center"
                 android:layout_marginBottom="24dp" />
 
@@ -55,7 +58,7 @@
                 android:layout_height="wrap_content"
                 android:text="Only $10/month"
                 android:textSize="16sp"
-                android:textColor="#FF5722"
+                android:textColor="@android:color/white"
                 android:layout_marginBottom="16dp"
                 android:gravity="center" />
 
@@ -84,6 +87,7 @@
                 android:text="✓ Unlimited AI-powered prompts\n✓ Personalized suggestions\n✓ Advanced emotion analysis\n✓ Priority support"
                 android:textSize="14sp"
                 android:gravity="center"
+                android:textColor="@android:color/white"
                 android:layout_marginBottom="16dp" />
         </LinearLayout>
 
@@ -94,7 +98,7 @@
             android:layout_height="wrap_content"
             android:text=""
             android:textSize="16sp"
-            android:textColor="#FF5722"
+            android:textColor="@android:color/white"
             android:gravity="center"
             android:visibility="gone"
             android:layout_marginTop="24dp" />

@@ -3,6 +3,7 @@ package com.rajkumar.cheerly
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import kotlinx.coroutines.delay
@@ -14,6 +15,8 @@ class SplashActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
+
+        window.statusBarColor = ContextCompat.getColor(this, R.color.orange_dark)
 
         lifecycleScope.launch {
             // Show splash for 2 seconds

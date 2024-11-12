@@ -57,6 +57,8 @@ class MoodRecommendationActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_mood_recommendation)
 
+        window.statusBarColor = ContextCompat.getColor(this, R.color.orange_dark)
+
         // Initialize repositories and location client
         spotifyRepository = SpotifyRepository.getInstance(this)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)

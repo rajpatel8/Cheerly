@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
+import androidx.core.content.ContextCompat
 
 class UserPrefrence : ComponentActivity() {
 
@@ -26,6 +27,9 @@ class UserPrefrence : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.user_prefrence)
+
+        window.statusBarColor = ContextCompat.getColor(this, R.color.orange_dark)
+
         setupButtons()
         setupNextButton()
     }

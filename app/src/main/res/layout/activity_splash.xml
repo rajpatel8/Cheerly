@@ -12,10 +12,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:context=".SplashActivity">
-
-    <!-- Tag line for the app-->
+    tools:context=".SplashActivity"
+    android:background="@drawable/background_gradient">
 
     <ImageView
         android:id="@+id/logoImageView"
@@ -38,10 +36,7 @@
         android:layout_marginBottom="1dp"
         android:gravity="center"
         android:text="@string/tag_line"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:textSize="16sp" />
-    <!--        // center the text-->
-
-
 </RelativeLayout>
 
