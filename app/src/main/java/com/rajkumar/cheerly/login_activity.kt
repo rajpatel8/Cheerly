@@ -268,7 +268,7 @@ class LoginActivity : ComponentActivity() {
     private fun updateContinueButton() {
         val spotifyConnected = tvSpotifyStatus.text.startsWith("✓")
         val youtubeConnected = tvYouTubeStatus.text.startsWith("✓")
-        btnContinue.isEnabled = true
+        btnContinue.isEnabled = spotifyConnected && youtubeConnected
     }
 
     private fun persistAuthState() {
