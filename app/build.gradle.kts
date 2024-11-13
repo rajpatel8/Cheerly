@@ -32,6 +32,12 @@ android {
         }
     }
 
+    // Add lint configuration
+    lint {
+        baseline = file("lint-baseline.xml")
+        abortOnError = true
+    }
+
     packaging {
         resources {
             excludes += listOf(
@@ -49,7 +55,6 @@ android {
         }
     }
 
-
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -62,19 +67,39 @@ android {
     }
 }
 
+configurations {
+    all {
+        // Exclude problematic transitive dependencies
+        exclude(group = "org.apache.httpcomponents", module = "httpclient")
+        exclude(group = "commons-logging", module = "commons-logging")
+    }
+}
+
 dependencies {
     // Location
-    implementation ("com.google.android.gms:play-services-location:21.0.1")
-    implementation ("com.google.android.gms:play-services-maps:18.2.0")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.1")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.1")
 
     // For OpenStreetMap API
-    implementation("org.osmdroid:osmdroid-android:6.1.16")
+    implementation("org.osmdroid:osmdroid-android:6.1.16") {
+        exclude(group = "org.apache.httpcomponents")
+        exclude(group = "commons-logging")
+    }
 
     // YouTube & Google APIs
-    implementation("com.google.apis:google-api-services-youtube:v3-rev20231011-2.0.0")
-    implementation("com.google.api-client:google-api-client-android:2.2.0")
-    implementation("com.google.oauth-client:google-oauth-client:1.34.1")
+    implementation("com.google.apis:google-api-services-youtube:v3-rev20231011-2.0.0") {
+        exclude(group = "org.apache.httpcomponents")
+        exclude(group = "commons-logging")
+    }
+    implementation("com.google.api-client:google-api-client-android:2.2.0") {
+        exclude(group = "org.apache.httpcomponents")
+        exclude(group = "commons-logging")
+    }
+    implementation("com.google.oauth-client:google-oauth-client:1.34.1") {
+        exclude(group = "org.apache.httpcomponents")
+        exclude(group = "commons-logging")
+    }
 
     // Google Sign In
     implementation("com.google.android.gms:play-services-auth:20.7.0")
@@ -83,7 +108,7 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.google.code.gson:gson:2.10.1")
-    implementation("com.squareup.okhttp3:okhttp:4.11.0") // Use okhttp
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
 
     // JSON parsing
     implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
@@ -111,12 +136,11 @@ dependencies {
     }
     implementation("com.google.android.gms:play-services-base:18.3.0")
 
-    // YouTube API
-    implementation("com.google.apis:google-api-services-youtube:v3-rev20231011-2.0.0")
-    implementation("com.google.api-client:google-api-client-android:2.2.0")
-
     // OAuth
-    implementation("net.openid:appauth:0.11.1")
+    implementation("net.openid:appauth:0.11.1") {
+        exclude(group = "org.apache.httpcomponents")
+        exclude(group = "commons-logging")
+    }
     implementation(libs.androidx.browser)
 
     // Network
