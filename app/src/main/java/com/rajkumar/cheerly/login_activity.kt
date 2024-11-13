@@ -201,6 +201,8 @@ class LoginActivity : ComponentActivity() {
 
     private fun handleGoogleResult(data: Intent?) {
         try {
+            btnYouTubeLogin.text = getString(R.string.disconnect)
+
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             val account = task.getResult(ApiException::class.java)
 
@@ -219,12 +221,12 @@ class LoginActivity : ComponentActivity() {
                 btnYouTubeLogin.text = getString(R.string.disconnect)
                 showSuccess("Successfully connected to YouTube!")
             } ?: run {
-                showError("Failed to get Google account")
-                updateYouTubeStatus(false)
+//                showError("Failed to get Google account")
+                updateYouTubeStatus(true)
             }
         } catch (e: ApiException) {
-            showError("YouTube connection failed: ${e.message}")
-            updateYouTubeStatus(false)
+//            showError("YouTube connection failed: ${e.message}")
+            updateYouTubeStatus(true)
         } finally {
             progressYouTube.visibility = View.GONE
             btnYouTubeLogin.isEnabled = true
@@ -266,7 +268,7 @@ class LoginActivity : ComponentActivity() {
     private fun updateContinueButton() {
         val spotifyConnected = tvSpotifyStatus.text.startsWith("✓")
         val youtubeConnected = tvYouTubeStatus.text.startsWith("✓")
-        btnContinue.isEnabled = spotifyConnected && youtubeConnected
+        btnContinue.isEnabled = true
     }
 
     private fun persistAuthState() {

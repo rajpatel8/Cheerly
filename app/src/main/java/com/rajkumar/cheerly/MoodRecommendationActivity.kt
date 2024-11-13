@@ -19,15 +19,16 @@ import com.google.android.gms.location.*
 import com.rajkumar.cheerly.Music.SongAdapter
 import com.rajkumar.cheerly.Music.SpotifyRepository
 import com.rajkumar.cheerly.Podcast.PodcastAdapter
-import com.rajkumar.cheerly.Podcast.PodcastRepository
 import com.rajkumar.cheerly.Video.VideoAdapter
 import com.rajkumar.cheerly.Video.VideoRepository
 import com.rajkumar.cheerly.Activity.ActivityAdapter
 import com.rajkumar.cheerly.Activity.ActivityRepository
 import com.rajkumar.cheerly.Activity.Models.ActivityLocation
+import com.rajkumar.cheerly.Podcast.TeddyPodcastRepository
 import kotlinx.coroutines.launch
 
 class MoodRecommendationActivity : ComponentActivity() {
+    private val TAG = "MoodRecommendation"
 
     private lateinit var musicRecyclerView: RecyclerView
     private lateinit var videoRecyclerView: RecyclerView
@@ -45,7 +46,7 @@ class MoodRecommendationActivity : ComponentActivity() {
     // Initialize repositories
     private lateinit var spotifyRepository: SpotifyRepository
     private lateinit var youtubeRepository: VideoRepository
-    private lateinit var podcastRepository: PodcastRepository
+    private lateinit var podcastRepository: TeddyPodcastRepository
     private lateinit var activityRepository: ActivityRepository
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -63,7 +64,7 @@ class MoodRecommendationActivity : ComponentActivity() {
         // Initialize repositories with context
         spotifyRepository = SpotifyRepository.getInstance(this)
         youtubeRepository = VideoRepository.getInstance(this)
-        podcastRepository = PodcastRepository.getInstance()
+        podcastRepository = TeddyPodcastRepository.getInstance()
         activityRepository = ActivityRepository.getInstance()
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -168,38 +169,50 @@ class MoodRecommendationActivity : ComponentActivity() {
             try {
                 // Load music recommendations
                 try {
+                    Log.d(TAG, "Loading music recommendations for mood: $mood")
                     val tracks = spotifyRepository.getRecommendations(mood)
                     if (tracks.isNotEmpty()) {
                         musicRecyclerView.adapter = SongAdapter(tracks)
                         musicSectionTitle.visibility = View.VISIBLE
                         musicRecyclerView.visibility = View.VISIBLE
+                        Log.d(TAG, "Successfully loaded ${tracks.size} music tracks")
+                    } else {
+                        Log.d(TAG, "No music tracks found for mood: $mood")
                     }
                 } catch (e: Exception) {
-                    Log.e("MoodRecommendation", "Error loading music", e)
+                    Log.d(TAG, "Error loading music: ${e.message}")
                 }
 
                 // Load video recommendations
                 try {
+                    Log.d(TAG, "Loading video recommendations for mood: $mood")
                     val videos = youtubeRepository.getVideoRecommendations(mood)
                     if (videos.isNotEmpty()) {
                         videoRecyclerView.adapter = VideoAdapter(videos)
                         videoSectionTitle.visibility = View.VISIBLE
                         videoRecyclerView.visibility = View.VISIBLE
+                        Log.d(TAG, "Successfully loaded ${videos.size} videos")
+                    } else {
+                        Log.d(TAG, "No videos found for mood: $mood")
                     }
                 } catch (e: Exception) {
-                    Log.e("MoodRecommendation", "Error loading videos", e)
+                    Log.d(TAG, "Error loading videos: ${e.message}")
                 }
 
                 // Load podcast recommendations
                 try {
+                    Log.d(TAG, "Loading podcast recommendations for mood: $mood")
                     val podcasts = podcastRepository.getPodcastRecommendations(mood)
                     if (podcasts.isNotEmpty()) {
                         podcastRecyclerView.adapter = PodcastAdapter(podcasts)
                         podcastSectionTitle.visibility = View.VISIBLE
                         podcastRecyclerView.visibility = View.VISIBLE
+                        Log.d(TAG, "Successfully loaded ${podcasts.size} podcasts")
+                    } else {
+                        Log.d(TAG, "No podcasts found for mood: $mood")
                     }
                 } catch (e: Exception) {
-                    Log.e("MoodRecommendation", "Error loading podcasts", e)
+                    Log.d(TAG, "Error loading podcasts: ${e.message}")
                 }
 
             } catch (e: Exception) {

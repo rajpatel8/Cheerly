@@ -16,6 +16,8 @@ import com.rajkumar.cheerly.R
 class PodcastAdapter(private val podcasts: List<PodcastEpisode>) :
     RecyclerView.Adapter<PodcastAdapter.ViewHolder>() {
 
+    private val TAG = "PodcastAdapter"
+
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val cardView: CardView = view.findViewById(R.id.cardView)
         val podcastTitle: TextView = view.findViewById(R.id.podcastTitle)
@@ -32,32 +34,41 @@ class PodcastAdapter(private val podcasts: List<PodcastEpisode>) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val podcast = podcasts[position]
 
-        // Set podcast title
-        holder.podcastTitle.text = podcast.title_original
-        holder.podcastTitle.visibility = View.VISIBLE
+        try {
+            // Set podcast title with ellipsis if too long
+            holder.podcastTitle.apply {
+                text = podcast.title_original
+                maxLines = 2
+                ellipsize = android.text.TextUtils.TruncateAt.END
+            }
 
-        // Set publisher name
-        holder.publisherName.text = podcast.podcast.publisher_original
-        holder.publisherName.visibility = View.VISIBLE
+            // Set publisher name with ellipsis if too long
+            holder.publisherName.apply {
+                text = podcast.podcast.publisher_original
+                maxLines = 1
+                ellipsize = android.text.TextUtils.TruncateAt.END
+            }
 
-        // Load thumbnail
-        holder.podcastThumbnail.load(podcast.thumbnail) {
-            crossfade(true)
-            placeholder(R.drawable.placeholder_image)
-            error(R.drawable.error_image)
+            // Load thumbnail with error handling
+            holder.podcastThumbnail.load(podcast.thumbnail) {
+                crossfade(true)
+                placeholder(R.drawable.placeholder_image)
+                error(R.drawable.error_image)
+            }
+
+            // Handle click with error handling
+            holder.cardView.setOnClickListener {
+                try {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(podcast.link))
+                    holder.itemView.context.startActivity(intent)
+                } catch (e: Exception) {
+                    Log.d(TAG, "Error opening podcast link: ${e.message}")
+                }
+            }
+
+        } catch (e: Exception) {
+            Log.d(TAG, "Error binding podcast at position $position: ${e.message}")
         }
-
-        holder.cardView.setOnClickListener {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(podcast.link))
-            holder.itemView.context.startActivity(intent)
-        }
-
-        // For debugging
-        Log.d("PodcastAdapter", """
-            Binding podcast at position $position:
-            Title: ${podcast.title_original}
-            Publisher: ${podcast.podcast.publisher_original}
-        """.trimIndent())
     }
 
     override fun getItemCount() = podcasts.size
