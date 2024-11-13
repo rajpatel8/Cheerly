@@ -72,7 +72,6 @@ class LoginActivity : ComponentActivity() {
         googleSignInClient = GoogleSignIn.getClient(this, gso)
     }
 
-
     private fun initializeViews() {
         btnSpotifyLogin = findViewById(R.id.btnSpotifyLogin)
         btnYouTubeLogin = findViewById(R.id.btnYouTubeLogin)
