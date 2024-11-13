@@ -7,7 +7,7 @@ import kotlinx.coroutines.withContext
 
 class VideoRepository private constructor() {
     private val videoService = VideoService.getInstance()
-    private val API_KEY = "AIzaSyARuNG3izYaKb5ao8nErJd9tKqupYrF3-A" // Replace with your YouTube API key
+    private val API_KEY = "AIzaSyAmAk1_sVwApr4rmxvNJ-XRLlGaQFGOA78" // Replace with your YouTube API key
 
     private val moodQueries = mapOf(
         "happy" to listOf(
