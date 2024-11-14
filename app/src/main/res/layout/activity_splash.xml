@@ -22,8 +22,14 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:rotationX="0"
-        android:scaleType="centerInside"
-        android:src="@drawable/splash_screen_logo" />
+        android:scaleType="centerCrop"
+        android:src="@drawable/background_image" />
+
+    <ImageView
+        android:layout_width="300dp"
+        android:layout_height="200dp"
+        android:src="@drawable/splash_screen_logo"
+        android:layout_centerInParent="true" />
 
     <TextView
         android:id="@+id/tagLineTextView"
