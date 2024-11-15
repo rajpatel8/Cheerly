@@ -36,7 +36,7 @@ interface SpotifyApiService {
     suspend fun getTopTracks(
         @Header("Authorization") auth: String,
         @Query("limit") limit: Int = 5,
-        @Query("time_range") timeRange: String = "medium_term"
+        @Query("time_range") timeRange: String = "long_term"
     ): Response<TopTracksResponse>
 
     @GET("me/player/recently-played")

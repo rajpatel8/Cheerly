@@ -74,6 +74,8 @@ dependencies {
 
     // For OpenStreetMap API
     implementation("org.osmdroid:osmdroid-android:6.1.16")
+    implementation(libs.androidx.rules)
+    implementation(libs.espresso.core)
 
     // YouTube & Google APIs
     dependencies {
@@ -162,4 +164,12 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-}}
+
+
+        testImplementation( libs.mockito.core)
+        testImplementation (libs.mockito.inline)
+        testImplementation (libs.androidx.core)
+        testImplementation (libs.androidx.junit.v113)
+        testImplementation (libs.robolectric)
+    }
+}
