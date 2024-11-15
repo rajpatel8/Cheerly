@@ -39,98 +39,215 @@ class ActivityRepository private constructor() {
         val preferPopular: Boolean,
         val weatherSensitive: Boolean,
         val timeOfDayPreference: List<String>,
-        val pricePreference: PricePreference
+        val pricePreference: PricePreference,
+        val moodSpecificFilters: (FoursquareVenue) -> Boolean
     )
 
     private val moodParameters = mapOf(
         "happy" to MoodParameters(
             foursquareCategories = listOf(
-                13003, // Park
                 10000, // Arts & Entertainment
-                13065, // Plaza
                 13338, // Nightlife
+                13003, // Park
+                13065, // Plaza
                 13035  // Coffee Shop
             ),
-            venueKeywords = listOf("fun", "entertainment", "social", "lively"),
+            venueKeywords = listOf("festival", "entertainment", "social", "party", "fun"),
             eventCategories = listOf("music", "comedy", "family", "attractions"),
-            eventKeywords = listOf("festival", "carnival", "concert", "party"),
+            eventKeywords = listOf("festival", "carnival", "concert", "celebration"),
             maxDistance = 30.0,
             preferIndoor = false,
             preferPopular = true,
             weatherSensitive = true,
             timeOfDayPreference = listOf("afternoon", "evening"),
-            pricePreference = PricePreference.ANY
+            pricePreference = PricePreference.ANY,
+            moodSpecificFilters = { venue ->
+                venue.categories.any { cat ->
+                    cat.name.lowercase().let { name ->
+                        name.contains("entertainment") ||
+                                name.contains("amusement") ||
+                                name.contains("fun") ||
+                                name.contains("social")
+                    }
+                }
+            }
         ),
+
         "sad" to MoodParameters(
             foursquareCategories = listOf(
                 13003, // Park
                 13091, // Garden
                 12072, // Wellness
-                12089, // Spa
-                13035  // Coffee Shop
+                13035, // Coffee Shop
+                12051  // Library
             ),
-            venueKeywords = listOf("peaceful", "quiet", "nature", "relaxing"),
-            eventCategories = listOf("art", "wellness", "museum"),
-            eventKeywords = listOf("meditation", "exhibition", "workshop"),
+            venueKeywords = listOf("peaceful", "quiet", "nature", "relaxing", "comfort"),
+            eventCategories = listOf("art", "wellness", "museum", "cultural"),
+            eventKeywords = listOf("meditation", "exhibition", "workshop", "gallery"),
             maxDistance = 15.0,
             preferIndoor = true,
             preferPopular = false,
             weatherSensitive = false,
             timeOfDayPreference = listOf("morning", "afternoon"),
-            pricePreference = PricePreference.MEDIUM
+            pricePreference = PricePreference.LOW,
+            moodSpecificFilters = { venue ->
+                venue.categories.any { cat ->
+                    cat.name.lowercase().let { name ->
+                        name.contains("garden") ||
+                                name.contains("park") ||
+                                name.contains("spa") ||
+                                name.contains("library")
+                    }
+                }
+            }
         ),
+
         "excited" to MoodParameters(
             foursquareCategories = listOf(
                 13338, // Nightlife
                 10000, // Arts & Entertainment
                 18000, // Sports
-                13384  // Fitness
+                13384, // Fitness
+                13273  // Arcade
             ),
-            venueKeywords = listOf("adventure", "active", "sports", "thrilling"),
-            eventCategories = listOf("sports", "music", "dance"),
-            eventKeywords = listOf("competition", "game", "performance"),
+            venueKeywords = listOf("adventure", "active", "sports", "energetic", "thrilling"),
+            eventCategories = listOf("sports", "music", "dance", "adventure"),
+            eventKeywords = listOf("competition", "game", "performance", "challenge"),
             maxDistance = 40.0,
             preferIndoor = false,
             preferPopular = true,
             weatherSensitive = true,
             timeOfDayPreference = listOf("afternoon", "evening"),
-            pricePreference = PricePreference.ANY
+            pricePreference = PricePreference.ANY,
+            moodSpecificFilters = { venue ->
+                venue.categories.any { cat ->
+                    cat.name.lowercase().let { name ->
+                        name.contains("sports") ||
+                                name.contains("fitness") ||
+                                name.contains("dance") ||
+                                name.contains("adventure")
+                    }
+                }
+            }
         ),
+
         "relaxed" to MoodParameters(
             foursquareCategories = listOf(
                 13003, // Park
                 13091, // Garden
                 13035, // Coffee Shop
-                12072  // Wellness
+                12072, // Wellness
+                12089  // Spa
             ),
-            venueKeywords = listOf("peaceful", "calm", "serene", "cozy"),
-            eventCategories = listOf("wellness", "art", "cultural"),
-            eventKeywords = listOf("meditation", "gallery", "garden"),
+            venueKeywords = listOf("peaceful", "calm", "serene", "cozy", "tranquil"),
+            eventCategories = listOf("wellness", "art", "cultural", "nature"),
+            eventKeywords = listOf("meditation", "garden", "relaxation", "peaceful"),
             maxDistance = 20.0,
             preferIndoor = false,
             preferPopular = false,
             weatherSensitive = false,
             timeOfDayPreference = listOf("morning", "afternoon"),
-            pricePreference = PricePreference.MEDIUM
+            pricePreference = PricePreference.MEDIUM,
+            moodSpecificFilters = { venue ->
+                venue.categories.any { cat ->
+                    cat.name.lowercase().let { name ->
+                        name.contains("cafe") ||
+                                name.contains("garden") ||
+                                name.contains("spa") ||
+                                name.contains("wellness")
+                    }
+                }
+            }
         ),
+
+        "bored" to MoodParameters(
+            foursquareCategories = listOf(
+                10000, // Arts & Entertainment
+                13273, // Arcade
+                13003, // Park
+                13338, // Nightlife
+                13035  // Coffee Shop
+            ),
+            venueKeywords = listOf("interesting", "unique", "fun", "entertaining", "novel"),
+            eventCategories = listOf("entertainment", "sports", "music", "comedy"),
+            eventKeywords = listOf("event", "show", "game", "experience"),
+            maxDistance = 25.0,
+            preferIndoor = true,
+            preferPopular = true,
+            weatherSensitive = false,
+            timeOfDayPreference = listOf("morning", "afternoon", "evening"),
+            pricePreference = PricePreference.ANY,
+            moodSpecificFilters = { venue ->
+                venue.categories.any { cat ->
+                    cat.name.lowercase().let { name ->
+                        name.contains("entertainment") ||
+                                name.contains("arcade") ||
+                                name.contains("activity") ||
+                                name.contains("game")
+                    }
+                }
+            }
+        ),
+
+        "anxious" to MoodParameters(
+            foursquareCategories = listOf(
+                13091, // Garden
+                12072, // Wellness
+                12089, // Spa
+                13035, // Coffee Shop
+                12051  // Library
+            ),
+            venueKeywords = listOf("quiet", "peaceful", "calming", "safe", "comfort"),
+            eventCategories = listOf("wellness", "yoga", "meditation", "art"),
+            eventKeywords = listOf("relaxation", "mindfulness", "peace", "wellness"),
+            maxDistance = 15.0, // Keeping it close for comfort
+            preferIndoor = true,
+            preferPopular = false, // Prefer less crowded places
+            weatherSensitive = false,
+            timeOfDayPreference = listOf("morning", "afternoon"),
+            pricePreference = PricePreference.MEDIUM,
+            moodSpecificFilters = { venue ->
+                venue.categories.any { cat ->
+                    cat.name.lowercase().let { name ->
+                        name.contains("wellness") ||
+                                name.contains("library") ||
+                                name.contains("garden") ||
+                                name.contains("bookstore")
+                    }
+                }
+            }
+        ),
+
         "focused" to MoodParameters(
             foursquareCategories = listOf(
                 13035, // Coffee Shop
                 12051, // Library
                 13145, // Coworking Space
-                13003  // Park
+                13002, // Study Area
+                12072  // Wellness
             ),
-            venueKeywords = listOf("quiet", "study", "work", "productive"),
-            eventCategories = listOf("learning", "workshop", "seminar"),
-            eventKeywords = listOf("workshop", "study", "learning"),
+            venueKeywords = listOf("quiet", "study", "work", "productive", "concentration"),
+            eventCategories = listOf("learning", "workshop", "seminar", "education"),
+            eventKeywords = listOf("workshop", "study", "learning", "class"),
             maxDistance = 15.0,
             preferIndoor = true,
-            preferPopular = false,
+            preferPopular = false, // Prefer quieter places
             weatherSensitive = false,
             timeOfDayPreference = listOf("morning", "afternoon"),
-            pricePreference = PricePreference.LOW
+            pricePreference = PricePreference.LOW,
+            moodSpecificFilters = { venue ->
+                venue.categories.any { cat ->
+                    cat.name.lowercase().let { name ->
+                        name.contains("library") ||
+                                name.contains("coffee") ||
+                                name.contains("study") ||
+                                name.contains("coworking")
+                    }
+                }
+            }
         )
     )
+
 
     init {
         val okHttpClient = OkHttpClient.Builder()
@@ -174,7 +291,7 @@ class ActivityRepository private constructor() {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(OpenWeatherService::class.java)
-         }
+    }
 
     private class LoggingInterceptor : Interceptor {
         override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
@@ -212,44 +329,17 @@ class ActivityRepository private constructor() {
             // Get weather info first as it affects other recommendations
             val weather = getWeatherInfo(location)
 
-            // Fetch venues and events in parallel with location filtering
-            val (venues, events) = withContext(Dispatchers.IO) {
-                val venuesDeferred = async {
-                    getFoursquareVenues(location, parameters, radius)
-                }
-                val eventsDeferred = async {
-                    getTicketmasterEvents(location, parameters, radius)
-                }
-                Pair(venuesDeferred.await(), eventsDeferred.await())
-            }
+            // Fetch venues and events in parallel
+            val venues = getFoursquareVenues(location, parameters, radius)
+            Log.d(TAG, "Retrieved ${venues.size} venues from Foursquare")
 
-            // Filter out results that are too far
-            val filteredVenues = venues.filter { venue ->
-                val distance = calculateActualDistance(
-                    location.latitude, location.longitude,
-                    venue.location.lat, venue.location.lng
-                )
-                distance <= MAX_ACTUAL_DISTANCE_KM
-            }
+            val events = getTicketmasterEvents(location, parameters, radius)
+            Log.d(TAG, "Retrieved ${events.size} events from Ticketmaster")
 
-            val filteredEvents = events.filter { event ->
-                val venue = event._embedded?.venues?.firstOrNull()
-                if (venue?.location != null) {
-                    val distance = calculateActualDistance(
-                        location.latitude, location.longitude,
-                        venue.location.latitude.toDouble(),
-                        venue.location.longitude.toDouble()
-                    )
-                    distance <= MAX_ACTUAL_DISTANCE_KM
-                } else {
-                    false
-                }
-            }
-
-            // Process recommendations with filtered results
+            // Process recommendations with retrieved venues and events
             processRecommendations(
-                venues = filteredVenues,
-                events = filteredEvents,
+                venues = venues,  // Make sure we're passing the venues list
+                events = events,
                 weather = weather,
                 parameters = parameters,
                 location = location
@@ -259,6 +349,7 @@ class ActivityRepository private constructor() {
             emptyList()
         }
     }
+
     private fun calculateActualDistance(
         lat1: Double, lon1: Double,
         lat2: Double, lon2: Double
@@ -295,58 +386,71 @@ class ActivityRepository private constructor() {
         radius: Int
     ): List<FoursquareVenue> {
         return try {
-            Log.d(TAG, """
-            Searching for venues:
-            Location: ${location.latitude}, ${location.longitude}
-            Radius: $radius meters
-            Categories: ${parameters.foursquareCategories.joinToString(",")}
-        """.trimIndent())
-
-            val categories = parameters.foursquareCategories.joinToString(",")
-            val query = parameters.venueKeywords.shuffled().take(2).joinToString(" ")
-            val latLong = "${location.latitude},${location.longitude}"
-
-            val response = foursquareService.searchVenues(
-                apiKey = FOURSQUARE_API_KEY,
-                query = query,
-                latLong = latLong,
+            // First try with categories
+            val categoriesResponse = foursquareService.searchVenues(
+                apiKey = FOURSQUARE_API_KEY,  // Remove "Bearer" prefix - it's already in the key
+                query = parameters.venueKeywords.take(2).joinToString(" "),
+                latLong = "${location.latitude},${location.longitude}",
                 radius = radius,
-                categories = categories,
-                sort = FoursquareService.DEFAULT_SORT,
-                limit = 50,
-                fields = FoursquareService.DEFAULT_FIELDS
+                categories = parameters.foursquareCategories.joinToString(",")
             )
 
-            if (response.isSuccessful) {
-                val venues = response.body()?.results ?: emptyList()
-                Log.d(TAG, "Found ${venues.size} venues before filtering")
-
-                venues.filter { venue ->
-                    val distance = calculateActualDistance(
-                        location.latitude, location.longitude,
-                        venue.location.lat, venue.location.lng
-                    )
-                    val withinDistance = distance <= MAX_ACTUAL_DISTANCE_KM
-                    Log.d(TAG, """
-                    Venue: ${venue.name}
-                    Distance: ${distance}km
-                    Within range: $withinDistance
-                    Location: ${venue.location.lat}, ${venue.location.lng}
-                """.trimIndent())
-                    withinDistance
-                }.also {
-                    Log.d(TAG, "Returning ${it.size} venues after filtering")
-                }
+            var venues = if (categoriesResponse.isSuccessful) {
+                Log.d(TAG, "Category search response: ${categoriesResponse.code()}")
+                categoriesResponse.body()?.results ?: emptyList()
             } else {
-                Log.e(TAG, "Foursquare API error: ${response.code()} - ${response.errorBody()?.string()}")
+                Log.e(TAG, "Category search failed: ${categoriesResponse.code()} - ${categoriesResponse.errorBody()?.string()}")
                 emptyList()
             }
+
+            // If no results, try without categories
+            if (venues.isEmpty()) {
+                val backupResponse = foursquareService.searchVenues(
+                    apiKey = FOURSQUARE_API_KEY,
+                    query = parameters.venueKeywords.first(),
+                    latLong = "${location.latitude},${location.longitude}",
+                    radius = radius,
+                    categories = null
+                )
+
+                if (backupResponse.isSuccessful) {
+                    venues = backupResponse.body()?.results ?: emptyList()
+                    Log.d(TAG, "Backup search found ${venues.size} venues")
+                } else {
+                    Log.e(TAG, "Backup search failed: ${backupResponse.code()} - ${backupResponse.errorBody()?.string()}")
+                }
+            }
+
+            // Try one more time with a generic query if still no results
+            if (venues.isEmpty()) {
+                val lastResponse = foursquareService.searchVenues(
+                    apiKey = FOURSQUARE_API_KEY,
+                    query = "entertainment places",
+                    latLong = "${location.latitude},${location.longitude}",
+                    radius = radius,
+                    categories = null
+                )
+
+                if (lastResponse.isSuccessful) {
+                    venues = lastResponse.body()?.results ?: emptyList()
+                    Log.d(TAG, "Generic search found ${venues.size} venues")
+                }
+            }
+
+            // Log final results
+            Log.d(TAG, """
+            Foursquare search results:
+            Total venues found: ${venues.size}
+            Categories: ${venues.flatMap { it.categories.map { cat -> cat.name } }.distinct()}
+        """.trimIndent())
+
+            venues
+
         } catch (e: Exception) {
             Log.e(TAG, "Error fetching Foursquare venues", e)
             emptyList()
         }
     }
-
     private suspend fun getTicketmasterEvents(
         location: ActivityLocation,
         parameters: MoodParameters,
@@ -423,6 +527,7 @@ class ActivityRepository private constructor() {
 
         return (matchesCategory || matchesKeywords) && priceInRange
     }
+
     private fun processRecommendations(
         venues: List<FoursquareVenue>,
         events: List<Event>,
@@ -430,36 +535,79 @@ class ActivityRepository private constructor() {
         parameters: MoodParameters,
         location: ActivityLocation
     ): List<NearbyActivity> {
+        Log.d(TAG, """
+        Starting recommendations processing:
+        Venues available: ${venues.size}
+        Events available: ${events.size}
+        Weather: ${weather?.description ?: "Not available"}
+    """.trimIndent())
+
         val activities = mutableListOf<NearbyActivity>()
 
-        Log.d(TAG, "Processing ${venues.size} venues and ${events.size} events")
-
-        // Process venues with less strict filtering
+        // Process venues first
         venues.forEach { venue ->
-            val basicActivity = convertFoursquareToNearbyActivity(venue, weather)
-            // Removed activityMatchesParameters check to be more lenient
-            val enhancedActivity = enhanceActivityWithContextualInfo(basicActivity, weather, parameters)
-            activities.add(enhancedActivity)
+            try {
+                val activity = convertFoursquareToNearbyActivity(venue, weather)
+                Log.d(TAG, """
+                Processing venue:
+                Name: ${venue.name}
+                Category: ${venue.categories.firstOrNull()?.name}
+                Distance: ${venue.distance}m
+                Rating: ${venue.rating}
+            """.trimIndent())
+
+                // Be more lenient with venue filtering initially
+                if (venue.distance <= parameters.maxDistance * 1000) { // Convert km to meters
+                    activities.add(activity)
+                    Log.d(TAG, "Added venue: ${activity.name}")
+                } else {
+                    Log.d(TAG, "Filtered out venue due to distance: ${activity.name}")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error processing venue ${venue.name}", e)
+            }
         }
 
-        // Process events with less strict filtering
+        // Process events
         events.forEach { event ->
-            val basicActivity = convertEventToNearbyActivity(event, location, weather)
-            // Removed activityMatchesParameters check to be more lenient
-            val enhancedActivity = enhanceActivityWithContextualInfo(basicActivity, weather, parameters)
-            activities.add(enhancedActivity)
+            try {
+                val activity = convertEventToNearbyActivity(event, location, weather)
+                if (shouldIncludeActivity(activity, parameters, weather)) {
+                    activities.add(activity)
+                    Log.d(TAG, "Added event: ${activity.name}")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error processing event ${event.name}", e)
+            }
         }
 
-        // Sort and return all recommendations, taking more results
+        // Log intermediate results
+        Log.d(TAG, """
+        After initial filtering:
+        Total activities: ${activities.size}
+        Venues: ${activities.count { it.type == "venue" }}
+        Events: ${activities.count { it.type == "event" }}
+    """.trimIndent())
+
+        // Ensure we have a mix of venues and events
         return activities
-            .distinctBy { it.id }
-            .sortedWith(
-                compareBy<NearbyActivity> { -calculateRecommendationScore(it, parameters, weather) }
-                    .thenBy { it.distance }
-            )
-            .take(10)  // Increased from 5 to 10
-            .also {
-                Log.d(TAG, "Returning ${it.size} final recommendations")
+            .groupBy { it.type }
+            .flatMap { (type, typeActivities) ->
+                Log.d(TAG, "Processing $type: ${typeActivities.size} items")
+                typeActivities
+                    .sortedByDescending { calculateRecommendationScore(it, parameters, weather) }
+                    .take(if (type == "venue") 5 else 5) // Take up to 5 of each type
+            }
+            .sortedByDescending { calculateRecommendationScore(it, parameters, weather) }
+            .take(10)
+            .also { finalActivities ->
+                Log.d(TAG, """
+                Final recommendations:
+                Total: ${finalActivities.size}
+                Venues: ${finalActivities.count { it.type == "venue" }}
+                Events: ${finalActivities.count { it.type == "event" }}
+                Items: ${finalActivities.map { "${it.name} (${it.type})" }.joinToString(", ")}
+            """.trimIndent())
             }
     }
     private fun activityMatchesParameters(
@@ -491,12 +639,22 @@ class ActivityRepository private constructor() {
         venue: FoursquareVenue,
         weather: WeatherInfo?
     ): NearbyActivity {
+        val category = venue.categories.firstOrNull()?.name ?: "Place"
+        val distance = venue.distance / 1000.0 // Convert meters to kilometers
+
+        Log.d(TAG, """
+        Converting venue:
+        Name: ${venue.name}
+        Category: $category
+        Distance: $distance km
+    """.trimIndent())
+
         return NearbyActivity(
             id = "fsq_${venue.fsq_id}",
             name = venue.name,
             type = "venue",
-            category = venue.categories.firstOrNull()?.name ?: "Place",
-            distance = venue.distance / 1000.0, // Convert meters to kilometers
+            category = category,
+            distance = distance,
             address = venue.location.formatted_address,
             rating = venue.rating?.toFloat(),
             imageUrl = venue.photos?.firstOrNull()?.let {
@@ -642,38 +800,59 @@ class ActivityRepository private constructor() {
         parameters: MoodParameters,
         weather: WeatherInfo?
     ): Boolean {
-        val currentPeriod = getPeriodOfDay()
+        // Log the start of filtering for this activity
+        Log.d(TAG, "Filtering activity: ${activity.name}")
 
-        // Time of day preference
-        if (!parameters.timeOfDayPreference.contains(currentPeriod)) {
+        // Distance check
+        if (activity.distance > parameters.maxDistance * 1.5) {
+            Log.d(TAG, "Activity ${activity.name} filtered out due to distance: ${activity.distance} km (max: ${parameters.maxDistance * 1.5} km)")
             return false
         }
 
-        // Weather conditions for outdoor activities
-        if (parameters.weatherSensitive && !parameters.preferIndoor) {
-            if (weather?.isGoodForActivity == false) {
+        // Weather check for outdoor venues
+        if (parameters.weatherSensitive && weather != null && !parameters.preferIndoor) {
+            val isOutdoorVenue = activity.category.lowercase().let { cat ->
+                cat.contains("park") || cat.contains("outdoor") || cat.contains("garden")
+            }
+
+            if (isOutdoorVenue && !weather.isGoodForActivity) {
+                Log.d(TAG, "Outdoor activity ${activity.name} filtered out due to weather: ${weather.description}")
                 return false
             }
         }
 
-        // Indoor/outdoor preference based on current weather
-        if (weather != null) {
-            val isOutdoorVenue = listOf("park", "garden", "plaza", "outdoor")
-                .any { activity.category.lowercase().contains(it) }
-
-            if (isOutdoorVenue && !weather.isGoodForActivity && parameters.weatherSensitive) {
+        // Modified popularity check - only apply to venues, not events
+        if (parameters.preferPopular && activity.type == "venue") {
+            val rating = activity.rating ?: 0f
+            if (rating < 3.5f) {
+                Log.d(TAG, "Venue ${activity.name} filtered out due to low rating: $rating")
                 return false
             }
         }
 
-        // Popular venues preference
-        if (parameters.preferPopular) {
-            val hasGoodRating = activity.rating?.let { it >= 4.0f } ?: false
-            if (!hasGoodRating) {
-                return false
-            }
+        // Time of day check
+        val currentPeriod = getPeriodOfDay()
+        if (!parameters.timeOfDayPreference.contains(currentPeriod)) {
+            Log.d(TAG, "Activity ${activity.name} filtered out due to time preference. Current: $currentPeriod, Preferred: ${parameters.timeOfDayPreference}")
+            return false
         }
 
+        // Check if the activity category or name matches any of the mood keywords
+        val keywordMatch = parameters.venueKeywords.any { keyword ->
+            activity.category.lowercase().contains(keyword.lowercase()) ||
+                    activity.name.lowercase().contains(keyword.lowercase()) ||
+                    // For events, also check event categories
+                    (activity.type == "event" && parameters.eventCategories.any { cat ->
+                        activity.category.lowercase().contains(cat.lowercase())
+                    })
+        }
+
+        if (!keywordMatch) {
+            Log.d(TAG, "Activity ${activity.name} filtered out due to no keyword matches with mood")
+            return false
+        }
+
+        Log.d(TAG, "Activity ${activity.name} passed all filters")
         return true
     }
 
@@ -779,18 +958,56 @@ class ActivityRepository private constructor() {
         parameters: MoodParameters,
         weather: WeatherInfo?
     ): Double {
-        val metrics = RecommendationMetrics(
-            weatherScore = calculateWeatherScore(activity, weather, parameters),
-            distanceScore = calculateDistanceScore(activity, parameters.maxDistance),
-            relevanceScore = calculateRelevanceScore(activity, parameters),
-            popularityScore = calculatePopularityScore(activity, parameters.preferPopular)
-        )
+        val baseScore = listOf(
+            calculateWeatherScore(activity, weather, parameters) * 0.2,
+            calculateDistanceScore(activity, parameters.maxDistance) * 0.2,
+            calculateTimeScore(activity, parameters.timeOfDayPreference) * 0.15,
+            calculatePopularityScore(activity, parameters.preferPopular) * 0.15,
+            calculateCategoryMatchScore(activity, parameters) * 0.3
+        ).sum()
 
-        return (metrics.weatherScore * 0.3 +
-                metrics.distanceScore * 0.25 +
-                metrics.relevanceScore * 0.25 +
-                metrics.popularityScore * 0.2)
+        // Apply mood-specific adjustments
+        val moodMultiplier = when (activity.category.lowercase()) {
+            // Boost scores for particularly good matches with the mood
+            in listOf("library", "study", "coworking") ->
+                if (parameters.timeOfDayPreference.contains("morning")) 1.2 else 1.0
+            in listOf("nightlife", "bar", "club") ->
+                if (parameters.timeOfDayPreference.contains("evening")) 1.2 else 0.8
+            in listOf("park", "garden") ->
+                if (weather?.isGoodForActivity == true) 1.2 else 0.7
+            else -> 1.0
+        }
+
+        return baseScore * moodMultiplier
     }
+
+    private fun calculateCategoryMatchScore(
+        activity: NearbyActivity,
+        parameters: MoodParameters
+    ): Double {
+        val categoryMatch = parameters.venueKeywords.any { keyword ->
+            activity.category.lowercase().contains(keyword.lowercase())
+        }
+        val nameMatch = parameters.venueKeywords.any { keyword ->
+            activity.name.lowercase().contains(keyword.lowercase())
+        }
+
+        return when {
+            categoryMatch && nameMatch -> 1.0
+            categoryMatch -> 0.8
+            nameMatch -> 0.6
+            else -> 0.4
+        }
+    }
+
+    private fun calculateTimeScore(
+        activity: NearbyActivity,
+        preferredTimes: List<String>
+    ): Double {
+        val currentPeriod = getPeriodOfDay()
+        return if (preferredTimes.contains(currentPeriod)) 1.0 else 0.5
+    }
+
 
     private fun calculateWeatherScore(
         activity: NearbyActivity,
