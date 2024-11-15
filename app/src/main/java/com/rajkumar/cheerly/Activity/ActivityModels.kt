@@ -15,10 +15,11 @@ data class NearbyActivity(
     val address: String,
     val rating: Float? = null,
     val imageUrl: String? = null,
-    val openNow: Boolean? = null,
+    val openNow: Boolean = true,
     val weather: WeatherInfo? = null,
     val externalLink: String? = null,
-    val placeId: String? = null
+    val placeId: String? = null,
+    val contextualTips: List<String> = emptyList()
 )
 
 data class WeatherInfo(

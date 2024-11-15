@@ -7,6 +7,10 @@ plugins {
 }
 
 android {
+    lint {
+        baseline = file("lint-baseline.xml")
+    }
+
     namespace = "com.rajkumar.cheerly"
     compileSdk = 34
 
@@ -72,9 +76,20 @@ dependencies {
     implementation("org.osmdroid:osmdroid-android:6.1.16")
 
     // YouTube & Google APIs
-    implementation("com.google.apis:google-api-services-youtube:v3-rev20231011-2.0.0")
-    implementation("com.google.api-client:google-api-client-android:2.2.0")
-    implementation("com.google.oauth-client:google-oauth-client:1.34.1")
+    dependencies {
+        // YouTube & Google APIs
+        implementation("com.google.apis:google-api-services-youtube:v3-rev20231011-2.0.0") {
+            exclude(group = "commons-logging", module = "commons-logging")
+            exclude(group = "org.apache.httpcomponents", module = "httpclient")
+        }
+        implementation("com.google.api-client:google-api-client-android:2.2.0") {
+            exclude(group = "commons-logging", module = "commons-logging")
+            exclude(group = "org.apache.httpcomponents", module = "httpclient")
+        }
+        implementation("com.google.oauth-client:google-oauth-client:1.34.1") {
+            exclude(group = "commons-logging", module = "commons-logging")
+            exclude(group = "org.apache.httpcomponents", module = "httpclient")
+        }
 
     // Google Sign In
     implementation("com.google.android.gms:play-services-auth:20.7.0")
@@ -147,4 +162,4 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-}
+}}
