@@ -1,9 +1,15 @@
 package com.rajkumar.cheerly
 
 import android.Manifest
+import android.app.AlertDialog
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
 import android.os.Looper
+import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
@@ -26,7 +32,6 @@ import com.rajkumar.cheerly.Activity.ActivityRepository
 import com.rajkumar.cheerly.Activity.Models.ActivityLocation
 import com.rajkumar.cheerly.Podcast.TeddyPodcastRepository
 import kotlinx.coroutines.launch
-
 class MoodRecommendationActivity : ComponentActivity() {
     private val TAG = "MoodRecommendation"
 
@@ -96,12 +101,26 @@ class MoodRecommendationActivity : ComponentActivity() {
         locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000)
             .setMinUpdateIntervalMillis(5000)
             .setMinUpdateDistanceMeters(20f)
+            .setWaitForAccurateLocation(true)  // Added to ensure accurate location
+            .setPriority(Priority.PRIORITY_HIGH_ACCURACY)  // Explicitly set high accuracy
             .build()
 
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
                 locationResult.lastLocation?.let { location ->
                     locationUpdateCount++
+
+                    // Log location details
+                    Log.d(TAG, """
+                    Location Update #$locationUpdateCount
+                    Latitude: ${location.latitude}
+                    Longitude: ${location.longitude}
+                    Accuracy: ${location.accuracy}m
+                    Provider: ${location.provider}
+                    Time: ${location.time}
+                    Is Mock Location: ${location.isFromMockProvider}
+                """.trimIndent())
+
                     val selectedMood = intent.getStringExtra("selectedMood") ?: "Happy"
 
                     when {
@@ -114,18 +133,17 @@ class MoodRecommendationActivity : ComponentActivity() {
                         locationUpdateCount >= MAX_LOCATION_UPDATES -> {
                             loadActivities(selectedMood, location)
                             stopLocationUpdates()
-                            locationStatusText.text = "Using approximate location"
+                            locationStatusText.text = "Using current location (Accuracy: ${location.accuracy}m)"
                             locationProgressBar.visibility = View.GONE
                         }
                         else -> {
-                            locationStatusText.text = "Improving location accuracy..."
+                            locationStatusText.text = "Getting better location... (Accuracy: ${location.accuracy}m)"
                         }
                     }
                 }
             }
         }
     }
-
     private fun initializeViews() {
         musicRecyclerView = findViewById(R.id.musicRecyclerView)
         videoRecyclerView = findViewById(R.id.videoRecyclerView)
@@ -224,9 +242,18 @@ class MoodRecommendationActivity : ComponentActivity() {
         }
     }
 
-    private fun loadActivities(mood: String, androidLocation: android.location.Location) {
+    private fun loadActivities(mood: String, androidLocation: Location) {
         lifecycleScope.launch {
             try {
+                Log.d(TAG, """
+                Loading activities:
+                Mood: $mood
+                Location: ${androidLocation.latitude}, ${androidLocation.longitude}
+                Accuracy: ${androidLocation.accuracy}m
+                Provider: ${androidLocation.provider}
+                Is Mock Location: ${androidLocation.isFromMockProvider}
+            """.trimIndent())
+
                 val activityLocation = ActivityLocation(
                     latitude = androidLocation.latitude,
                     longitude = androidLocation.longitude
@@ -244,28 +271,64 @@ class MoodRecommendationActivity : ComponentActivity() {
                     activityRecyclerView.visibility = View.VISIBLE
                 } else {
                     locationStatusText.text = "No activities found nearby"
+                    Log.d(TAG, "No activities found for location: ${androidLocation.latitude}, ${androidLocation.longitude}")
                 }
             } catch (e: Exception) {
-                Log.e("MoodRecommendation", "Error loading activities", e)
+                Log.e(TAG, "Error loading activities", e)
                 locationStatusText.text = "Error loading activities: ${e.message}"
             }
         }
     }
-
     private fun startLocationUpdates() {
         try {
             if (checkLocationPermission()) {
+                // Check if location services are enabled
+                val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+                val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+                val isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+
+                if (!isGpsEnabled && !isNetworkEnabled) {
+                    // Show dialog to enable location services
+                    showEnableLocationDialog()
+                    return
+                }
+
+                // Request last known location first
+                fusedLocationClient.lastLocation
+                    .addOnSuccessListener { location ->
+                        location?.let {
+                            Log.d(TAG, "Last known location: ${location.latitude}, ${location.longitude}")
+                        }
+                    }
+
+                // Start receiving location updates
                 fusedLocationClient.requestLocationUpdates(
                     locationRequest,
                     locationCallback,
                     Looper.getMainLooper()
                 )
+
+                Log.d(TAG, "Location updates started")
+            } else {
+                Log.d(TAG, "Location permission not granted")
+                requestLocationPermission()
             }
         } catch (e: Exception) {
-            Log.e("Location", "Error starting location updates", e)
-            locationStatusText.text = "Error getting location: ${e.message}"
+            Log.e(TAG, "Error starting location updates", e)
+            locationStatusText.text = "Error getting location"
             locationProgressBar.visibility = View.GONE
         }
+    }
+
+    private fun showEnableLocationDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Enable Location Services")
+            .setMessage("Please enable location services to get nearby activities")
+            .setPositiveButton("Open Settings") { _, _ ->
+                startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     private fun stopLocationUpdates() {
@@ -273,16 +336,23 @@ class MoodRecommendationActivity : ComponentActivity() {
     }
 
     private fun checkLocationPermission(): Boolean {
-        return ContextCompat.checkSelfPermission(
+        return (ContextCompat.checkSelfPermission(
             this,
             Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
+        ) == PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED)
     }
 
     private fun requestLocationPermission() {
         ActivityCompat.requestPermissions(
             this,
-            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ),
             LOCATION_PERMISSION_REQUEST_CODE
         )
     }
@@ -298,17 +368,18 @@ class MoodRecommendationActivity : ComponentActivity() {
                 if (grantResults.isNotEmpty() &&
                     grantResults[0] == PackageManager.PERMISSION_GRANTED
                 ) {
+                    Log.d(TAG, "Location permission granted, starting updates")
                     locationStatusText.text = "Finding nearby activities..."
                     locationProgressBar.visibility = View.VISIBLE
                     startLocationUpdates()
                 } else {
+                    Log.d(TAG, "Location permission denied")
                     locationStatusText.text = "Location permission denied"
                     locationProgressBar.visibility = View.GONE
                 }
             }
         }
     }
-
     private fun showError(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
@@ -319,6 +390,6 @@ class MoodRecommendationActivity : ComponentActivity() {
     }
 
     companion object {
-        private const val LOCATION_PERMISSION_REQUEST_CODE = 1000
+        const val LOCATION_PERMISSION_REQUEST_CODE = 1000
     }
 }

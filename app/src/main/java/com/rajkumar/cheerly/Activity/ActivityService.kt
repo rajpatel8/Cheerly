@@ -22,7 +22,8 @@ interface TicketmasterService {
         @Query("radius") radius: String,
         @Query("unit") unit: String = "km",
         @Query("size") size: Int = 10,
-        @Query("sort") sort: String = "date,asc"
+        @Query("sort") sort: String = "date,asc",
+        @Query("countryCode") countryCode: String? = null  // This is correct for Ticketmaster
     ): Response<EventResponse>
 }
 
