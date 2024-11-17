@@ -4,9 +4,7 @@ import android.util.Log
 import com.rajkumar.cheerly.Activity.Models.*
 import com.rajkumar.cheerly.config.ApiKeys
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.awaitAll
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -40,8 +38,26 @@ class ActivityRepository private constructor() {
         val weatherSensitive: Boolean,
         val timeOfDayPreference: List<String>,
         val pricePreference: PricePreference,
-        val moodSpecificFilters: (FoursquareVenue) -> Boolean
+        val moodSpecificFilters: (FoursquareVenue) -> Boolean,
     )
+
+    private fun getMoodFromParameters(parameters: MoodParameters): String {
+        // Create sets of keywords for each mood
+        val moodKeywords = mapOf(
+            "happy" to setOf("festival", "entertainment", "social", "party", "fun", "uplifting"),
+            "sad" to setOf("peaceful", "quiet", "nature", "relaxing", "comfort", "healing"),
+            "excited" to setOf("adventure", "active", "sports", "energetic", "thrilling"),
+            "relaxed" to setOf("peaceful", "calm", "serene", "cozy", "tranquil"),
+            "bored" to setOf("interesting", "unique", "entertaining", "novel", "experience"),
+            "anxious" to setOf("quiet", "peaceful", "calming", "safe", "comfort"),
+            "focused" to setOf("quiet", "study", "work", "productive", "concentration")
+        )
+
+        // Find the mood with the most keyword matches
+        return moodKeywords.entries.maxByOrNull { (_, keywords) ->
+            parameters.venueKeywords.count { it in keywords }
+        }?.key ?: "happy"
+    }
 
     private val moodParameters = mapOf(
         "happy" to MoodParameters(
@@ -293,6 +309,127 @@ class ActivityRepository private constructor() {
             .create(OpenWeatherService::class.java)
     }
 
+    private fun isHighPriorityForMood(activity: NearbyActivity, parameters: MoodParameters): Boolean {
+        val mood = getMoodFromParameters(parameters)
+        return when (mood.lowercase()) {
+            "happy" -> {
+                activity.category.lowercase().let { cat ->
+                    cat.contains("entertainment") ||
+                            cat.contains("party") ||
+                            cat.contains("festival") ||
+                            cat.contains("social")
+                }
+            }
+            "sad" -> {
+                activity.category.lowercase().let { cat ->
+                    cat.contains("garden") ||
+                            cat.contains("park") ||
+                            cat.contains("wellness") ||
+                            cat.contains("spa")
+                }
+            }
+            "excited" -> {
+                activity.category.lowercase().let { cat ->
+                    cat.contains("sports") ||
+                            cat.contains("adventure") ||
+                            cat.contains("activity") ||
+                            cat.contains("fitness")
+                }
+            }
+            "relaxed" -> {
+                activity.category.lowercase().let { cat ->
+                    cat.contains("cafe") ||
+                            cat.contains("garden") ||
+                            cat.contains("spa") ||
+                            cat.contains("park")
+                }
+            }
+            "bored" -> {
+                activity.category.lowercase().let { cat ->
+                    cat.contains("entertainment") ||
+                            cat.contains("arcade") ||
+                            cat.contains("activity") ||
+                            cat.contains("game")
+                }
+            }
+            "anxious" -> {
+                activity.category.lowercase().let { cat ->
+                    cat.contains("spa") ||
+                            cat.contains("wellness") ||
+                            cat.contains("garden") ||
+                            cat.contains("meditation")
+                }
+            }
+            "focused" -> {
+                activity.category.lowercase().let { cat ->
+                    cat.contains("library") ||
+                            cat.contains("study") ||
+                            cat.contains("workspace") ||
+                            cat.contains("coworking")
+                }
+            }
+            else -> false
+        }
+    }
+
+    private fun isMediumPriorityForMood(activity: NearbyActivity, parameters: MoodParameters): Boolean {
+        if (isHighPriorityForMood(activity, parameters)) return false
+
+        val mood = getMoodFromParameters(parameters)
+        return when (mood.lowercase()) {
+            "happy" -> {
+                activity.category.lowercase().let { cat ->
+                    cat.contains("cafe") ||
+                            cat.contains("restaurant") ||
+                            cat.contains("plaza")
+                }
+            }
+            "sad" -> {
+                activity.category.lowercase().let { cat ->
+                    cat.contains("cafe") ||
+                            cat.contains("bookstore") ||
+                            cat.contains("tea")
+                }
+            }
+            "excited" -> {
+                activity.category.lowercase().let { cat ->
+                    cat.contains("entertainment") ||
+                            cat.contains("game") ||
+                            cat.contains("dance")
+                }
+            }
+            "relaxed" -> {
+                activity.category.lowercase().let { cat ->
+                    cat.contains("bookstore") ||
+                            cat.contains("tea") ||
+                            cat.contains("coffee")
+                }
+            }
+            "bored" -> {
+                activity.category.lowercase().let { cat ->
+                    cat.contains("shopping") ||
+                            cat.contains("museum") ||
+                            cat.contains("theater")
+                }
+            }
+            "anxious" -> {
+                activity.category.lowercase().let { cat ->
+                    cat.contains("cafe") ||
+                            cat.contains("library") ||
+                            cat.contains("bookstore")
+                }
+            }
+            "focused" -> {
+                activity.category.lowercase().let { cat ->
+                    cat.contains("cafe") ||
+                            cat.contains("coffee") ||
+                            cat.contains("bookstore")
+                }
+            }
+            else -> false
+        }
+    }
+
     private class LoggingInterceptor : Interceptor {
         override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
             val request = chain.request()
@@ -535,33 +672,28 @@ class ActivityRepository private constructor() {
         parameters: MoodParameters,
         location: ActivityLocation
     ): List<NearbyActivity> {
-        Log.d(TAG, """
-        Starting recommendations processing:
-        Venues available: ${venues.size}
-        Events available: ${events.size}
-        Weather: ${weather?.description ?: "Not available"}
-    """.trimIndent())
+        Log.d(TAG, "Starting recommendations processing with ${venues.size} venues and ${events.size} events")
 
         val activities = mutableListOf<NearbyActivity>()
 
-        // Process venues first
+        // Process venues
         venues.forEach { venue ->
             try {
                 val activity = convertFoursquareToNearbyActivity(venue, weather)
+                val venueScore = calculateVenueMoodScore(venue, parameters)
+
                 Log.d(TAG, """
                 Processing venue:
                 Name: ${venue.name}
                 Category: ${venue.categories.firstOrNull()?.name}
                 Distance: ${venue.distance}m
-                Rating: ${venue.rating}
+                Mood Score: $venueScore
             """.trimIndent())
 
-                // Be more lenient with venue filtering initially
-                if (venue.distance <= parameters.maxDistance * 1000) { // Convert km to meters
+                // Lower threshold from 0.5 to 0.3 to include more venues
+                if (venueScore > 0.3) {
                     activities.add(activity)
                     Log.d(TAG, "Added venue: ${activity.name}")
-                } else {
-                    Log.d(TAG, "Filtered out venue due to distance: ${activity.name}")
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error processing venue ${venue.name}", e)
@@ -572,7 +704,17 @@ class ActivityRepository private constructor() {
         events.forEach { event ->
             try {
                 val activity = convertEventToNearbyActivity(event, location, weather)
-                if (shouldIncludeActivity(activity, parameters, weather)) {
+                val eventScore = calculateEventMoodScore(event, parameters)
+
+                Log.d(TAG, """
+                Processing event:
+                Name: ${event.name}
+                Category: ${event.classifications?.firstOrNull()?.segment?.name}
+                Score: $eventScore
+            """.trimIndent())
+
+                // Lower threshold from 0.5 to 0.3 to include more events
+                if (eventScore > 0.3) {
                     activities.add(activity)
                     Log.d(TAG, "Added event: ${activity.name}")
                 }
@@ -581,24 +723,41 @@ class ActivityRepository private constructor() {
             }
         }
 
-        // Log intermediate results
-        Log.d(TAG, """
-        After initial filtering:
-        Total activities: ${activities.size}
-        Venues: ${activities.count { it.type == "venue" }}
-        Events: ${activities.count { it.type == "event" }}
-    """.trimIndent())
+        // Ensure we have activities before proceeding
+        if (activities.isEmpty()) {
+            Log.d(TAG, "No activities met scoring criteria, including top scored items")
+            // Take top 5 venues and top 5 events regardless of score
+            val topVenues = venues.sortedByDescending { calculateVenueMoodScore(it, parameters) }.take(5)
+            val topEvents = events.sortedByDescending { calculateEventMoodScore(it, parameters) }.take(5)
 
-        // Ensure we have a mix of venues and events
-        return activities
-            .groupBy { it.type }
-            .flatMap { (type, typeActivities) ->
-                Log.d(TAG, "Processing $type: ${typeActivities.size} items")
-                typeActivities
-                    .sortedByDescending { calculateRecommendationScore(it, parameters, weather) }
-                    .take(if (type == "venue") 5 else 5) // Take up to 5 of each type
+            topVenues.forEach { venue ->
+                activities.add(convertFoursquareToNearbyActivity(venue, weather))
             }
-            .sortedByDescending { calculateRecommendationScore(it, parameters, weather) }
+            topEvents.forEach { event ->
+                activities.add(convertEventToNearbyActivity(event, location, weather))
+            }
+        }
+
+        Log.d(TAG, "After initial filtering: ${activities.size} activities")
+
+        // Sort and return final recommendations
+        return activities
+            .distinctBy { "${it.name}${it.type}" }
+            .sortedWith(
+                compareByDescending<NearbyActivity> { activity ->
+                    when (activity.type) {
+                        "venue" -> calculateVenueMoodScore(
+                            venues.find { it.fsq_id == activity.placeId } ?: return@compareByDescending 0.0,
+                            parameters
+                        )
+                        "event" -> calculateEventMoodScore(
+                            events.find { "tm_${it.id}" == activity.id } ?: return@compareByDescending 0.0,
+                            parameters
+                        )
+                        else -> 0.0
+                    }
+                }.thenBy { it.distance }
+            )
             .take(10)
             .also { finalActivities ->
                 Log.d(TAG, """
@@ -606,10 +765,276 @@ class ActivityRepository private constructor() {
                 Total: ${finalActivities.size}
                 Venues: ${finalActivities.count { it.type == "venue" }}
                 Events: ${finalActivities.count { it.type == "event" }}
-                Items: ${finalActivities.map { "${it.name} (${it.type})" }.joinToString(", ")}
+                Categories: ${finalActivities.groupBy { it.category }.mapValues { it.value.size }}
             """.trimIndent())
             }
     }
+    private fun isIndoorActivity(activity: NearbyActivity): Boolean {
+        return activity.category.lowercase().let { cat ->
+            cat.contains("cafe") ||
+                    cat.contains("restaurant") ||
+                    cat.contains("library") ||
+                    cat.contains("museum") ||
+                    cat.contains("mall") ||
+                    cat.contains("cinema") ||
+                    cat.contains("theater") ||
+                    cat.contains("spa")
+        }
+    }
+
+    private fun isImmediateActivity(activity: NearbyActivity): Boolean {
+        // Venues are immediate, events depend on their scheduled time
+        return when (activity.type) {
+            "venue" -> true
+            "event" -> {
+                // For events, we'd check if they're happening soon
+                // This is a simplified version - you'd want to check actual event times
+                true
+            }
+            else -> false
+        }
+    }
+
+
+    private fun getEventTimeOfDay(event: Event): String {
+        // Extract hour from event start time and determine period
+        return try {
+            val startTime = event.dates.start.localTime
+            val hour = startTime.substring(0, 2).toInt()
+            when {
+                hour < 12 -> "morning"
+                hour < 17 -> "afternoon"
+                else -> "evening"
+            }
+        } catch (e: Exception) {
+            // Default to evening if can't determine time
+            "evening"
+        }
+    }
+
+    private fun getNextPeriod(currentPeriod: String): String {
+        return when (currentPeriod) {
+            "morning" -> "afternoon"
+            "afternoon" -> "evening"
+            "evening" -> "morning"
+            else -> "afternoon"
+        }
+    }
+
+    private fun calculateVenueMoodScore(venue: FoursquareVenue, parameters: MoodParameters): Double {
+        var score = 0.0
+        val category = venue.categories.firstOrNull()?.name?.lowercase() ?: return 0.0
+
+        // Get mood from keywords
+        val moodBasedScore = when {
+            // Happy mood indicators
+            parameters.venueKeywords.any { it in listOf("festival", "entertainment", "social", "party", "fun") } -> {
+                when {
+                    category.contains("entertainment") || category.contains("party") -> 0.4
+                    category.contains("social") || category.contains("plaza") -> 0.3
+                    category.contains("cafe") || category.contains("restaurant") -> 0.2
+                    else -> 0.1
+                }
+            }
+
+            // Sad mood indicators
+            parameters.venueKeywords.any { it in listOf("peaceful", "quiet", "nature", "relaxing", "comfort") } -> {
+                when {
+                    category.contains("garden") || category.contains("park") -> 0.4
+                    category.contains("wellness") || category.contains("spa") -> 0.3
+                    category.contains("cafe") || category.contains("bookstore") -> 0.2
+                    else -> 0.1
+                }
+            }
+
+            // Excited mood indicators
+            parameters.venueKeywords.any { it in listOf("adventure", "active", "sports", "energetic") } -> {
+                when {
+                    category.contains("sports") || category.contains("activity") -> 0.4
+                    category.contains("entertainment") || category.contains("game") -> 0.3
+                    category.contains("dance") || category.contains("fitness") -> 0.2
+                    else -> 0.1
+                }
+            }
+
+            // Relaxed mood indicators
+            parameters.venueKeywords.any { it in listOf("peaceful", "calm", "serene", "cozy") } -> {
+                when {
+                    category.contains("spa") || category.contains("garden") -> 0.4
+                    category.contains("cafe") || category.contains("tea") -> 0.3
+                    category.contains("bookstore") || category.contains("library") -> 0.2
+                    else -> 0.1
+                }
+            }
+
+            // Bored mood indicators
+            parameters.venueKeywords.any { it in listOf("interesting", "unique", "fun", "entertaining") } -> {
+                when {
+                    category.contains("entertainment") || category.contains("arcade") -> 0.4
+                    category.contains("activity") || category.contains("game") -> 0.3
+                    category.contains("shopping") || category.contains("museum") -> 0.2
+                    else -> 0.1
+                }
+            }
+
+            // Anxious mood indicators
+            parameters.venueKeywords.any { it in listOf("quiet", "peaceful", "calming", "safe") } -> {
+                when {
+                    category.contains("spa") || category.contains("wellness") -> 0.4
+                    category.contains("garden") || category.contains("park") -> 0.3
+                    category.contains("library") || category.contains("cafe") -> 0.2
+                    else -> 0.1
+                }
+            }
+
+            // Focused mood indicators
+            parameters.venueKeywords.any { it in listOf("quiet", "study", "work", "productive") } -> {
+                when {
+                    category.contains("library") || category.contains("study") -> 0.4
+                    category.contains("workspace") || category.contains("coworking") -> 0.3
+                    category.contains("cafe") || category.contains("coffee") -> 0.2
+                    else -> 0.1
+                }
+            }
+
+            else -> 0.1 // Default score
+        }
+
+        score += moodBasedScore
+
+        // Time of day adjustment
+        when (getPeriodOfDay()) {
+            "morning" -> {
+                if (category.contains("coffee") || category.contains("breakfast")) score += 0.2
+            }
+            "afternoon" -> {
+                if (category.contains("park") || category.contains("shopping")) score += 0.2
+            }
+            "evening" -> {
+                if (category.contains("restaurant") || category.contains("entertainment")) score += 0.2
+            }
+        }
+
+        // Weather adjustment
+        if (parameters.weatherSensitive) {
+            val isIndoorVenue = isIndoorVenue(category)
+            score *= if (isIndoorVenue) 1.2 else 0.8
+        }
+
+        // Distance adjustment
+        if (venue.distance <= parameters.maxDistance * 500) { // If within half the max distance
+            score *= 1.2
+        }
+
+        return score.coerceIn(0.0, 1.0)
+    }
+    private fun calculateEventMoodScore(event: Event, parameters: MoodParameters): Double {
+        var score = 0.0
+        val category = event.classifications?.firstOrNull()?.segment?.name?.lowercase() ?: return 0.0
+        val eventName = event.name.lowercase()
+        val currentMood = getMoodFromParameters(parameters)
+
+        // Mood-specific event scoring
+        when (currentMood.lowercase()) {
+            "happy" -> {
+                if (category.contains("music") || category.contains("comedy")) score += 0.4
+                if (category.contains("family") || category.contains("festival")) score += 0.3
+                if (eventName.contains("party") || eventName.contains("celebration")) score += 0.3
+            }
+            "relaxed" -> {
+                if (category.contains("art") || category.contains("cultural")) score += 0.4
+                if (category.contains("exhibition") || category.contains("museum")) score += 0.4
+                if (eventName.contains("acoustic") || eventName.contains("jazz")) score += 0.3
+            }
+            // Add more mood cases here as needed
+        }
+
+        // Time of day adjustment
+        val eventTime = getEventTimeOfDay(event)
+        score *= when {
+            eventTime == getPeriodOfDay() -> 1.2
+            eventTime == getNextPeriod(getPeriodOfDay()) -> 1.1
+            else -> 0.9
+        }
+
+        return score.coerceIn(0.0, 1.0)
+    }
+    private fun buildBalancedRecommendations(
+        groupedActivities: Map<String, List<NearbyActivity>>,
+        parameters: MoodParameters
+    ): List<NearbyActivity> {
+        val recommendations = mutableListOf<NearbyActivity>()
+
+        // Add high priority activities first
+        groupedActivities["high"]?.let { highPriority ->
+            recommendations.addAll(
+                highPriority.sortedWith(
+                    compareByDescending<NearbyActivity> {
+                        if (it.type == "venue") calculateVenuePriority(it, parameters)
+                        else calculateEventPriority(it, parameters)
+                    }
+                ).take(5)
+            )
+        }
+
+        // Fill remaining slots with medium priority activities
+        val remainingSlots = 10 - recommendations.size
+        if (remainingSlots > 0) {
+            groupedActivities["medium"]?.let { mediumPriority ->
+                recommendations.addAll(
+                    mediumPriority.sortedWith(
+                        compareByDescending<NearbyActivity> {
+                            if (it.type == "venue") calculateVenuePriority(it, parameters)
+                            else calculateEventPriority(it, parameters)
+                        }
+                    ).take(remainingSlots)
+                )
+            }
+        }
+
+        return recommendations.distinctBy { "${it.name}${it.type}" }
+            .take(10)
+            .also { finalList ->
+                Log.d(TAG, "Final recommendations balanced between:")
+                Log.d(TAG, "- Indoor/Outdoor: ${finalList.count { isIndoorActivity(it) }}/${finalList.count { !isIndoorActivity(it) }}")
+                Log.d(TAG, "- Immediate/Future: ${finalList.count { isImmediateActivity(it) }}/${finalList.count { !isImmediateActivity(it) }}")
+                Log.d(TAG, "- Categories: ${finalList.groupBy { it.category }.mapValues { it.value.size }}")
+            }
+    }
+
+
+    private fun calculateVenuePriority(activity: NearbyActivity, parameters: MoodParameters): Double {
+        var priority = 0.0
+
+        // Distance factor (closer is better)
+        priority += (parameters.maxDistance - activity.distance) / parameters.maxDistance
+
+        // Category match
+        if (isHighPriorityForMood(activity, parameters)) priority += 0.4
+        else if (isMediumPriorityForMood(activity, parameters)) priority += 0.2
+
+        // Indoor/outdoor preference
+        if (parameters.preferIndoor == isIndoorActivity(activity)) priority += 0.2
+
+        return priority
+    }
+
+    private fun calculateEventPriority(activity: NearbyActivity, parameters: MoodParameters): Double {
+        var priority = 0.0
+
+        // Time match
+        if (parameters.timeOfDayPreference.contains(getPeriodOfDay())) priority += 0.3
+
+        // Category match
+        if (isHighPriorityForMood(activity, parameters)) priority += 0.4
+        else if (isMediumPriorityForMood(activity, parameters)) priority += 0.2
+
+        // Indoor/outdoor preference
+        if (parameters.preferIndoor == isIndoorActivity(activity)) priority += 0.2
+
+        return priority
+    }
+
     private fun activityMatchesParameters(
         activity: NearbyActivity,
         parameters: MoodParameters,
