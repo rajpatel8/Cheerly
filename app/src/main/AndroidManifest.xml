@@ -70,15 +70,8 @@
         <!-- Spotify Authentication Activity -->
         <activity
             android:name="com.spotify.sdk.android.auth.LoginActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data
-                    android:host="callback"
-                    android:scheme="cheerly" />
-            </intent-filter>
+            android:exported="true"
+            tools:ignore="MissingClass">
         </activity>
 
         <!-- Google/YouTube Sign-in Activity -->

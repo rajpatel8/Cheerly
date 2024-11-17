@@ -3,6 +3,7 @@ package com.rajkumar.cheerly
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.activity.ComponentActivity
@@ -66,6 +67,7 @@ class LoginActivity : ComponentActivity() {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
             .requestProfile()
+            .requestIdToken(getString(R.string.default_web_client_id))
             .requestScopes(Scope("https://www.googleapis.com/auth/youtube.readonly"))
             .build()
 
@@ -201,37 +203,40 @@ class LoginActivity : ComponentActivity() {
 
     private fun handleGoogleResult(data: Intent?) {
         try {
-            btnYouTubeLogin.text = getString(R.string.disconnect)
-
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             val account = task.getResult(ApiException::class.java)
 
             account?.let { googleAccount ->
-                // Save Google credentials
-                val sharedPrefs = getSharedPreferences("GooglePrefs", MODE_PRIVATE)
-                sharedPrefs.edit().apply {
-                    putString("google_id", googleAccount.id)
-                    putString("google_email", googleAccount.email)
-                    putString("google_display_name", googleAccount.displayName)
-                    putString("google_id_token", googleAccount.idToken)
-                    apply()
+                val idToken = googleAccount.idToken
+                if (idToken != null) {
+                    // Save Google credentials
+                    val sharedPrefs = getSharedPreferences("GooglePrefs", MODE_PRIVATE)
+                    sharedPrefs.edit().apply {
+                        putString("google_id", googleAccount.id)
+                        putString("google_email", googleAccount.email)
+                        putString("google_display_name", googleAccount.displayName)
+                        putString("google_id_token", idToken) // Save ID token
+                        apply()
+                    }
+                    Log.d("GoogleSignIn", "Google account: $googleAccount")
+                    showSuccess("Successfully connected to YouTube!")
+                    updateYouTubeStatus(true)
+                } else {
+                    Log.e("GoogleSignIn", "ID Token is null")
+                    showError("Failed to retrieve ID Token")
                 }
-
-                updateYouTubeStatus(true)
-                btnYouTubeLogin.text = getString(R.string.disconnect)
-                showSuccess("Successfully connected to YouTube!")
             } ?: run {
-//                showError("Failed to get Google account")
-                updateYouTubeStatus(true)
+                showError("Failed to retrieve Google account")
             }
         } catch (e: ApiException) {
-//            showError("YouTube connection failed: ${e.message}")
-            updateYouTubeStatus(true)
+            Log.e("GoogleSignIn", "Sign-in failed: ${e.statusCode}", e)
+            showError("YouTube connection failed: ${e.message}")
         } finally {
             progressYouTube.visibility = View.GONE
             btnYouTubeLogin.isEnabled = true
         }
     }
+
 
     private fun handleAuthError(exception: Exception) {
         showError("Authentication failed: ${exception.message}")

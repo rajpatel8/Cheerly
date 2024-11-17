@@ -30,4 +30,7 @@
     <string name="connect_youtube">Connect YouTube</string>
 <!--    <string name="disconnect_youtube">Disconnect YouTube</string>-->
     <string name="continue_text">Continue</string>
+    <!-- res/values/strings.xml -->
+    <string name="default_web_client_id">575113949986-1dvgtitrltdk8gmceouq68p0p5b3l7t2.apps.googleusercontent.com</string>
+
 </resources>
