@@ -216,12 +216,14 @@ class LoginActivity : ComponentActivity() {
                         putString("google_id", googleAccount.id)
                         putString("google_email", googleAccount.email)
                         putString("google_display_name", googleAccount.displayName)
-                        putString("google_id_token", idToken) // Save ID token
+                        putString("google_id_token", idToken)
                         apply()
                     }
                     Log.d("GoogleSignIn", "Google account: $googleAccount")
                     showSuccess("Successfully connected to YouTube!")
                     updateYouTubeStatus(true)
+                    // Add this line to update the button text
+                    btnYouTubeLogin.text = getString(R.string.disconnect)
                 } else {
                     Log.e("GoogleSignIn", "ID Token is null")
                     showError("Failed to retrieve ID Token")
@@ -237,7 +239,6 @@ class LoginActivity : ComponentActivity() {
             btnYouTubeLogin.isEnabled = true
         }
     }
-
 
     private fun handleAuthError(exception: Exception) {
         showError("Authentication failed: ${exception.message}")
