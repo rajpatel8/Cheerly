@@ -21,7 +21,7 @@ class SplashActivity : ComponentActivity() {
 
         lifecycleScope.launch {
             // Show splash for 2 seconds
-            delay(2000)
+            delay(1000)
 
             // Check if user has completed initial setup
             val sharedPreferences = getSharedPreferences("AppPrefs", MODE_PRIVATE)

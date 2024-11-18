@@ -13,7 +13,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".SplashActivity"
-    android:background="@drawable/background_gradient">
+    android:background="@drawable/background_gradient"
+    >
 
     <ImageView
         android:id="@+id/logoImageView"
@@ -21,7 +22,7 @@
         android:layout_height="wrap_content"
         android:rotationX="0"
         android:scaleType="centerInside"
-        android:src="@drawable/splash_screen_logo" />
+        android:src="@drawable/cheerly_transparent" />
 
     <TextView
         android:id="@+id/tagLineTextView"
