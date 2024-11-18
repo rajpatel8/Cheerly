@@ -17,6 +17,7 @@ class SplashActivity : ComponentActivity() {
         setContentView(R.layout.activity_splash)
 
         window.statusBarColor = ContextCompat.getColor(this, R.color.orange_dark)
+        window.navigationBarColor = ContextCompat.getColor(this, R.color.Cheerly_Pink)
 
         lifecycleScope.launch {
             // Show splash for 2 seconds

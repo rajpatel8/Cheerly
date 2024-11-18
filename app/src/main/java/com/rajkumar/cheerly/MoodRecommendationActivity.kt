@@ -65,6 +65,7 @@ class MoodRecommendationActivity : ComponentActivity() {
         setContentView(R.layout.activity_mood_recommendation)
 
         window.statusBarColor = ContextCompat.getColor(this, R.color.orange_dark)
+        window.navigationBarColor = ContextCompat.getColor(this, R.color.Cheerly_Pink)
 
         // Initialize repositories with context
         spotifyRepository = SpotifyRepository.getInstance(this)

@@ -76,6 +76,8 @@ dependencies {
     implementation("org.osmdroid:osmdroid-android:6.1.16")
     implementation(libs.androidx.rules)
     implementation(libs.espresso.core)
+    implementation ("androidx.security:security-crypto:1.1.0-alpha06")
+
 
     // YouTube & Google APIs
     dependencies {

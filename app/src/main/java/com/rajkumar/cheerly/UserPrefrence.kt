@@ -1,7 +1,8 @@
 package com.rajkumar.cheerly
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -29,6 +30,7 @@ class UserPrefrence : ComponentActivity() {
         setContentView(R.layout.user_prefrence)
 
         window.statusBarColor = ContextCompat.getColor(this, R.color.orange_dark)
+        window.navigationBarColor = ContextCompat.getColor(this, R.color.Cheerly_Pink)
 
         setupButtons()
         setupNextButton()
@@ -44,16 +46,30 @@ class UserPrefrence : ComponentActivity() {
         btnNext.setBackgroundResource(R.color.grey)
         btnNext.setOnClickListener {
             if (visibility) {
-                val sharedPreferences: SharedPreferences = getSharedPreferences("AppPrefs", MODE_PRIVATE)
+                // Create a MasterKey for encrypted shared preferences
+                val masterKey = MasterKey.Builder(this)
+                    .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                    .build()
+
+                // Create EncryptedSharedPreferences
+                val sharedPreferences: SharedPreferences = EncryptedSharedPreferences.create(
+                    this,
+                    "secret_shared_prefs",
+                    masterKey,
+                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+                )
+
+                // Write user preferences to EncryptedSharedPreferences
                 val editor = sharedPreferences.edit()
                 editor.putBoolean("isUserPreferenceSet", true)
-                // TODO : add the preference selected by user and update the SPF file
-                // writing the options selected by user to the shared preference file
                 editor.putStringSet("selectedMusicOptions", selectedOptionsMap["Music"]?.toSet())
                 editor.putStringSet("selectedVideoOptions", selectedOptionsMap["Videos"]?.toSet())
                 editor.putStringSet("selectedPodcastOptions", selectedOptionsMap["Podcasts"]?.toSet())
                 editor.putStringSet("selectedActivityOptions", selectedOptionsMap["Activities"]?.toSet())
                 editor.apply()
+
+                // Navigate to PromptActivity
                 startActivity(Intent(this, PromptActivity::class.java))
             } else {
                 Toast.makeText(this, "Please select an option from each group", Toast.LENGTH_SHORT).show()

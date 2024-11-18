@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     android:fillViewport="true"
     android:background="@android:color/transparent">
-    >
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -48,6 +47,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
+            <!-- Happy Button -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -60,12 +60,13 @@
                     android:id="@+id/btnHappy"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
-                    android:background="?attr/selectableItemBackground"
+                    android:background="@null"
                     android:text="Happy 😊"
                     android:textSize="16sp"
                     android:textAllCaps="false" />
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Sad Button -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -78,12 +79,13 @@
                     android:id="@+id/btnSad"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
-                    android:background="?attr/selectableItemBackground"
+                    android:background="@null"
                     android:text="Sad 😢"
                     android:textSize="16sp"
                     android:textAllCaps="false" />
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Excited Button -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -96,12 +98,13 @@
                     android:id="@+id/btnExcited"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
-                    android:background="?attr/selectableItemBackground"
+                    android:background="@null"
                     android:text="Excited 🎉"
                     android:textSize="16sp"
                     android:textAllCaps="false" />
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Relaxed Button -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -114,12 +117,13 @@
                     android:id="@+id/btnRelaxed"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
-                    android:background="?attr/selectableItemBackground"
+                    android:background="@null"
                     android:text="Relaxed 😌"
                     android:textSize="16sp"
                     android:textAllCaps="false" />
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Bored Button -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -132,12 +136,13 @@
                     android:id="@+id/btnBored"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
-                    android:background="?attr/selectableItemBackground"
+                    android:background="@null"
                     android:text="Bored 😑"
                     android:textSize="16sp"
                     android:textAllCaps="false" />
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Anxious Button -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -150,12 +155,13 @@
                     android:id="@+id/btnAnxious"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
-                    android:background="?attr/selectableItemBackground"
+                    android:background="@null"
                     android:text="Anxious 😰"
                     android:textSize="16sp"
                     android:textAllCaps="false" />
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Focused Button -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -169,7 +175,7 @@
                     android:id="@+id/btnFocused"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
-                    android:background="?attr/selectableItemBackground"
+                    android:background="@null"
                     android:text="Focused 🎯"
                     android:textSize="16sp"
                     android:textAllCaps="false" />
@@ -177,7 +183,7 @@
 
         </androidx.gridlayout.widget.GridLayout>
 
-        <!-- Optional subtitle -->
+        <!-- Bottom text -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

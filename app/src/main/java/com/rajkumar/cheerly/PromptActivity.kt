@@ -14,6 +14,7 @@ class PromptActivity : FragmentActivity() {
         setContentView(R.layout.activity_prompt)
 
         window.statusBarColor = ContextCompat.getColor(this, R.color.orange_dark)
+        window.navigationBarColor = ContextCompat.getColor(this, R.color.Cheerly_Pink)
 
         val btnMoods: Button = findViewById(R.id.btnMoods)
         val btnPrompt: Button = findViewById(R.id.btnPrompt)

@@ -18,6 +18,7 @@
             android:layout_height="wrap_content"
             android:textSize="24sp"
             android:textStyle="bold"
+            android:textColor="@android:color/white"
             android:layout_marginBottom="16dp"/>
 
         <ProgressBar
@@ -33,6 +34,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Music Recommendations"
+            android:textColor="@android:color/black"
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_marginTop="16dp"
@@ -50,6 +52,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Video Recommendations"
+            android:textColor="@android:color/black"
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_marginTop="16dp"
@@ -67,6 +70,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Podcast Recommendations"
+            android:textColor="@android:color/black"
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_marginTop="16dp"
@@ -84,6 +88,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Nearby Activities"
+            android:textColor="@android:color/black"
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_marginTop="16dp"

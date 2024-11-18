@@ -6,7 +6,6 @@ import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
@@ -15,51 +14,57 @@ class TeddyPodcastRepository private constructor() {
     private val TAG = "TeddyPodcastRepo"
     private val API_KEY = "b09988f38897940d7023fc73c66f87eb3021306ef9b232c6522bfb120202040d0d726ec3d943779b2f19dde94b0637cd63"
     private val USER_ID = "2031"
-    private val BASE_URL = "https://api.taddy.org/graphql"  // Added /graphql endpoint
+    private val BASE_URL = "https://api.taddy.org/graphql"
     private val CONTENT_TYPE = "application/json"
 
     data class PodcastMoodCriteria(
         val searchTerms: String,
-        val alternateTerms: String,
+        val genre: String,
         val topicFocus: List<String>,
-        val contentType: String,
         val maxDuration: Int = 3600
     )
 
     private val moodParameters: Map<String, PodcastMoodCriteria> = mapOf(
         "happy" to PodcastMoodCriteria(
-            searchTerms = "positive psychology growth mindset",
-            alternateTerms = "success stories inspiration",
-            topicFocus = listOf("personal development", "positive mindset", "achievement"),
-            contentType = "uplifting stories and motivation",
-            maxDuration = 2700
+            searchTerms = "positive psychology happiness motivation comedy",
+            genre = "Self-Help, Comedy",
+            topicFocus = listOf("happiness", "motivation", "comedy", "success"),
+            maxDuration = 2400
         ),
         "sad" to PodcastMoodCriteria(
-            searchTerms = "emotional healing mindfulness therapy",
-            alternateTerms = "self compassion mental wellness",
-            topicFocus = listOf("emotional resilience", "coping strategies", "mental health"),
-            contentType = "therapeutic content and gentle discussions",
-            maxDuration = 3600
+            searchTerms = "mindfulness healing emotional wellness meditation",
+            genre = "Mental Health, Wellness",
+            topicFocus = listOf("healing", "mindfulness", "support", "meditation"),
+            maxDuration = 3000
+        ),
+        "excited" to PodcastMoodCriteria(
+            searchTerms = "high energy motivation sports adventure",
+            genre = "Sports, Adventure",
+            topicFocus = listOf("adventure", "sports", "fitness", "challenge"),
+            maxDuration = 1800
+        ),
+        "relaxed" to PodcastMoodCriteria(
+            searchTerms = "meditation calm relaxation mindfulness nature",
+            genre = "Meditation, Nature",
+            topicFocus = listOf("meditation", "relaxation", "mindfulness", "peace"),
+            maxDuration = 2700
+        ),
+        "bored" to PodcastMoodCriteria(
+            searchTerms = "interesting stories mystery entertainment fascinating",
+            genre = "Entertainment, Storytelling",
+            topicFocus = listOf("mystery", "stories", "entertainment", "comedy"),
+            maxDuration = 2400
         ),
         "anxious" to PodcastMoodCriteria(
-            searchTerms = "anxiety relief mindfulness meditation",
-            alternateTerms = "stress management calming techniques",
-            topicFocus = listOf("anxiety management", "breathing exercises", "present moment awareness"),
-            contentType = "guided relaxation and expert advice",
+            searchTerms = "anxiety relief stress management calming meditation",
+            genre = "Mental Health, Wellness",
+            topicFocus = listOf("anxiety", "stress relief", "calming", "mindfulness"),
             maxDuration = 1800
         ),
         "focused" to PodcastMoodCriteria(
-            searchTerms = "deep work productivity flow state",
-            alternateTerms = "concentration techniques mental clarity",
-            topicFocus = listOf("cognitive enhancement", "productivity systems", "focus techniques"),
-            contentType = "structured learning and practical techniques",
-            maxDuration = 2400
-        ),
-        "bored" to PodcastMoodCriteria(
-            searchTerms = "entertaining stories unusual facts",
-            alternateTerms = "comedy interesting discussions",
-            topicFocus = listOf("entertainment", "comedy", "engaging stories"),
-            contentType = "entertaining and engaging content",
+            searchTerms = "productivity focus concentration learning",
+            genre = "Education, Business",
+            topicFocus = listOf("productivity", "learning", "focus", "efficiency"),
             maxDuration = 2400
         )
     )
@@ -75,67 +80,74 @@ class TeddyPodcastRepository private constructor() {
                 Log.d(TAG, "Starting podcast fetch for mood: $mood")
 
                 val moodCriteria = moodParameters[mood.lowercase()] ?: moodParameters["happy"]!!
-                val searchQuery = "${moodCriteria.searchTerms} ${moodCriteria.alternateTerms}"
 
-                // Properly formatted GraphQL query with variables
-                val queryJson = JSONObject().apply {
-                    put("query", """
-                        query GetPodcastsByName(${"$"}name: String!) {
-                            getPodcastSeries(name: ${"$"}name) {
-                                uuid
-                                name
-                                itunesId
-                                description
-                                imageUrl
-                                itunesInfo {
-                                    uuid
-                                    publisherName
-                                    baseArtworkUrlOf(size: 640)
-                                }
-                                episodes {
+                // Create multiple search queries for variety
+                val searchQueries = listOf(
+                    moodCriteria.searchTerms,
+                    "${moodCriteria.genre} ${moodCriteria.topicFocus.random()}",
+                    moodCriteria.topicFocus.joinToString(" ").take(2)
+                )
+
+                val allEpisodes = mutableListOf<PodcastEpisode>()
+
+                // Try each search query
+                for (searchQuery in searchQueries) {
+                    val queryJson = JSONObject().apply {
+                        put("query", """
+                            query GetPodcastsByName(${"$"}name: String!) {
+                                getPodcastSeries(name: ${"$"}name) {
                                     uuid
                                     name
+                                    itunesId
                                     description
-                                    audioUrl
+                                    imageUrl
+                                    itunesInfo {
+                                        uuid
+                                        publisherName
+                                        baseArtworkUrlOf(size: 640)
+                                    }
+                                    episodes {
+                                        uuid
+                                        name
+                                        description
+                                        audioUrl
+                                    }
                                 }
                             }
-                        }
-                    """.trimIndent())
-                    put("variables", JSONObject().put("name", searchQuery))
-                }
-
-                val requestBody = queryJson.toString().toRequestBody("application/json".toMediaType())
-
-                val request = Request.Builder()
-                    .url(BASE_URL)
-                    .post(requestBody)
-                    .addHeader("Content-Type", "application/json")
-                    .addHeader("X-USER-ID", USER_ID)
-                    .addHeader("X-API-KEY", API_KEY)
-                    .build()
-
-                Log.d(TAG, "Request Body: ${queryJson}")
-
-                val response = okHttpClient.newCall(request).execute()
-                val responseBody = response.body?.string()
-
-                Log.d(TAG, "Response: $responseBody")
-
-                if (response.isSuccessful && responseBody != null) {
-                    val jsonResponse = JSONObject(responseBody)
-                    if (jsonResponse.has("errors")) {
-                        Log.e(TAG, "GraphQL errors: ${jsonResponse.getJSONArray("errors")}")
-                        emptyList()
-                    } else {
-                        val podcastSeries = parsePodcastSeries(responseBody)
-                        podcastSeries?.episodes?.let {
-                            convertTeddyToPodcastEpisodes(it, podcastSeries).take(3)
-                        } ?: emptyList()
+                        """.trimIndent())
+                        put("variables", JSONObject().put("name", searchQuery))
                     }
-                } else {
-                    Log.e(TAG, "API call failed with code: ${response.code} and message: ${response.message}")
-                    emptyList()
+
+                    val requestBody = queryJson.toString().toRequestBody("application/json".toMediaType())
+
+                    val request = Request.Builder()
+                        .url(BASE_URL)
+                        .post(requestBody)
+                        .addHeader("Content-Type", "application/json")
+                        .addHeader("X-USER-ID", USER_ID)
+                        .addHeader("X-API-KEY", API_KEY)
+                        .build()
+
+                    val response = okHttpClient.newCall(request).execute()
+                    val responseBody = response.body?.string()
+
+                    if (response.isSuccessful && responseBody != null) {
+                        val podcastSeries = parsePodcastSeries(responseBody)
+                        podcastSeries?.episodes?.let { episodes ->
+                            allEpisodes.addAll(convertTeddyToPodcastEpisodes(episodes, podcastSeries))
+                        }
+                    }
                 }
+
+                // Filter and return unique episodes
+                allEpisodes
+                    .distinctBy { "${it.title_original}${it.podcast.publisher_original}" }
+                    .shuffled() // Add randomness to prevent same order
+                    .take(3)
+                    .also {
+                        Log.d(TAG, "Returning ${it.size} unique episodes for mood: $mood")
+                    }
+
             } catch (e: Exception) {
                 Log.e(TAG, "Error fetching podcasts: ${e.message}")
                 e.printStackTrace()

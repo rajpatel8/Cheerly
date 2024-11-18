@@ -48,6 +48,7 @@ gridlayout = "1.0.0"
 robolectric = "4.10.3"
 rules = "1.6.1"
 espressoCoreVersion = "3.6.1"
+securityCryptoKtx = "1.0.0"
 
 [libraries]
 androidx-cardview = { module = "androidx.cardview:cardview", version.ref = "cardview" }
@@ -106,6 +107,7 @@ androidx-gridlayout = { group = "androidx.gridlayout", name = "gridlayout", vers
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 androidx-rules = { group = "androidx.test", name = "rules", version.ref = "rules" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCoreVersion" }
+androidx-security-crypto-ktx = { group = "androidx.security", name = "security-crypto-ktx", version.ref = "securityCryptoKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

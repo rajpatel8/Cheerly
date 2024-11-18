@@ -51,6 +51,7 @@ class LoginActivity : ComponentActivity() {
         setContentView(R.layout.activity_login)
 
         window.statusBarColor = ContextCompat.getColor(this, R.color.orange_dark)
+        window.navigationBarColor = ContextCompat.getColor(this, R.color.Cheerly_Pink)
 
         // Initialize services and managers
         authService = AuthorizationService(this)

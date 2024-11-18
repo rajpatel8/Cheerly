@@ -7,9 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
+import com.google.android.material.card.MaterialCardView
 
 class MoodsFragment : Fragment() {
-    private var selectedButton: Button? = null
+    private var selectedCard: MaterialCardView? = null
+    private lateinit var moodButtons: List<Pair<MaterialCardView, Button>>
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -18,58 +20,87 @@ class MoodsFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_moods, container, false)
 
-        // Get button references
-        val btnHappy: Button = view.findViewById(R.id.btnHappy)
-        val btnSad: Button = view.findViewById(R.id.btnSad)
-        val btnExcited: Button = view.findViewById(R.id.btnExcited)
-        val btnRelaxed: Button = view.findViewById(R.id.btnRelaxed)
-        val btnBored: Button = view.findViewById(R.id.btnBored)
-        val btnAnxious: Button = view.findViewById(R.id.btnAnxious)
-        val btnFocused: Button = view.findViewById(R.id.btnFocused)
+        // Initialize buttons and cards
+        moodButtons = listOf(
+            createMoodPair(view, R.id.btnHappy),
+            createMoodPair(view, R.id.btnSad),
+            createMoodPair(view, R.id.btnExcited),
+            createMoodPair(view, R.id.btnRelaxed),
+            createMoodPair(view, R.id.btnBored),
+            createMoodPair(view, R.id.btnAnxious),
+            createMoodPair(view, R.id.btnFocused)
+        )
 
-        // Add all buttons to a list
-        val buttons = listOf(btnHappy, btnSad, btnExcited, btnRelaxed,
-            btnBored, btnAnxious, btnFocused)
-
-        // Set click listener for each button
-        buttons.forEach { button ->
+        // Set up click listeners
+        moodButtons.forEach { (card, button) ->
+            // Enable button clicks
             button.setOnClickListener {
-                animateButtonSelection(button)
+                handleSelection(card, button)
+            }
+
+            // Also enable card clicks
+            card.setOnClickListener {
+                handleSelection(card, button)
             }
         }
 
         return view
     }
 
-    private fun animateButtonSelection(button: Button) {
-        // Animate button scale
-        button.animate()
+    private fun createMoodPair(view: View, buttonId: Int): Pair<MaterialCardView, Button> {
+        val button = view.findViewById<Button>(buttonId)
+        val card = button.parent as MaterialCardView
+        return Pair(card, button)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        resetAllCards()
+    }
+
+    private fun handleSelection(card: MaterialCardView, button: Button) {
+        // First reset previous selection
+        selectedCard?.setCardBackgroundColor(resources.getColor(android.R.color.white))
+
+        // Animate and select new card
+        animateCard(card) {
+            // Set new selection
+            card.setCardBackgroundColor(resources.getColor(R.color.Cheerly_Orange))
+            selectedCard = card
+
+            // Navigate after animation
+            val mood = button.text.toString().split(" ")[0]
+            navigateToRecommendations(mood)
+        }
+    }
+
+    private fun animateCard(card: MaterialCardView, onComplete: () -> Unit) {
+        card.animate()
             .scaleX(0.95f)
             .scaleY(0.95f)
             .setDuration(100)
             .withEndAction {
-                button.animate()
+                card.animate()
                     .scaleX(1f)
                     .scaleY(1f)
                     .setDuration(100)
                     .withEndAction {
-                        selectSingleOption(button)
+                        onComplete()
                     }
             }
             .start()
     }
 
-    private fun selectSingleOption(button: Button) {
-        // Deselect the previously selected button, if any
-        selectedButton?.setBackgroundResource(R.drawable.rounded_button)
+    private fun resetAllCards() {
+        moodButtons.forEach { (card, _) ->
+            card.setCardBackgroundColor(resources.getColor(android.R.color.white))
+            card.scaleX = 1f
+            card.scaleY = 1f
+        }
+        selectedCard = null
+    }
 
-        // Select the new button
-        button.setBackgroundResource(R.drawable.button_selected)
-        selectedButton = button
-
-        // Get the mood text without emojis
-        val mood = button.text.toString().split(" ")[0]
-
+    private fun navigateToRecommendations(mood: String) {
         try {
             val intent = Intent(context, MoodRecommendationActivity::class.java).apply {
                 putExtra("selectedMood", mood)
