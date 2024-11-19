@@ -105,7 +105,7 @@ class VideoRepository private constructor() {
         @Volatile
         private var instance: VideoRepository? = null
 
-        fun getInstance(moodRecommendationActivity: MoodRecommendationActivity): VideoRepository {
+        fun getInstance(): VideoRepository {
             return instance ?: synchronized(this) {
                 instance ?: VideoRepository().also { instance = it }
             }

@@ -1,127 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:background="@drawable/background_gradient">
 
-    <LinearLayout
+    <!-- Title Section -->
+    <TextView
+        android:id="@+id/titleText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:background="@android:color/transparent"
+        android:padding="16dp"
+        android:text="Cheerly"
+        android:textAlignment="center"
+        android:textColor="@android:color/white"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif-medium" />
 
-        <TextView
-            android:id="@+id/titleText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="@android:color/white"
-            android:layout_marginBottom="16dp"/>
+    <!-- TabLayout for navigation -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/Cheerly_Orange_Light"
+        app:tabTextColor="@android:color/white"
+        app:tabSelectedTextColor="@android:color/white"
+        app:tabIndicatorColor="@android:color/white"
+        app:tabGravity="fill"
+        app:tabMode="fixed">
 
-        <ProgressBar
-            android:id="@+id/progressBar"
+        <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="gone"/>
+            android:text="Music" />
 
-        <!-- Music Section -->
-        <TextView
-            android:id="@+id/musicSectionTitle"
-            android:layout_width="match_parent"
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Music Recommendations"
-            android:textColor="@android:color/black"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp"/>
+            android:text="Videos" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/musicRecyclerView"
-            android:layout_width="match_parent"
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false"/>
+            android:text="Podcasts" />
 
-        <!-- Video Section -->
-        <TextView
-            android:id="@+id/videoSectionTitle"
-            android:layout_width="match_parent"
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Video Recommendations"
-            android:textColor="@android:color/black"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp"/>
+            android:text="Activities" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/videoRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false"/>
+    </com.google.android.material.tabs.TabLayout>
 
-        <!-- Podcast Section -->
-        <TextView
-            android:id="@+id/podcastSectionTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Podcast Recommendations"
-            android:textColor="@android:color/black"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp"/>
+    <!-- ViewPager2 for swipeable content -->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/podcastRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false"/>
+    <!-- Main Progress Bar -->
+    <ProgressBar
+        android:id="@+id/mainProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone" />
 
-        <!-- Activity Section -->
-        <TextView
-            android:id="@+id/activitySectionTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Nearby Activities"
-            android:textColor="@android:color/black"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp"/>
-
-        <!-- Location Status Section -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="8dp">
-
-            <ProgressBar
-                android:id="@+id/locationProgressBar"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginEnd="8dp"/>
-
-            <TextView
-                android:id="@+id/locationStatusText"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textSize="14sp"
-                android:textColor="@android:color/darker_gray"/>
-        </LinearLayout>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/activityRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false"/>
-
-    </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+</LinearLayout>
