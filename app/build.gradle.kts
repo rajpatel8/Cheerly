@@ -1,3 +1,13 @@
+import java.io.FileInputStream
+import java.util.Properties
+
+val keystoreProperties = Properties().apply {
+    val keystorePropertiesFile = rootProject.file("keystore.properties")
+    if (keystorePropertiesFile.exists()) {
+        load(FileInputStream(keystorePropertiesFile))
+    }
+}
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -26,8 +36,34 @@ android {
         manifestPlaceholders["appAuthRedirectUri"] = "cheerly"
     }
 
+    signingConfigs {
+        getByName("debug") {
+            if (keystoreProperties.containsKey("storeFile")) {
+                storeFile = rootProject.file(keystoreProperties["storeFile"]!!)
+                storePassword = keystoreProperties["storePassword"].toString()
+                keyAlias = keystoreProperties["keyAlias"].toString()
+                keyPassword = keystoreProperties["keyPassword"].toString()
+            }
+        }
+
+        create("release") {
+            if (keystoreProperties.containsKey("storeFile")) {
+                storeFile = rootProject.file(keystoreProperties["storeFile"]!!)
+                storePassword = keystoreProperties["storePassword"].toString()
+                keyAlias = keystoreProperties["keyAlias"].toString()
+                keyPassword = keystoreProperties["keyPassword"].toString()
+            }
+        }
+    }
+
     buildTypes {
+        debug {
+            signingConfig = signingConfigs.getByName("debug")
+            isDebuggable = true
+        }
+
         release {
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -53,14 +89,15 @@ android {
         }
     }
 
-
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlinOptions {
         jvmTarget = "11"
     }
+
     buildFeatures {
         compose = true
     }
@@ -68,32 +105,29 @@ android {
 
 dependencies {
     // Location
-    implementation ("com.google.android.gms:play-services-location:21.0.1")
-    implementation ("com.google.android.gms:play-services-maps:18.2.0")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.1")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.1")
 
     // For OpenStreetMap API
     implementation("org.osmdroid:osmdroid-android:6.1.16")
     implementation(libs.androidx.rules)
     implementation(libs.espresso.core)
-    implementation ("androidx.security:security-crypto:1.1.0-alpha06")
-
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
 
     // YouTube & Google APIs
-    dependencies {
-        // YouTube & Google APIs
-        implementation("com.google.apis:google-api-services-youtube:v3-rev20231011-2.0.0") {
-            exclude(group = "commons-logging", module = "commons-logging")
-            exclude(group = "org.apache.httpcomponents", module = "httpclient")
-        }
-        implementation("com.google.api-client:google-api-client-android:2.2.0") {
-            exclude(group = "commons-logging", module = "commons-logging")
-            exclude(group = "org.apache.httpcomponents", module = "httpclient")
-        }
-        implementation("com.google.oauth-client:google-oauth-client:1.34.1") {
-            exclude(group = "commons-logging", module = "commons-logging")
-            exclude(group = "org.apache.httpcomponents", module = "httpclient")
-        }
+    implementation("com.google.apis:google-api-services-youtube:v3-rev20231011-2.0.0") {
+        exclude(group = "commons-logging", module = "commons-logging")
+        exclude(group = "org.apache.httpcomponents", module = "httpclient")
+    }
+    implementation("com.google.api-client:google-api-client-android:2.2.0") {
+        exclude(group = "commons-logging", module = "commons-logging")
+        exclude(group = "org.apache.httpcomponents", module = "httpclient")
+    }
+    implementation("com.google.oauth-client:google-oauth-client:1.34.1") {
+        exclude(group = "commons-logging", module = "commons-logging")
+        exclude(group = "org.apache.httpcomponents", module = "httpclient")
+    }
 
     // Google Sign In
     implementation("com.google.android.gms:play-services-auth:20.7.0")
@@ -102,7 +136,7 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.google.code.gson:gson:2.10.1")
-    implementation("com.squareup.okhttp3:okhttp:4.11.0") // Use okhttp
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
 
     // JSON parsing
     implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
@@ -129,10 +163,6 @@ dependencies {
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib-jdk8")
     }
     implementation("com.google.android.gms:play-services-base:18.3.0")
-
-    // YouTube API
-    implementation("com.google.apis:google-api-services-youtube:v3-rev20231011-2.0.0")
-    implementation("com.google.api-client:google-api-client-android:2.2.0")
 
     // OAuth
     implementation("net.openid:appauth:0.11.1")
@@ -167,11 +197,9 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-
-        testImplementation( libs.mockito.core)
-        testImplementation (libs.mockito.inline)
-        testImplementation (libs.androidx.core)
-        testImplementation (libs.androidx.junit.v113)
-        testImplementation (libs.robolectric)
-    }
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.inline)
+    testImplementation(libs.androidx.core)
+    testImplementation(libs.androidx.junit.v113)
+    testImplementation(libs.robolectric)
 }
