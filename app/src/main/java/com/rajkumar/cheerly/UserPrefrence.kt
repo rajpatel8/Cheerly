@@ -1,8 +1,6 @@
 package com.rajkumar.cheerly
 
 import android.annotation.SuppressLint
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -46,19 +44,8 @@ class UserPrefrence : ComponentActivity() {
         btnNext.setBackgroundResource(R.color.grey)
         btnNext.setOnClickListener {
             if (visibility) {
-                // Create a MasterKey for encrypted shared preferences
-                val masterKey = MasterKey.Builder(this)
-                    .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                    .build()
-
                 // Create EncryptedSharedPreferences
-                val sharedPreferences: SharedPreferences = EncryptedSharedPreferences.create(
-                    this,
-                    "secret_shared_prefs",
-                    masterKey,
-                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-                )
+                val sharedPreferences: SharedPreferences = getSharedPreferences("AppPrefs", MODE_PRIVATE)
 
                 // Write user preferences to EncryptedSharedPreferences
                 val editor = sharedPreferences.edit()
