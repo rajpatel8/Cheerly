@@ -19,7 +19,6 @@
 local.properties
 
 # Signing configs and keystores
-/keystore.properties
 /keystore/
 *.jks
 *.keystore
