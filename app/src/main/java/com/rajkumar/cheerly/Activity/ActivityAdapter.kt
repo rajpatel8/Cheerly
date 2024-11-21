@@ -1,15 +1,16 @@
 package com.rajkumar.cheerly.Activity
 
-import android.content.Intent
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
+import android.widget.FrameLayout
 import android.widget.TextView
+import android.widget.ImageView
 import androidx.cardview.widget.CardView
+import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import com.google.android.material.button.MaterialButton
 import com.rajkumar.cheerly.R
 import com.rajkumar.cheerly.Activity.Models.NearbyActivity
 import kotlin.math.roundToInt
@@ -19,14 +20,15 @@ class ActivityAdapter(private val activities: List<NearbyActivity>) :
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val cardView: CardView = view.findViewById(R.id.cardView)
+        val imageContainer: FrameLayout = view.findViewById(R.id.imageContainer)
+        val activityImage: ImageView = view.findViewById(R.id.activityImage)
         val activityTitle: TextView = view.findViewById(R.id.activityTitle)
         val activityCategory: TextView = view.findViewById(R.id.activityCategory)
         val activityDistance: TextView = view.findViewById(R.id.activityDistance)
         val activityAddress: TextView = view.findViewById(R.id.activityAddress)
-        val activityImage: ImageView = view.findViewById(R.id.activityImage)
         val weatherIcon: ImageView = view.findViewById(R.id.weatherIcon)
         val weatherText: TextView = view.findViewById(R.id.weatherText)
-        val mapsIcon: ImageView = view.findViewById(R.id.mapsIcon)
+        val navigateButton: MaterialButton = view.findViewById(R.id.navigateButton)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -38,38 +40,34 @@ class ActivityAdapter(private val activities: List<NearbyActivity>) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val activity = activities[position]
 
+        if (!activity.imageUrl.isNullOrEmpty()) {
+            holder.imageContainer.visibility = View.VISIBLE
+            holder.activityImage.load(activity.imageUrl) {
+                crossfade(true)
+                placeholder(R.drawable.placeholder_image)
+                error(R.drawable.error_image)
+            }
+        } else {
+            holder.imageContainer.visibility = View.GONE
+        }
+
+        // Set activity title
         holder.activityTitle.text = activity.name
 
+        // Set category
         holder.activityCategory.text = activity.category
             .split("_")
             .joinToString(" ") { it.capitalize() }
 
-        // Format distance
+        // Format and set distance
         val distanceText = when {
             activity.distance < 1.0 -> "${(activity.distance * 1000).roundToInt()} m"
             else -> String.format("%.1f km", activity.distance)
         }
         holder.activityDistance.text = "$distanceText away"
 
+        // Set address
         holder.activityAddress.text = activity.address
-
-        // Load activity image
-        activity.imageUrl?.let { url ->
-            holder.activityImage.load(url) {
-                crossfade(true)
-                placeholder(R.drawable.placeholder_image)
-                error(R.drawable.error_image)
-            }
-        } ?: run {
-            // Default image based on category
-            val defaultImageRes = when {
-                activity.category.contains("park", ignoreCase = true) -> R.drawable.ic_park
-                activity.category.contains("food", ignoreCase = true) -> R.drawable.ic_restaurant
-                activity.category.contains("event", ignoreCase = true) -> R.drawable.ic_event
-                else -> R.drawable.ic_activity
-            }
-            holder.activityImage.setImageResource(defaultImageRes)
-        }
 
         // Weather information
         activity.weather?.let { weather ->
@@ -81,41 +79,29 @@ class ActivityAdapter(private val activities: List<NearbyActivity>) :
                 placeholder(R.drawable.ic_weather)
             }
 
-            val weatherStatus = if (weather.isGoodForActivity) "Good for visiting" else "Check before going"
             holder.weatherText.text = String.format("%.1f°C, %s\n%s",
                 weather.temperature,
                 weather.description.capitalize(),
-                weatherStatus
+                if (weather.isGoodForActivity) "Good for visiting" else "Check weather before going"
             )
         } ?: run {
             holder.weatherIcon.visibility = View.GONE
             holder.weatherText.visibility = View.GONE
         }
 
-        // Click handler for Google Maps navigation
+        // Click handlers
         holder.cardView.setOnClickListener {
             val context = holder.itemView.context
-            try {
-                // Try to open in Google Maps app
-                val gmmIntentUri = Uri.parse("geo:0,0?q=" + Uri.encode(activity.address))
-                val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri).apply {
-                    setPackage("com.google.android.apps.maps")
-                }
-
-                if (mapIntent.resolveActivity(context.packageManager) != null) {
-                    context.startActivity(mapIntent)
-                } else {
-                    // Fallback to browser using Google Maps URL
-                    val browserIntent = Intent(Intent.ACTION_VIEW,
-                        Uri.parse("https://www.google.com/maps/search/?api=1&query=${Uri.encode(activity.address)}"))
-                    context.startActivity(browserIntent)
-                }
-            } catch (e: Exception) {
-                // Final fallback - open address in browser
-                val browserIntent = Intent(Intent.ACTION_VIEW,
-                    Uri.parse("https://www.google.com/maps/search/?api=1&query=${Uri.encode(activity.address)}"))
-                context.startActivity(browserIntent)
+            if (context is FragmentActivity) {
+                ActivityDetailDialog.newInstance(activity)
+                    .show(context.supportFragmentManager, "activity_detail")
             }
+        }
+
+        // Navigate button click handler
+        holder.navigateButton.setOnClickListener {
+            val context = holder.itemView.context
+            ActivityDetailDialog.openInMaps(context, activity.address)
         }
     }
 

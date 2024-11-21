@@ -1,11 +1,16 @@
 package com.rajkumar.cheerly.Activity.Models
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+
 // Base Models
 data class ActivityLocation(
     val latitude: Double,
     val longitude: Double
 )
 
+@Parcelize
 data class NearbyActivity(
     val id: String,
     val name: String,
@@ -20,14 +25,15 @@ data class NearbyActivity(
     val externalLink: String? = null,
     val placeId: String? = null,
     val contextualTips: List<String> = emptyList()
-)
+) : Parcelable
 
+@Parcelize
 data class WeatherInfo(
     val temperature: Double,
     val description: String,
     val icon: String,
     val isGoodForActivity: Boolean
-)
+) : Parcelable
 
 data class ActivityParameters(
     val categories: List<String>,

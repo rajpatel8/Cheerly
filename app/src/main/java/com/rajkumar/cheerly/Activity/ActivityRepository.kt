@@ -434,20 +434,7 @@ class ActivityRepository private constructor() {
         override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
             val request = chain.request()
 
-            Log.d("FoursquareAPI", """
-                Sending request:
-                URL: ${request.url}
-                Headers: ${request.headers}
-                Method: ${request.method}
-            """.trimIndent())
-
             val response = chain.proceed(request)
-
-            Log.d("FoursquareAPI", """
-                Received response:
-                Code: ${response.code}
-                Message: ${response.message}
-            """.trimIndent())
 
             return response
         }
@@ -468,10 +455,8 @@ class ActivityRepository private constructor() {
 
             // Fetch venues and events in parallel
             val venues = getFoursquareVenues(location, parameters, radius)
-            Log.d(TAG, "Retrieved ${venues.size} venues from Foursquare")
 
             val events = getTicketmasterEvents(location, parameters, radius)
-            Log.d(TAG, "Retrieved ${events.size} events from Ticketmaster")
 
             // Process recommendations with retrieved venues and events
             processRecommendations(
@@ -533,7 +518,6 @@ class ActivityRepository private constructor() {
             )
 
             var venues = if (categoriesResponse.isSuccessful) {
-                Log.d(TAG, "Category search response: ${categoriesResponse.code()}")
                 categoriesResponse.body()?.results ?: emptyList()
             } else {
                 Log.e(TAG, "Category search failed: ${categoriesResponse.code()} - ${categoriesResponse.errorBody()?.string()}")
@@ -552,7 +536,6 @@ class ActivityRepository private constructor() {
 
                 if (backupResponse.isSuccessful) {
                     venues = backupResponse.body()?.results ?: emptyList()
-                    Log.d(TAG, "Backup search found ${venues.size} venues")
                 } else {
                     Log.e(TAG, "Backup search failed: ${backupResponse.code()} - ${backupResponse.errorBody()?.string()}")
                 }
@@ -570,17 +553,10 @@ class ActivityRepository private constructor() {
 
                 if (lastResponse.isSuccessful) {
                     venues = lastResponse.body()?.results ?: emptyList()
-                    Log.d(TAG, "Generic search found ${venues.size} venues")
                 }
             }
 
             // Log final results
-            Log.d(TAG, """
-            Foursquare search results:
-            Total venues found: ${venues.size}
-            Categories: ${venues.flatMap { it.categories.map { cat -> cat.name } }.distinct()}
-        """.trimIndent())
-
             venues
 
         } catch (e: Exception) {
@@ -594,12 +570,6 @@ class ActivityRepository private constructor() {
         radius: Int
     ): List<Event> {
         return try {
-            Log.d(TAG, """
-            Searching for events:
-            Location: ${location.latitude}, ${location.longitude}
-            Radius: 100km
-            Country: CA
-        """.trimIndent())
 
             val response = ticketmasterService.searchEvents(
                 apiKey = ApiKeys.TICKETMASTER_API_KEY,
@@ -612,7 +582,6 @@ class ActivityRepository private constructor() {
             )
             if (response.isSuccessful) {
                 val events = response.body()?._embedded?.events ?: emptyList()
-                Log.d(TAG, "Found ${events.size} events before filtering")
 
                 events.filter { event ->
                     val venue = event._embedded?.venues?.firstOrNull()
@@ -623,13 +592,8 @@ class ActivityRepository private constructor() {
                             venueLoc.longitude.toDouble()
                         )
                         val withinDistance = distance <= MAX_ACTUAL_DISTANCE_KM
-                        if (!withinDistance) {
-                            Log.d(TAG, "Filtered out event ${event.name} at distance ${distance}km")
-                        }
                         withinDistance
                     } ?: false
-                }.also {
-                    Log.d(TAG, "Returning ${it.size} events after filtering")
                 }
             } else {
                 Log.e(TAG, "Ticketmaster API error: ${response.code()}")
@@ -682,18 +646,9 @@ class ActivityRepository private constructor() {
                 val activity = convertFoursquareToNearbyActivity(venue, weather)
                 val venueScore = calculateVenueMoodScore(venue, parameters)
 
-                Log.d(TAG, """
-                Processing venue:
-                Name: ${venue.name}
-                Category: ${venue.categories.firstOrNull()?.name}
-                Distance: ${venue.distance}m
-                Mood Score: $venueScore
-            """.trimIndent())
-
                 // Lower threshold from 0.5 to 0.3 to include more venues
                 if (venueScore > 0.3) {
                     activities.add(activity)
-                    Log.d(TAG, "Added venue: ${activity.name}")
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error processing venue ${venue.name}", e)
@@ -706,17 +661,9 @@ class ActivityRepository private constructor() {
                 val activity = convertEventToNearbyActivity(event, location, weather)
                 val eventScore = calculateEventMoodScore(event, parameters)
 
-                Log.d(TAG, """
-                Processing event:
-                Name: ${event.name}
-                Category: ${event.classifications?.firstOrNull()?.segment?.name}
-                Score: $eventScore
-            """.trimIndent())
-
                 // Lower threshold from 0.5 to 0.3 to include more events
                 if (eventScore > 0.3) {
                     activities.add(activity)
-                    Log.d(TAG, "Added event: ${activity.name}")
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error processing event ${event.name}", e)
@@ -725,7 +672,6 @@ class ActivityRepository private constructor() {
 
         // Ensure we have activities before proceeding
         if (activities.isEmpty()) {
-            Log.d(TAG, "No activities met scoring criteria, including top scored items")
             // Take top 5 venues and top 5 events regardless of score
             val topVenues = venues.sortedByDescending { calculateVenueMoodScore(it, parameters) }.take(5)
             val topEvents = events.sortedByDescending { calculateEventMoodScore(it, parameters) }.take(5)
@@ -737,8 +683,6 @@ class ActivityRepository private constructor() {
                 activities.add(convertEventToNearbyActivity(event, location, weather))
             }
         }
-
-        Log.d(TAG, "After initial filtering: ${activities.size} activities")
 
         // Sort and return final recommendations
         return activities
@@ -759,15 +703,6 @@ class ActivityRepository private constructor() {
                 }.thenBy { it.distance }
             )
             .take(10)
-            .also { finalActivities ->
-                Log.d(TAG, """
-                Final recommendations:
-                Total: ${finalActivities.size}
-                Venues: ${finalActivities.count { it.type == "venue" }}
-                Events: ${finalActivities.count { it.type == "event" }}
-                Categories: ${finalActivities.groupBy { it.category }.mapValues { it.value.size }}
-            """.trimIndent())
-            }
     }
     private fun isIndoorActivity(activity: NearbyActivity): Boolean {
         return activity.category.lowercase().let { cat ->
@@ -994,12 +929,6 @@ class ActivityRepository private constructor() {
 
         return recommendations.distinctBy { "${it.name}${it.type}" }
             .take(10)
-            .also { finalList ->
-                Log.d(TAG, "Final recommendations balanced between:")
-                Log.d(TAG, "- Indoor/Outdoor: ${finalList.count { isIndoorActivity(it) }}/${finalList.count { !isIndoorActivity(it) }}")
-                Log.d(TAG, "- Immediate/Future: ${finalList.count { isImmediateActivity(it) }}/${finalList.count { !isImmediateActivity(it) }}")
-                Log.d(TAG, "- Categories: ${finalList.groupBy { it.category }.mapValues { it.value.size }}")
-            }
     }
 
 
@@ -1066,13 +995,6 @@ class ActivityRepository private constructor() {
     ): NearbyActivity {
         val category = venue.categories.firstOrNull()?.name ?: "Place"
         val distance = venue.distance / 1000.0 // Convert meters to kilometers
-
-        Log.d(TAG, """
-        Converting venue:
-        Name: ${venue.name}
-        Category: $category
-        Distance: $distance km
-    """.trimIndent())
 
         return NearbyActivity(
             id = "fsq_${venue.fsq_id}",
@@ -1225,12 +1147,8 @@ class ActivityRepository private constructor() {
         parameters: MoodParameters,
         weather: WeatherInfo?
     ): Boolean {
-        // Log the start of filtering for this activity
-        Log.d(TAG, "Filtering activity: ${activity.name}")
-
         // Distance check
         if (activity.distance > parameters.maxDistance * 1.5) {
-            Log.d(TAG, "Activity ${activity.name} filtered out due to distance: ${activity.distance} km (max: ${parameters.maxDistance * 1.5} km)")
             return false
         }
 
@@ -1241,7 +1159,6 @@ class ActivityRepository private constructor() {
             }
 
             if (isOutdoorVenue && !weather.isGoodForActivity) {
-                Log.d(TAG, "Outdoor activity ${activity.name} filtered out due to weather: ${weather.description}")
                 return false
             }
         }
@@ -1250,7 +1167,6 @@ class ActivityRepository private constructor() {
         if (parameters.preferPopular && activity.type == "venue") {
             val rating = activity.rating ?: 0f
             if (rating < 3.5f) {
-                Log.d(TAG, "Venue ${activity.name} filtered out due to low rating: $rating")
                 return false
             }
         }
@@ -1258,7 +1174,6 @@ class ActivityRepository private constructor() {
         // Time of day check
         val currentPeriod = getPeriodOfDay()
         if (!parameters.timeOfDayPreference.contains(currentPeriod)) {
-            Log.d(TAG, "Activity ${activity.name} filtered out due to time preference. Current: $currentPeriod, Preferred: ${parameters.timeOfDayPreference}")
             return false
         }
 
@@ -1273,11 +1188,9 @@ class ActivityRepository private constructor() {
         }
 
         if (!keywordMatch) {
-            Log.d(TAG, "Activity ${activity.name} filtered out due to no keyword matches with mood")
             return false
         }
 
-        Log.d(TAG, "Activity ${activity.name} passed all filters")
         return true
     }
 
