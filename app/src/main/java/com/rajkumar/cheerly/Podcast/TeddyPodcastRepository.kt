@@ -143,7 +143,7 @@ class TeddyPodcastRepository private constructor() {
                 allEpisodes
                     .distinctBy { "${it.title_original}${it.podcast.publisher_original}" }
                     .shuffled() // Add randomness to prevent same order
-                    .take(3)
+                    .take(7)
                     .also {
                         Log.d(TAG, "Returning ${it.size} unique episodes for mood: $mood")
                     }

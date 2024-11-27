@@ -25,10 +25,17 @@ interface SpotifyApiService {
     suspend fun getRecommendations(
         @Header("Authorization") auth: String,
         @Query("seed_tracks") seedTracks: String?,
-        @Query("seed_genres") seedGenres: String,
+        @Query("seed_artists") seedArtists: String?,
+        @Query("seed_genres") seedGenres: String?,
         @Query("target_valence") targetValence: Float,
         @Query("target_energy") targetEnergy: Float,
-        @Query("limit") limit: Int = 3,
+        @Query("target_danceability") targetDanceability: Float,
+        @Query("target_tempo") targetTempo: Float,
+        @Query("target_acousticness") targetAcousticness: Float,
+        @Query("target_instrumentalness") targetInstrumentalness: Float,
+        @Query("min_popularity") minPopularity: Int,
+        @Query("max_duration_ms") maxDurationMs: Int,
+        @Query("limit") limit: Int = 10,
         @Query("market") market: String = "US"
     ): Response<SpotifyRecommendationsResponse>
 
@@ -36,7 +43,7 @@ interface SpotifyApiService {
     suspend fun getTopTracks(
         @Header("Authorization") auth: String,
         @Query("limit") limit: Int = 5,
-        @Query("time_range") timeRange: String = "long_term"
+        @Query("time_range") timeRange: String = "medium_term"
     ): Response<TopTracksResponse>
 
     @GET("me/player/recently-played")

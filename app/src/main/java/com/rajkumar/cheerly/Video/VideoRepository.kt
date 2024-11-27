@@ -8,14 +8,14 @@ import kotlinx.coroutines.withContext
 class VideoRepository private constructor() {
     private val videoService = VideoService.getInstance()
     private val TAG = "VideoRepository"
-    private val API_KEY = "AIzaSyCssC4IkFKwOq7Jr0o3odM0sNHS4GFjjGM"
+    private val API_KEY = "AIzaSyDx50soPE4eUZH7Ym1WWuwRZMwzcSHKOxI"
 
     private val moodChannels = mapOf(
         "happy" to listOf(
             "Michael Sealey Meditation",
             "Great Meditation",
             "The Honest Guys Meditations",
-            "Yoga With Adriene",
+//            "Yoga With Adriene",
             "New Horizon Meditation & Sleep Stories",
             "PowerThoughts Meditation Club",
             "Goodful",
