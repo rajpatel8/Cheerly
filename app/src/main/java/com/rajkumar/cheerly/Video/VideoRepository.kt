@@ -16,37 +16,96 @@ class VideoRepository private constructor() {
             "Great Meditation",
             "The Honest Guys Meditations",
             "Yoga With Adriene",
-            "New Horizon Meditation & Sleep Stories"
+            "New Horizon Meditation & Sleep Stories",
+            "PowerThoughts Meditation Club",
+            "Goodful",
+            "Calm",
+            "Headspace",
+            "Positive Energy Meditation",
+            "Daily Motivation",
+            "Success Chasers",
+            "Mind Valley"
         ),
         "sad" to listOf(
             "Michael Sealey Meditation",
             "Great Meditation",
             "The Honest Guys Meditations",
             "Yoga With Adriene",
-            "New Horizon Meditation & Sleep Stories"
+            "New Horizon Meditation & Sleep Stories",
+            "Jason Stephenson - Sleep Meditation Music",
+            "Yellow Brick Cinema",
+            "Calm",
+            "Soothing Relaxation",
+            "Nu Meditation Music",
+            "Meditation Vacation",
+            "Ambient Relaxation",
+            "Meditation and Healing"
         ),
         "bored" to listOf(
             "Veritasium",
             "Mark Rober",
             "SmarterEveryDay",
             "Steve Mould",
-            "ScienceC"
+            "ScienceC",
+            "Vsauce",
+            "Tom Scott",
+            "Wendover Productions",
+            "Kurzgesagt",
+            "Real Engineering",
+            "The Action Lab",
+            "Minute Physics",
+            "Mind Your Decisions",
+            "3Blue1Brown",
+            "AsapSCIENCE"
         ),
         "anxious" to listOf(
             "Michael Sealey Meditation",
             "Great Meditation",
             "The Honest Guys Meditations",
             "Yoga With Adriene",
-            "New Horizon Meditation & Sleep Stories"
+            "New Horizon Meditation & Sleep Stories",
+            "Calm",
+            "Headspace",
+            "Jason Stephenson",
+            "The Mindful Movement",
+            "Meditation Vacation",
+            "Goodful",
+            "Declutter The Mind",
+            "Mindful Peace",
+            "Daily Calm",
+            "Zen Meditation Planet"
         ),
         "focused" to listOf(
-            "sirgog"
+            "sirgog",
+            "Study MD",
+            "ChilledCow",
+            "The Jazz Hop Café",
+            "College Music",
+            "Relaxing White Noise",
+            "Focus Music",
+            "Study Music Project",
+            "Quiet Quest - Study Music",
+            "4K Study",
+            "Productivity Game",
+            "Focus at Will",
+            "Brain Wave Power Music"
         ),
         "excited" to listOf(
             "Red Bull",
             "Dude Perfect",
             "Marshmello",
-            "Red Bull Motorsports"
+            "Red Bull Motorsports",
+            "GoPro",
+            "X Games",
+            "People Are Awesome",
+            "Nitro Circus",
+            "Monster Energy",
+            "Thrill Zone",
+            "Adrenaline Addiction",
+            "Epic Adventures",
+            "Extreme Sports Channel",
+            "STORROR",
+            "Team Edge"
         )
     )
 
@@ -63,7 +122,7 @@ class VideoRepository private constructor() {
                     // First, search for channel's content
                     val response = videoService.searchVideos(
                         query = "channel:\"$channelName\"",
-                        maxResults = 10,
+                        maxResults = 5,
                         apiKey = API_KEY,
                         order = "date", // Get latest videos
                         videoDuration = "medium",
@@ -103,7 +162,7 @@ class VideoRepository private constructor() {
             return@withContext allVideos
                 .distinctBy { it.id }
                 .shuffled()
-                .take(5)
+                .take(15)
                 .also { results ->
                     Log.d(TAG, "Final recommendations for $mood: ${results.size} videos")
                     results.forEach { video ->
