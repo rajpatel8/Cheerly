@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
@@ -56,18 +57,34 @@ class PodcastAdapter(private val podcasts: List<PodcastEpisode>) :
                 error(R.drawable.error_image)
             }
 
-            // Handle click with error handling
+            // Handle click with audio URL
             holder.cardView.setOnClickListener {
                 try {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(podcast.link))
-                    holder.itemView.context.startActivity(intent)
+                    podcast.audio?.let { audioUrl ->
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(audioUrl))
+                        // Try to open in browser if no dedicated app is found
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        holder.itemView.context.startActivity(intent)
+                    } ?: run {
+                        // If audio URL is null, show a message
+                        Toast.makeText(
+                            holder.itemView.context,
+                            "Audio URL not available",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 } catch (e: Exception) {
-                    Log.d(TAG, "Error opening podcast link: ${e.message}")
+                    Log.e(TAG, "Error opening podcast: ${e.message}")
+                    Toast.makeText(
+                        holder.itemView.context,
+                        "Unable to open podcast",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
 
         } catch (e: Exception) {
-            Log.d(TAG, "Error binding podcast at position $position: ${e.message}")
+            Log.e(TAG, "Error binding podcast at position $position: ${e.message}")
         }
     }
 
