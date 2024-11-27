@@ -1,111 +1,139 @@
 package com.rajkumar.cheerly.Video
 
+import android.content.Context
 import android.util.Log
-import com.rajkumar.cheerly.MoodRecommendationActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class VideoRepository private constructor() {
     private val videoService = VideoService.getInstance()
+    private val TAG = "VideoRepository"
+    private val API_KEY = "AIzaSyCssC4IkFKwOq7Jr0o3odM0sNHS4GFjjGM"
 
-    private val API_KEY = "AIzaSyC_xEkXM8LJz0OvMmQLXP5eF1OTIM1tj4w" // Replace with your YouTube API key
-
-
-    private val moodQueries = mapOf(
+    private val moodChannels = mapOf(
         "happy" to listOf(
-            "uplifting happy music videos",
-            "positive feel good content",
-            "cheerful entertainment videos",
-            "happy mood playlist"
+            "Michael Sealey Meditation",
+            "Great Meditation",
+            "The Honest Guys Meditations",
+            "Yoga With Adriene",
+            "New Horizon Meditation & Sleep Stories"
         ),
         "sad" to listOf(
-            "calming relaxing music",
-            "peaceful meditation videos",
-            "soothing ambient music",
-            "gentle acoustic songs"
-        ),
-        "excited" to listOf(
-            "high energy music videos",
-            "epic moments compilation",
-            "exciting adventure videos",
-            "party music playlist"
-        ),
-        "relaxed" to listOf(
-            "chill lofi music",
-            "relaxing nature sounds",
-            "peaceful piano music",
-            "ambient relaxation videos"
+            "Michael Sealey Meditation",
+            "Great Meditation",
+            "The Honest Guys Meditations",
+            "Yoga With Adriene",
+            "New Horizon Meditation & Sleep Stories"
         ),
         "bored" to listOf(
-            "interesting facts videos",
-            "amazing discoveries compilation",
-            "mind blowing content",
-            "entertaining highlights"
+            "Veritasium",
+            "Mark Rober",
+            "SmarterEveryDay",
+            "Steve Mould",
+            "ScienceC"
         ),
         "anxious" to listOf(
-            "calming meditation music",
-            "anxiety relief sounds",
-            "peaceful nature scenes",
-            "relaxing sleep music"
+            "Michael Sealey Meditation",
+            "Great Meditation",
+            "The Honest Guys Meditations",
+            "Yoga With Adriene",
+            "New Horizon Meditation & Sleep Stories"
         ),
         "focused" to listOf(
-            "study music concentration",
-            "productivity music mix",
-            "focus beats playlist",
-            "concentration music"
+            "sirgog"
+        ),
+        "excited" to listOf(
+            "Red Bull",
+            "Dude Perfect",
+            "Marshmello",
+            "Red Bull Motorsports"
         )
     )
 
     suspend fun getVideoRecommendations(mood: String): List<Video> = withContext(Dispatchers.IO) {
         try {
-            val queries = moodQueries[mood.lowercase()] ?: moodQueries["happy"]!!
+            val channels = moodChannels[mood.lowercase()] ?: moodChannels["happy"]!!
             val allVideos = mutableListOf<Video>()
 
-            // Get videos for each query
-            queries.forEach { query ->
+            Log.d(TAG, "Fetching videos for mood: $mood")
+
+            // Get videos from each channel
+            channels.forEach { channelName ->
                 try {
+                    // First, search for channel's content
                     val response = videoService.searchVideos(
-                        query = query,
-                        maxResults = 5,
-                        apiKey = API_KEY
+                        query = "channel:\"$channelName\"",
+                        maxResults = 10,
+                        apiKey = API_KEY,
+                        order = "date", // Get latest videos
+                        videoDuration = "medium",
+                        relevanceLanguage = "en"
                     )
 
                     if (response.isSuccessful) {
-                        response.body()?.items?.forEach { video ->
-                            allVideos.add(
-                                Video(
-                                    id = video.id.videoId,
-                                    title = video.snippet.title,
-                                    channelName = video.snippet.channelTitle,
-                                    thumbnailUrl = video.snippet.thumbnails.high.url,
-                                    videoUrl = "https://www.youtube.com/watch?v=${video.id.videoId}"
-                                )
-                            )
+                        response.body()?.items?.mapNotNull { video ->
+                            try {
+                                // Only include videos from the exact channel name match
+                                if (video.snippet.channelTitle.equals(channelName, ignoreCase = true)) {
+                                    Video(
+                                        id = video.id.videoId,
+                                        title = sanitizeTitle(video.snippet.title),
+                                        channelName = video.snippet.channelTitle,
+                                        thumbnailUrl = getBestThumbnail(video.snippet.thumbnails),
+                                        videoUrl = "https://www.youtube.com/watch?v=${video.id.videoId}"
+                                    )
+                                } else null
+                            } catch (e: Exception) {
+                                Log.e(TAG, "Error processing video from $channelName: ${e.message}")
+                                null
+                            }
+                        }?.let { videos ->
+                            allVideos.addAll(videos)
+                            Log.d(TAG, "Found ${videos.size} videos from channel: $channelName")
                         }
+                    } else {
+                        Log.e(TAG, "API error for $channelName: ${response.code()}")
                     }
                 } catch (e: Exception) {
-                    Log.e(TAG, "Error fetching videos for query: $query", e)
+                    Log.e(TAG, "Error fetching from channel: $channelName", e)
                 }
             }
 
-            // Filter duplicates and select top results
-            allVideos.distinctBy { it.id }
-                .distinctBy { it.channelName }
+            // Return random selection of videos
+            return@withContext allVideos
+                .distinctBy { it.id }
+                .shuffled()
                 .take(5)
+                .also { results ->
+                    Log.d(TAG, "Final recommendations for $mood: ${results.size} videos")
+                    results.forEach { video ->
+                        Log.d(TAG, "Recommending: ${video.title} by ${video.channelName}")
+                    }
+                }
 
         } catch (e: Exception) {
-            Log.e(TAG, "Error getting video recommendations", e)
+            Log.e(TAG, "Error getting recommendations", e)
             emptyList()
         }
     }
 
-    companion object {
-        private const val TAG = "VideoRepository"
+    private fun sanitizeTitle(title: String): String {
+        return title.replace(Regex("&#39;"), "'")
+            .replace(Regex("&quot;"), "\"")
+            .replace(Regex("&amp;"), "&")
+    }
 
+    private fun getBestThumbnail(thumbnails: Thumbnails): String {
+        return thumbnails.high?.url
+            ?: thumbnails.medium?.url
+            ?: thumbnails.default.url
+    }
+
+    companion object {
         @Volatile
         private var instance: VideoRepository? = null
 
-        fun getInstance(): VideoRepository {
+        fun getInstance(requireContext: Context): VideoRepository {
             return instance ?: synchronized(this) {
                 instance ?: VideoRepository().also { instance = it }
             }

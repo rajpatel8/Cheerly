@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.rajkumar.cheerly.MoodRecommendationActivity
 import com.rajkumar.cheerly.R
 import com.rajkumar.cheerly.Video.VideoAdapter
 import com.rajkumar.cheerly.Video.VideoRepository
@@ -26,10 +27,6 @@ class VideosFragment : Fragment() {
 
     companion object {
         private const val TAG = "VideosFragment"
-
-        fun newInstance(): VideosFragment {
-            return VideosFragment()
-        }
     }
 
     override fun onCreateView(
@@ -57,7 +54,7 @@ class VideosFragment : Fragment() {
 
     private fun initializeRepository() {
         try {
-            videoRepository = VideoRepository.getInstance()
+            videoRepository = VideoRepository.getInstance( requireContext())
             Log.d(TAG, "Successfully initialized VideoRepository")
         } catch (e: Exception) {
             Log.e(TAG, "Error initializing VideoRepository", e)
@@ -83,13 +80,18 @@ class VideosFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 showLoading(true)
+
+                (activity as? MoodRecommendationActivity)?.let { activity ->
+                    selectedMood = activity.getSelectedMood()
+                }
+
                 Log.d(TAG, "Starting video recommendations fetch for mood: $selectedMood")
 
                 val videos = videoRepository.getVideoRecommendations(selectedMood)
 
                 if (videos.isNotEmpty()) {
                     videoRecyclerView.adapter = VideoAdapter(videos)
-                    sectionTitle.text = "Video Recommendations"
+                    updateSectionTitle()
                     showContent()
                     Log.d(TAG, "Successfully loaded ${videos.size} videos")
                 } else {
@@ -99,11 +101,29 @@ class VideosFragment : Fragment() {
 
             } catch (e: Exception) {
                 Log.e(TAG, "Error loading videos", e)
-                showError("Error loading video recommendations")
+                showError(if (e.message?.contains("authenticated") == true) {
+                    "Please sign in to YouTube for personalized recommendations"
+                } else {
+                    "Error loading video recommendations"
+                })
             } finally {
                 showLoading(false)
             }
         }
+    }
+
+    private fun updateSectionTitle() {
+        val titleText = when (selectedMood.lowercase()) {
+            "happy" -> "Uplifting Content For You"
+            "sad" -> "Calming Videos To Soothe You"
+            "excited" -> "Thrilling Content To Keep You Going"
+            "relaxed" -> "Peaceful Videos For Relaxation"
+            "bored" -> "Fascinating Content To Explore"
+            "anxious" -> "Calming Content To Ease Your Mind"
+            "focused" -> "Content To Help You Stay Focused"
+            else -> "Video Recommendations"
+        }
+        sectionTitle.text = titleText
     }
 
     private fun showLoading(isLoading: Boolean) {

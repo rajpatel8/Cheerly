@@ -16,9 +16,11 @@ interface YouTubeApi {
         @Query("q") query: String,
         @Query("type") type: String = "video",
         @Query("key") apiKey: String,
-        @Query("videoCategoryId") videoCategoryId: String? = null,
+        @Query("videoDuration") videoDuration: String? = null,
         @Query("relevanceLanguage") relevanceLanguage: String = "en",
-        @Query("safeSearch") safeSearch: String = "moderate"
+        @Query("safeSearch") safeSearch: String = "moderate",
+        @Query("order") order: String = "relevance",
+        @Query("publishedAfter") publishedAfter: String? = null
     ): Response<YouTubeSearchResponse>
 }
 
@@ -45,13 +47,21 @@ class VideoService {
         query: String,
         maxResults: Int = 10,
         apiKey: String,
-        videoCategoryId: String? = null
+        videoDuration: String? = null,
+        relevanceLanguage: String = "en",
+        safeSearch: String = "moderate",
+        order: String = "relevance",
+        publishedAfter: String? = null
     ): Response<YouTubeSearchResponse> {
         return api.searchVideos(
             query = query,
             maxResults = maxResults,
             apiKey = apiKey,
-            videoCategoryId = videoCategoryId
+            videoDuration = videoDuration,
+            relevanceLanguage = relevanceLanguage,
+            safeSearch = safeSearch,
+            order = order,
+            publishedAfter = publishedAfter
         )
     }
 
