@@ -8,38 +8,49 @@ import kotlinx.coroutines.withContext
 class VideoRepository private constructor() {
     private val videoService = VideoService.getInstance()
     private val TAG = "VideoRepository"
-    private val API_KEY = "AIzaSyDx50soPE4eUZH7Ym1WWuwRZMwzcSHKOxI"
+    private val API_KEY = "AIzaSyAKookqX3kZziARW8rTPNSk1SxGmS4iLtM"
 
     private val moodChannels = mapOf(
         "happy" to listOf(
-            "Michael Sealey Meditation",
-            "Great Meditation",
-            "The Honest Guys Meditations",
-//            "Yoga With Adriene",
-            "New Horizon Meditation & Sleep Stories",
-            "PowerThoughts Meditation Club",
-            "Goodful",
-            "Calm",
-            "Headspace",
-            "Positive Energy Meditation",
-            "Daily Motivation",
-            "Success Chasers",
-            "Mind Valley"
+            "The Ellen Show",
+            "The Tonight Show Starring Jimmy Fallon",
+            "Good Mythical Morning",
+            "BuzzFeed Video",
+            "The Late Late Show with James Corden",
+            "Food Network",
+            "Animal Planet",
+            "Disney",
+            "Just For Laughs Gags",
+            "America's Got Talent"
         ),
         "sad" to listOf(
-            "Michael Sealey Meditation",
-            "Great Meditation",
-            "The Honest Guys Meditations",
-            "Yoga With Adriene",
-            "New Horizon Meditation & Sleep Stories",
-            "Jason Stephenson - Sleep Meditation Music",
-            "Yellow Brick Cinema",
-            "Calm",
-            "Soothing Relaxation",
-            "Nu Meditation Music",
-            "Meditation Vacation",
-            "Ambient Relaxation",
-            "Meditation and Healing"
+            // Feel-Good/Inspiring Stories
+            "The Dodo",
+            "Goalcast",
+            "Jay Shetty",
+            "SoulPancake",
+            "Nas Daily",
+
+            // Wholesome Entertainment
+            "Good Mythical Morning",
+            "Yes Theory",
+            "Daily Dose Of Internet",
+            "Some Good News",
+            "Cut",
+
+            // Motivational Channels
+            "Prince Ea",
+            "Absolute Motivation",
+            "Tom Bilyeu",
+            "Lewis Howes",
+            "Improvement Pill",
+
+            // Positive Lifestyle
+            "Binging with Babish",
+            "Matt D'Avella",
+            "Peter McKinnon",
+            "Casey Neistat",
+            "Peaceful Cuisine"
         ),
         "bored" to listOf(
             "Veritasium",
@@ -59,36 +70,28 @@ class VideoRepository private constructor() {
             "AsapSCIENCE"
         ),
         "anxious" to listOf(
-            "Michael Sealey Meditation",
-            "Great Meditation",
-            "The Honest Guys Meditations",
-            "Yoga With Adriene",
-            "New Horizon Meditation & Sleep Stories",
-            "Calm",
             "Headspace",
-            "Jason Stephenson",
-            "The Mindful Movement",
-            "Meditation Vacation",
-            "Goodful",
-            "Declutter The Mind",
-            "Mindful Peace",
-            "Daily Calm",
-            "Zen Meditation Planet"
+            "Calm",
+            "Yoga With Adriene",
+            "TheHonestGuys",
+            "Nature Soundscapes",
+            "Peaceful Cuisine",
+            "ASMRMagic",
+            "Walking Videos",
+            "Relax With Nature",
+            "Calmed By Nature"
         ),
         "focused" to listOf(
-            "sirgog",
             "Study MD",
-            "ChilledCow",
-            "The Jazz Hop Café",
             "College Music",
-            "Relaxing White Noise",
-            "Focus Music",
-            "Study Music Project",
-            "Quiet Quest - Study Music",
-            "4K Study",
+            "ChilledCow",
+            "StudyMusic",
             "Productivity Game",
-            "Focus at Will",
-            "Brain Wave Power Music"
+            "The Jazz Hop Café",
+            "Merve",
+            "Focus@Will",
+            "Brain Beats",
+            "Study Together"
         ),
         "excited" to listOf(
             "Red Bull",
@@ -114,66 +117,72 @@ class VideoRepository private constructor() {
             val channels = moodChannels[mood.lowercase()] ?: moodChannels["happy"]!!
             val allVideos = mutableListOf<Video>()
 
-            Log.d(TAG, "Fetching videos for mood: $mood")
+            // Select 5 random channels
+            val selectedChannels = channels.shuffled().take(5)
+            Log.d(TAG, "Selected channels for $mood: $selectedChannels")
 
-            // Get videos from each channel
-            channels.forEach { channelName ->
+            // Get one video from each channel
+            selectedChannels.forEach { selectedChannel ->
                 try {
-                    // First, search for channel's content
                     val response = videoService.searchVideos(
-                        query = "channel:\"$channelName\"",
+                        query = selectedChannel,
                         maxResults = 5,
                         apiKey = API_KEY,
-                        order = "date", // Get latest videos
+                        order = "relevance",
                         videoDuration = "medium",
                         relevanceLanguage = "en"
                     )
 
                     if (response.isSuccessful) {
-                        response.body()?.items?.mapNotNull { video ->
-                            try {
-                                // Only include videos from the exact channel name match
-                                if (video.snippet.channelTitle.equals(channelName, ignoreCase = true)) {
-                                    Video(
-                                        id = video.id.videoId,
-                                        title = sanitizeTitle(video.snippet.title),
-                                        channelName = video.snippet.channelTitle,
-                                        thumbnailUrl = getBestThumbnail(video.snippet.thumbnails),
-                                        videoUrl = "https://www.youtube.com/watch?v=${video.id.videoId}"
-                                    )
-                                } else null
-                            } catch (e: Exception) {
-                                Log.e(TAG, "Error processing video from $channelName: ${e.message}")
-                                null
-                            }
-                        }?.let { videos ->
-                            allVideos.addAll(videos)
-                            Log.d(TAG, "Found ${videos.size} videos from channel: $channelName")
+                        response.body()?.items?.firstOrNull { video ->
+                            videoMatchesChannel(video, selectedChannel)
+                        }?.let { video ->
+                            allVideos.add(
+                                Video(
+                                    id = video.id.videoId,
+                                    title = sanitizeTitle(video.snippet.title),
+                                    channelName = video.snippet.channelTitle,
+                                    thumbnailUrl = getBestThumbnail(video.snippet.thumbnails),
+                                    videoUrl = "https://www.youtube.com/watch?v=${video.id.videoId}"
+                                )
+                            )
+                            Log.d(TAG, "Added video from channel: ${video.snippet.channelTitle}")
                         }
                     } else {
-                        Log.e(TAG, "API error for $channelName: ${response.code()}")
+                        Log.e(TAG, "API error for $selectedChannel: ${response.code()}")
                     }
                 } catch (e: Exception) {
-                    Log.e(TAG, "Error fetching from channel: $channelName", e)
+                    Log.e(TAG, "Error fetching from channel: $selectedChannel", e)
                 }
             }
 
-            // Return random selection of videos
-            return@withContext allVideos
-                .distinctBy { it.id }
-                .shuffled()
-                .take(15)
-                .also { results ->
-                    Log.d(TAG, "Final recommendations for $mood: ${results.size} videos")
-                    results.forEach { video ->
-                        Log.d(TAG, "Recommending: ${video.title} by ${video.channelName}")
-                    }
+            return@withContext allVideos.also { results ->
+                Log.d(TAG, "Final recommendations for $mood: ${results.size} videos")
+                results.forEach { video ->
+                    Log.d(TAG, "Recommending: ${video.title} by ${video.channelName}")
                 }
+            }
 
         } catch (e: Exception) {
             Log.e(TAG, "Error getting recommendations", e)
             emptyList()
         }
+    }
+
+    private fun videoMatchesChannel(video: YouTubeVideo, channelQuery: String): Boolean {
+        val title = video.snippet.title.lowercase()
+        val channelTitle = video.snippet.channelTitle.lowercase()
+        val query = channelQuery.lowercase()
+
+        // Split query into words
+        val queryWords = query.split(" ")
+
+        // Check if most of the query words appear in either title or channel name
+        val matchCount = queryWords.count { word ->
+            title.contains(word) || channelTitle.contains(word)
+        }
+
+        return matchCount >= queryWords.size / 2
     }
 
     private fun sanitizeTitle(title: String): String {
