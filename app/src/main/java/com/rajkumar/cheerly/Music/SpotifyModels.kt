@@ -3,40 +3,71 @@ package com.rajkumar.cheerly.Music
 data class Track(
     val id: String,
     val name: String,
-    val artists: List<Artist>,
+    val artists: List<Artist> = emptyList(),
     val album: Album,
     val external_urls: ExternalUrls,
     val isHeader: Boolean = false,
     val popularity: Int = 0,
     val duration_ms: Long = 0
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Track
+        return id == other.id
+    }
+
+    override fun hashCode(): Int = id.hashCode()
+}
 
 data class Artist(
-    val id: String,
-    val name: String,
-    val external_urls: ExternalUrls,
+    val id: String = "",
+    val name: String = "",
+    val external_urls: ExternalUrls = ExternalUrls(""),
     val genres: List<String> = emptyList(),
     val images: List<Image> = emptyList(),
     val popularity: Int = 0
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Artist
+        return id == other.id
+    }
+
+    override fun hashCode(): Int = id.hashCode()
+}
 
 data class Album(
-    val id: String,
-    val name: String,
-    val images: List<Image>,
-    val external_urls: ExternalUrls,
+    val id: String = "",
+    val name: String = "",
+    val images: List<Image> = emptyList(),
+    val external_urls: ExternalUrls = ExternalUrls(""),
     val release_date: String? = null,
     val album_type: String? = null
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Album
+        return id == other.id
+    }
+
+    override fun hashCode(): Int = id.hashCode()
+}
+
 
 data class Image(
-    val url: String,
-    val height: Int,
-    val width: Int
+    val url: String = "",
+    val height: Int = 0,
+    val width: Int = 0
 )
 
 data class ExternalUrls(
-    val spotify: String
+    val spotify: String = ""
 )
 
 data class SpotifyError(
