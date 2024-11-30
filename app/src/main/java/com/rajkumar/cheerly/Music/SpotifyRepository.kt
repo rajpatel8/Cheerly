@@ -1,6 +1,7 @@
 package com.rajkumar.cheerly.Music
 
 import android.content.Context
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -8,108 +9,45 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 import net.openid.appauth.AuthState
-import android.util.Log
 
 class SpotifyRepository(private val context: Context) {
+    private val TAG = "SpotifyRepository"
     private val BASE_API_URL = "https://api.spotify.com/v1/"
     private val PREFS_NAME = "SpotifyAuthPrefs"
     private val KEY_AUTH_STATE = "auth_state"
-    private val TAG = "SpotifyRepository"
-
-    // Define mood-based audio features
-    data class MoodParameters(
-        val valence: Float,      // Musical positiveness
-        val energy: Float,       // Intensity and activity
-        val danceability: Float, // How suitable for dancing
-        val tempo: Float,        // Speed of the track
-        val acousticness: Float, // Amount of acoustic sound
-        val instrumentalness: Float, // Amount of instrumental content
-        val genres: List<String>,
-        val minPopularity: Int,
-        val maxDurationMs: Int
-    )
-
-    private val moodParameters = mapOf(
-        "happy" to MoodParameters(
-            valence = 0.8f,
-            energy = 0.7f,
-            danceability = 0.7f,
-            tempo = 120f,
-            acousticness = 0.3f,
-            instrumentalness = 0.2f,
-            genres = listOf("pop", "happy", "dance", "electronic"),
-            minPopularity = 60,
-            maxDurationMs = 300000 // 5 minutes
-        ),
-        "sad" to MoodParameters(
-            valence = 0.2f,
-            energy = 0.3f,
-            danceability = 0.4f,
-            tempo = 90f,
-            acousticness = 0.7f,
-            instrumentalness = 0.4f,
-            genres = listOf("acoustic", "sad", "indie", "piano"),
-            minPopularity = 40,
-            maxDurationMs = 360000 // 6 minutes
-        ),
-        "excited" to MoodParameters(
-            valence = 0.8f,
-            energy = 0.9f,
-            danceability = 0.8f,
-            tempo = 130f,
-            acousticness = 0.2f,
-            instrumentalness = 0.3f,
-            genres = listOf("dance", "edm", "party", "electronic"),
-            minPopularity = 70,
-            maxDurationMs = 240000 // 4 minutes
-        ),
-        "relaxed" to MoodParameters(
-            valence = 0.5f,
-            energy = 0.2f,
-            danceability = 0.3f,
-            tempo = 85f,
-            acousticness = 0.8f,
-            instrumentalness = 0.6f,
-            genres = listOf("ambient", "chill", "study", "classical"),
-            minPopularity = 30,
-            maxDurationMs = 420000 // 7 minutes
-        ),
-        "focused" to MoodParameters(
-            valence = 0.5f,
-            energy = 0.4f,
-            danceability = 0.3f,
-            tempo = 100f,
-            acousticness = 0.5f,
-            instrumentalness = 0.8f,
-            genres = listOf("focus", "study", "classical", "ambient"),
-            minPopularity = 40,
-            maxDurationMs = 360000 // 6 minutes
-        ),
-        "anxious" to MoodParameters(
-            valence = 0.4f,
-            energy = 0.3f,
-            danceability = 0.3f,
-            tempo = 80f,
-            acousticness = 0.7f,
-            instrumentalness = 0.5f,
-            genres = listOf("ambient", "meditation", "piano", "classical"),
-            minPopularity = 30,
-            maxDurationMs = 420000 // 7 minutes
-        ),
-        "bored" to MoodParameters(
-            valence = 0.7f,
-            energy = 0.6f,
-            danceability = 0.6f,
-            tempo = 115f,
-            acousticness = 0.4f,
-            instrumentalness = 0.3f,
-            genres = listOf("pop", "rock", "indie", "alternative"),
-            minPopularity = 50,
-            maxDurationMs = 300000 // 5 minutes
-        )
-    )
 
     private val apiService: SpotifyApiService
+
+    private val moodKeywords = mapOf(
+        "happy" to listOf(
+            "dance", "pop", "happy", "joy", "fun", "party", "sunshine", "summer",
+            "bright", "upbeat", "groove", "celebration"
+        ),
+        "sad" to listOf(
+            "acoustic", "piano", "melancholy", "slow", "ballad", "sad",
+            "heartbreak", "emotional", "quiet"
+        ),
+        "excited" to listOf(
+            "dance", "edm", "party", "energy", "power", "rock", "beat",
+            "rhythm", "electro", "fast", "club"
+        ),
+        "relaxed" to listOf(
+            "chill", "ambient", "calm", "peace", "soft", "gentle", "meditation",
+            "relax", "smooth", "easy"
+        ),
+        "bored" to listOf(
+            "discover", "new", "fresh", "unique", "different", "interesting",
+            "exciting", "dynamic", "variety"
+        ),
+        "anxious" to listOf(
+            "calm", "meditation", "peaceful", "quiet", "gentle", "soft",
+            "soothing", "instrumental", "ambient"
+        ),
+        "focused" to listOf(
+            "instrumental", "study", "focus", "concentration", "classical",
+            "ambient", "minimal", "piano"
+        )
+    )
 
     init {
         val okHttpClient = OkHttpClient.Builder()
@@ -126,195 +64,305 @@ class SpotifyRepository(private val context: Context) {
     }
 
     private fun getStoredAuthToken(): String? {
+        Log.d(TAG, "Retrieving stored auth token")
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val authStateJson = prefs.getString(KEY_AUTH_STATE, null)
         return if (authStateJson != null) {
             try {
                 val authState = AuthState.jsonDeserialize(authStateJson)
+                Log.d(TAG, "Auth token retrieved successfully")
                 authState.accessToken
             } catch (e: Exception) {
-                Log.e(TAG, "Error getting stored auth token", e)
+                Log.e(TAG, "Error deserializing auth state", e)
                 null
             }
-        } else null
+        } else {
+            Log.w(TAG, "No auth state found in preferences")
+            null
+        }
     }
 
-    private fun getUserMusicPreferences(): Set<String> {
+    suspend fun createOrUpdatePlaylist(mood: String, tracks: List<Track>): Result<String> = withContext(Dispatchers.IO) {
+        try {
+            val token = getStoredAuthToken() ?: return@withContext Result.failure(Exception("Not authenticated"))
+            val auth = "Bearer $token"
+            val playlistName = "Cheerly-${mood.capitalize()}"
+
+            // First, check if playlist already exists
+            val existingPlaylist = findExistingPlaylist(auth, playlistName)
+
+            if (existingPlaylist != null) {
+                // Get existing tracks to avoid duplicates
+                val existingTracks = getPlaylistTracks(auth, existingPlaylist.id)
+                val existingTrackIds = existingTracks.map { it.id }.toSet()
+
+                // Filter out tracks that are already in the playlist
+                val newTracks = tracks.filterNot { existingTrackIds.contains(it.id) }
+
+                if (newTracks.isNotEmpty()) {
+                    // Add new tracks to existing playlist
+                    val trackUris = newTracks.map { "spotify:track:${it.id}" }
+                    val addTracksResponse = apiService.addTracksToPlaylist(
+                        auth = auth,
+                        playlistId = existingPlaylist.id,
+                        tracksRequest = AddTracksRequest(trackUris)
+                    )
+
+                    return@withContext if (addTracksResponse.isSuccessful) {
+                        Result.success("existing")
+                    } else {
+                        Result.failure(Exception("Failed to add tracks to existing playlist"))
+                    }
+                } else {
+                    return@withContext Result.success("no_new_tracks")
+                }
+            } else {
+                // Create new playlist if it doesn't exist
+                val userResponse = apiService.getCurrentUser(auth)
+                if (!userResponse.isSuccessful) {
+                    return@withContext Result.failure(Exception("Failed to get user profile"))
+                }
+                val userId = userResponse.body()?.id ?: return@withContext Result.failure(Exception("User ID not found"))
+
+                // Create new playlist
+                val description = "Music recommendations for $mood mood by Cheerly"
+                val createPlaylistResponse = apiService.createPlaylist(
+                    auth = auth,
+                    userId = userId,
+                    playlistRequest = CreatePlaylistRequest(
+                        name = playlistName,
+                        description = description
+                    )
+                )
+
+                if (!createPlaylistResponse.isSuccessful) {
+                    return@withContext Result.failure(Exception("Failed to create playlist"))
+                }
+
+                val playlistId = createPlaylistResponse.body()?.id
+                    ?: return@withContext Result.failure(Exception("Playlist ID not found"))
+
+                // Add tracks to new playlist
+                val trackUris = tracks.map { "spotify:track:${it.id}" }
+                val addTracksResponse = apiService.addTracksToPlaylist(
+                    auth = auth,
+                    playlistId = playlistId,
+                    tracksRequest = AddTracksRequest(trackUris)
+                )
+
+                return@withContext if (addTracksResponse.isSuccessful) {
+                    Result.success("new")
+                } else {
+                    Result.failure(Exception("Failed to add tracks to playlist"))
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error managing playlist", e)
+            Result.failure(e)
+        }
+    }
+
+    private suspend fun findExistingPlaylist(auth: String, playlistName: String): PlaylistItem? {
+        try {
+            val response = apiService.getUserPlaylists(auth)
+            if (response.isSuccessful) {
+                return response.body()?.items?.find { it.name == playlistName }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error finding existing playlist", e)
+        }
+        return null
+    }
+
+    private suspend fun getPlaylistTracks(auth: String, playlistId: String): List<Track> {
+        try {
+            val response = apiService.getPlaylistTracks(auth, playlistId)
+            if (response.isSuccessful) {
+                return response.body()?.items?.map { it.track } ?: emptyList()
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error getting playlist tracks", e)
+        }
+        return emptyList()
+    }
+
+    suspend fun getUserTopTracks(): List<Track> = withContext(Dispatchers.IO) {
+        try {
+            Log.d(TAG, "Fetching user's top tracks")
+            val token = getStoredAuthToken() ?: return@withContext emptyList()
+
+            val response = apiService.getTopTracks(
+                auth = "Bearer $token",
+                limit = 50,
+                timeRange = "long_term"
+            )
+
+            if (response.isSuccessful) {
+                val tracks = response.body()?.items ?: emptyList()
+                Log.d(TAG, "Successfully fetched ${tracks.size} top tracks")
+                tracks
+            } else {
+                Log.e(TAG, "Failed to get top tracks: ${response.code()}")
+                emptyList()
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error fetching top tracks", e)
+            emptyList()
+        }
+    }
+
+    suspend fun getUserRecentTracks(): List<Track> = withContext(Dispatchers.IO) {
+        try {
+            Log.d(TAG, "Fetching user's recent tracks")
+            val token = getStoredAuthToken() ?: return@withContext emptyList()
+
+            val response = apiService.getRecentlyPlayed(
+                auth = "Bearer $token",
+                limit = 50
+            )
+
+            if (response.isSuccessful) {
+                val tracks = response.body()?.items?.map { it.track } ?: emptyList()
+                Log.d(TAG, "Successfully fetched ${tracks.size} recent tracks")
+                tracks
+            } else {
+                Log.e(TAG, "Failed to get recent tracks: ${response.code()}")
+                emptyList()
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error fetching recent tracks", e)
+            emptyList()
+        }
+    }
+
+    suspend fun getRecommendations(mood: String): List<Track> = withContext(Dispatchers.IO) {
+        try {
+            Log.d(TAG, "Starting recommendations process for mood: $mood")
+
+            // Get user preferences
+            val userPreferences = getUserPreferences()
+            Log.d(TAG, "User preferences: $userPreferences")
+
+            // Get a larger pool of tracks
+            val allTracks = mutableListOf<Track>()
+            allTracks.addAll(getUserTopTracks())
+            allTracks.addAll(getUserRecentTracks())
+
+            // Remove duplicates
+            val uniqueTracks = allTracks.distinctBy { it.id }.toMutableList()
+            Log.d(TAG, "Total unique tracks available: ${uniqueTracks.size}")
+
+            val recommendations = mutableListOf<Track>()
+            val processedArtists = mutableSetOf<String>()
+
+            // First, add tracks matching user preferences
+            for (preference in userPreferences) {
+                val matchingTracks = uniqueTracks.filter { track ->
+                    val matchesPreference = matchesPreference(track, preference)
+                    val isNewArtist = track.artists.none { it.id in processedArtists }
+                    matchesPreference && isNewArtist
+                }.take(2)
+
+                recommendations.addAll(matchingTracks)
+                uniqueTracks.removeAll(matchingTracks.toSet())
+                processedArtists.addAll(matchingTracks.flatMap { it.artists.map { artist -> artist.id } })
+            }
+
+            // Then, add mood-based tracks
+            val moodKeywordList = moodKeywords[mood.lowercase()] ?: moodKeywords["happy"]!!
+            val moodBasedTracks = uniqueTracks
+                .asSequence()
+                .filter { track ->
+                    track.artists.none { it.id in processedArtists } &&
+                            calculateMoodScore(track, moodKeywordList) > 0.0
+                }
+                .sortedByDescending { calculateMoodScore(it, moodKeywordList) }
+                .take(5 - recommendations.size)
+                .toList()
+
+            recommendations.addAll(moodBasedTracks)
+
+            // If we still need more tracks, add random ones ensuring artist diversity
+            if (recommendations.size < 5) {
+                val remainingTracks = uniqueTracks
+                    .filter { track -> track.artists.none { it.id in processedArtists } }
+                    .shuffled()
+                    .take(5 - recommendations.size)
+
+                recommendations.addAll(remainingTracks)
+            }
+
+            Log.d(TAG, "Final recommendations (${recommendations.size} tracks):")
+            recommendations.forEach { track ->
+                Log.d(TAG, "Track: ${track.name} by ${track.artists.joinToString { it.name }}")
+            }
+
+            recommendations.shuffled()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error generating recommendations", e)
+            emptyList()
+        }
+    }
+
+    private fun getUserPreferences(): Set<String> {
         return context.getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
             .getStringSet("selectedMusicOptions", emptySet()) ?: emptySet()
     }
 
-    suspend fun getRecommendations(mood: String): List<Track> {
-        return withContext(Dispatchers.IO) {
-            try {
-                val token = getStoredAuthToken() ?: throw Exception("No auth token available")
-                Log.d(TAG, "Getting recommendations for mood: $mood")
+    private fun matchesPreference(track: Track, preference: String): Boolean {
+        val searchTerms = when (preference.lowercase()) {
+            "rock" -> listOf("rock", "alternative", "metal", "indie")
+            "jazz" -> listOf("jazz", "blues", "swing", "bebop")
+            "classical" -> listOf("classical", "orchestra", "symphony", "piano")
+            "hip-hop" -> listOf("hip hop", "rap", "hip-hop", "trap")
+            "country" -> listOf("country", "folk", "bluegrass")
+            else -> listOf(preference.lowercase())
+        }
 
-                // Get user's music preferences from AppPrefs
-                val userGenres = getUserMusicPreferences()
-                Log.d(TAG, "User preferred genres: $userGenres")
+        return searchTerms.any { term ->
+            track.name.lowercase().contains(term) ||
+                    track.artists.any { it.name.lowercase().contains(term) } ||
+                    track.album.name.lowercase().contains(term)
+        }
+    }
 
-                // Get user's listening history
-                val userProfile = getUserProfile(mood, token)
-                if (userProfile.isEmpty()) {
-                    Log.w(TAG, "No user profile available, using default recommendations")
-                }
+    private fun calculateMoodScore(track: Track, keywords: List<String>): Double {
+        var score = 0.0
 
-                // Get mood parameters
-                val params = moodParameters[mood.lowercase()] ?: moodParameters["happy"]!!
-                Log.d(TAG, "Using mood parameters: $params")
-
-                val recommendations = mutableListOf<Track>()
-
-                // Get recommendations for each user-preferred genre
-                for (genre in userGenres) {
-                    val genreParams = params.copy(
-                        genres = listOf(genre.lowercase()) + params.genres
-                    )
-
-                    val genreRecommendations = getRecommendationsWithSeeds(
-                        token,
-                        genreParams,
-                        seedTracks = null,
-                        seedArtists = null,
-                        seedGenres = genre.lowercase()
-                    )
-
-                    // Take 3 recommendations for each genre
-                    recommendations.addAll(
-                        genreRecommendations
-                            .distinctBy { it.id }
-                            .take(3)
-                    )
-                }
-
-                // If we don't have enough recommendations, add mood-based recommendations
-                if (recommendations.size < userGenres.size * 3) {
-                    val moodRecommendations = getRecommendationsWithSeeds(
-                        token,
-                        params,
-                        seedTracks = userProfile.take(2).map { it.id }.joinToString(","),
-                        seedArtists = null,
-                        seedGenres = params.genres.take(3).joinToString(",")
-                    )
-                    recommendations.addAll(moodRecommendations)
-                }
-
-                // Filter and sort recommendations
-                recommendations
-                    .distinctBy { it.id }
-                    .groupBy { track ->
-                        // Find matching genre for the track
-                        userGenres.find { genre ->
-                            track.album.name.contains(genre, ignoreCase = true) ||
-                                    track.name.contains(genre, ignoreCase = true)
-                        } ?: "other"
-                    }
-                    .flatMap { (genre, tracks) ->
-                        // Take top 3 tracks for each genre
-                        tracks.sortedWith(
-                            compareByDescending<Track> { it.popularity }
-                                .thenBy { it.name }
-                        ).take(3)
-                    }
-                    .also {
-                        Log.d(TAG, "Returning ${it.size} recommendations")
-                    }
-
-            } catch (e: Exception) {
-                Log.e(TAG, "Error getting recommendations", e)
-                emptyList()
+        // Check track name (highest weight)
+        keywords.forEach { keyword ->
+            if (track.name.lowercase().contains(keyword.lowercase())) {
+                score += 1.0
             }
         }
-    }
 
-    private suspend fun getUserProfile(mood: String, token: String): List<Track> {
-        val profile = mutableListOf<Track>()
-
-        try {
-            // Get user's top tracks
-            val topTracks = getUserTopTracks(token)
-            profile.addAll(topTracks)
-
-            // Get recently played tracks
-            val recentTracks = getUserRecentTracks(token)
-            profile.addAll(recentTracks)
-
-        } catch (e: Exception) {
-            Log.e(TAG, "Error getting user profile", e)
-        }
-
-        return profile.distinctBy { it.id }
-    }
-
-    private suspend fun getRecommendationsWithSeeds(
-        token: String,
-        params: MoodParameters,
-        seedTracks: String?,
-        seedArtists: String?,
-        seedGenres: String?
-    ): List<Track> {
-        try {
-            val response = apiService.getRecommendations(
-                auth = "Bearer $token",
-                seedTracks = seedTracks,
-                seedArtists = seedArtists,
-                seedGenres = seedGenres,
-                targetValence = params.valence,
-                targetEnergy = params.energy,
-                targetDanceability = params.danceability,
-                targetTempo = params.tempo,
-                targetAcousticness = params.acousticness,
-                targetInstrumentalness = params.instrumentalness,
-                minPopularity = params.minPopularity,
-                maxDurationMs = params.maxDurationMs,
-                limit = 10,
-                market = "IN"
-            )
-
-            return if (response.isSuccessful) {
-                response.body()?.tracks ?: emptyList()
-            } else {
-                Log.e(TAG, "Failed to get recommendations: ${response.code()}")
-                emptyList()
+        // Check artist names (medium weight)
+        track.artists.forEach { artist ->
+            keywords.forEach { keyword ->
+                if (artist.name.lowercase().contains(keyword.lowercase())) {
+                    score += 0.5
+                }
             }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error getting recommendations with seeds", e)
-            return emptyList()
         }
-    }
 
-    private suspend fun getUserTopTracks(token: String): List<Track> {
-        val response = apiService.getTopTracks(
-            auth = "Bearer $token",
-            limit = 10,
-            timeRange = "long_term"
-        )
-        return if (response.isSuccessful) {
-            response.body()?.items ?: emptyList()
-        } else {
-            emptyList()
+        // Check album name (lower weight)
+        keywords.forEach { keyword ->
+            if (track.album.name.lowercase().contains(keyword.lowercase())) {
+                score += 0.3
+            }
         }
-    }
 
-    private suspend fun getUserRecentTracks(token: String): List<Track> {
-        val response = apiService.getRecentlyPlayed(
-            auth = "Bearer $token",
-            limit = 10
-        )
-        return if (response.isSuccessful) {
-            response.body()?.items?.map { it.track } ?: emptyList()
-        } else {
-            emptyList()
-        }
+        return score
     }
 
     companion object {
+        private const val TAG = "SpotifyRepository"
         @Volatile
         private var instance: SpotifyRepository? = null
 
         fun getInstance(context: Context): SpotifyRepository {
             return instance ?: synchronized(this) {
+                Log.d(TAG, "Creating new SpotifyRepository instance")
                 instance ?: SpotifyRepository(context).also { instance = it }
             }
         }

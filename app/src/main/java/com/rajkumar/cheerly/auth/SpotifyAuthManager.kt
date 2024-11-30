@@ -10,11 +10,11 @@ import kotlin.coroutines.suspendCoroutine
 
 class SpotifyAuthManager(private val context: Context) {
     companion object {
-        private const val CLIENT_ID = "caba4ab96d9a4b008ff4334c6050cfc4"
+        private const val CLIENT_ID = "e4350e0b977f4e589509378a28cebffa"
         private const val REDIRECT_URI = "cheerly://callback"
         private const val AUTH_ENDPOINT = "https://accounts.spotify.com/authorize"
         private const val TOKEN_ENDPOINT = "https://accounts.spotify.com/api/token"
-        private const val SCOPE = "user-read-private user-read-email playlist-read-private streaming user-top-read user-read-recently-played "
+        private const val SCOPE = "user-read-private playlist-modify-public playlist-modify-private user-read-email playlist-read-private streaming user-top-read user-read-recently-played "
     }
 
     private val serviceConfig = AuthorizationServiceConfiguration(

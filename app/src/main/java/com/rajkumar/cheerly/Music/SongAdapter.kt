@@ -19,14 +19,14 @@ class SongAdapter(private val tracks: List<Track>) :
         private const val VIEW_TYPE_TRACK = 1
     }
 
+    class HeaderViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val headerText: TextView = view.findViewById(R.id.headerText)
+    }
+
     class TrackViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val songTitle: TextView = view.findViewById(R.id.songTitle)
         val artistName: TextView = view.findViewById(R.id.artistName)
         val albumArt: ImageView = view.findViewById(R.id.albumArt)
-    }
-
-    class HeaderViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val genreTitle: TextView = view.findViewById(R.id.genreTitle)
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -53,7 +53,7 @@ class SongAdapter(private val tracks: List<Track>) :
 
         when (holder) {
             is HeaderViewHolder -> {
-                holder.genreTitle.text = track.name
+                holder.headerText.text = track.name
             }
             is TrackViewHolder -> {
                 // Set song title

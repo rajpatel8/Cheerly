@@ -21,38 +21,56 @@ interface SpotifyAuthService {
 }
 
 interface SpotifyApiService {
-    @GET("recommendations")
-    suspend fun getRecommendations(
-        @Header("Authorization") auth: String,
-        @Query("seed_tracks") seedTracks: String?,
-        @Query("seed_artists") seedArtists: String?,
-        @Query("seed_genres") seedGenres: String?,
-        @Query("target_valence") targetValence: Float,
-        @Query("target_energy") targetEnergy: Float,
-        @Query("target_danceability") targetDanceability: Float,
-        @Query("target_tempo") targetTempo: Float,
-        @Query("target_acousticness") targetAcousticness: Float,
-        @Query("target_instrumentalness") targetInstrumentalness: Float,
-        @Query("min_popularity") minPopularity: Int,
-        @Query("max_duration_ms") maxDurationMs: Int,
-        @Query("limit") limit: Int = 10,
-        @Query("market") market: String = "US"
-    ): Response<SpotifyRecommendationsResponse>
-
     @GET("me/top/tracks")
     suspend fun getTopTracks(
         @Header("Authorization") auth: String,
-        @Query("limit") limit: Int = 5,
+        @Query("limit") limit: Int = 50,
         @Query("time_range") timeRange: String = "medium_term"
     ): Response<TopTracksResponse>
 
     @GET("me/player/recently-played")
     suspend fun getRecentlyPlayed(
         @Header("Authorization") auth: String,
-        @Query("limit") limit: Int = 10
+        @Query("limit") limit: Int = 50
     ): Response<RecentlyPlayedResponse>
-}
 
+    @GET("artists/{id}")
+    suspend fun getArtist(
+        @Header("Authorization") auth: String,
+        @Path("id") artistId: String
+    ): Response<Artist>
+
+    @POST("users/{user_id}/playlists")
+    suspend fun createPlaylist(
+        @Header("Authorization") auth: String,
+        @Path("user_id") userId: String,
+        @Body playlistRequest: CreatePlaylistRequest
+    ): Response<PlaylistResponse>
+
+    @POST("playlists/{playlist_id}/tracks")
+    suspend fun addTracksToPlaylist(
+        @Header("Authorization") auth: String,
+        @Path("playlist_id") playlistId: String,
+        @Body tracksRequest: AddTracksRequest
+    ): Response<AddTracksResponse>
+
+    @GET("me")
+    suspend fun getCurrentUser(
+        @Header("Authorization") auth: String
+    ): Response<UserProfile>
+
+    @GET("me/playlists")
+    suspend fun getUserPlaylists(
+        @Header("Authorization") auth: String,
+        @Query("limit") limit: Int = 50
+    ): Response<PlaylistsResponse>
+
+    @GET("playlists/{playlist_id}/tracks")
+    suspend fun getPlaylistTracks(
+        @Header("Authorization") auth: String,
+        @Path("playlist_id") playlistId: String
+    ): Response<PlaylistTracksResponse>
+}
 
 // Response Data Classes
 data class SpotifyTokenResponse(
@@ -63,34 +81,8 @@ data class SpotifyTokenResponse(
     val scope: String? = null
 )
 
-//data class TopTracksResponse(
-//    val items: List<Track>
-//)
-
-data class SpotifyRecommendationsResponse(
-    val tracks: List<Track>,
-    val seeds: List<RecommendationSeed>
-)
-
-data class RecommendationSeed(
-    val id: String,
-    val type: String,
-    val href: String
-)
-
-data class GenreSeedsResponse(
-    val genres: List<String>
-)
-
 data class TopTracksResponse(
     val items: List<Track>,
-    val total: Int,
-    val limit: Int,
-    val offset: Int
-)
-
-data class TopArtistsResponse(
-    val items: List<Artist>,
     val total: Int,
     val limit: Int,
     val offset: Int
@@ -100,32 +92,7 @@ data class RecentlyPlayedResponse(
     val items: List<PlayHistoryObject>
 )
 
-data class SavedTracksResponse(
-    val items: List<SavedTrack>,
-    val total: Int,
-    val limit: Int,
-    val offset: Int
-)
-
-
 data class PlayHistoryObject(
     val track: Track,
     val played_at: String
-)
-
-data class SavedTrack(
-    val added_at: String,
-    val track: Track
-)
-
-data class Cursors(
-    val after: String?,
-    val before: String?
-)
-
-data class Context(
-    val type: String,
-    val href: String,
-    val external_urls: ExternalUrls,
-    val uri: String
 )
