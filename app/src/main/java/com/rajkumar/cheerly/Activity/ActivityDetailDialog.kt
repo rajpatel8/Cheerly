@@ -83,10 +83,18 @@ class ActivityDetailDialog : DialogFragment() {
         // Initialize views
         view.apply {
             // Load activity image
-            findViewById<ImageView>(R.id.activityImage).load(activity.imageUrl) {
-                crossfade(true)
-                placeholder(R.drawable.placeholder_image)
-                error(R.drawable.error_image)
+            findViewById<ImageView>(R.id.activityImage).apply {
+                if (activity.imageUrl.isNullOrEmpty()) {
+                    // If no image URL, load the default outdoor activity image
+                    setImageResource(R.drawable.activity_outdoor_image)
+                } else {
+                    // If image URL exists, load it with Coil
+                    load(activity.imageUrl) {
+                        crossfade(true)
+                        placeholder(R.drawable.placeholder_image)
+                        error(R.drawable.activity_outdoor_image) // Also use outdoor image as error fallback
+                    }
+                }
             }
 
             // Set activity details
