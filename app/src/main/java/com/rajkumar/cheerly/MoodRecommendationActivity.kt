@@ -39,6 +39,8 @@ class MoodRecommendationActivity : FragmentActivity(), TabChangeListener {  // C
         tabLayout = findViewById(R.id.tabLayout)
     }
 
+
+
     private fun setupViewPager() {
         // Initialize the adapter
         pagerAdapter = ViewPagerAdapter(this, selectedMood)
@@ -115,18 +117,6 @@ class MoodRecommendationActivity : FragmentActivity(), TabChangeListener {  // C
     // Public method to get selected mood (used by fragments)
     fun getSelectedMood(): String = selectedMood
 
-    override fun onBackPressed() {
-        when (viewPager.currentItem) {
-            0 -> {
-                // If we're on the first page, handle back as normal
-                super.onBackPressed()
-            }
-            else -> {
-                // If we're not on the first page, go to the previous page
-                viewPager.currentItem = viewPager.currentItem - 1
-            }
-        }
-    }
 
     companion object {
         private const val TAG = "MoodRecommendation"
