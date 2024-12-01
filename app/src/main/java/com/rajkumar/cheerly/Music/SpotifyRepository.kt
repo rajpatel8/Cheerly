@@ -125,7 +125,7 @@ class SpotifyRepository(private val context: Context) {
                 val userId = userResponse.body()?.id ?: return@withContext Result.failure(Exception("User ID not found"))
 
                 // Create new playlist
-                val description = "Music recommendations for $mood mood by Cheerly"
+                val description = "Music for $mood mood by Cheerly :) 🎶"
                 val createPlaylistResponse = apiService.createPlaylist(
                     auth = auth,
                     userId = userId,
@@ -261,7 +261,7 @@ class SpotifyRepository(private val context: Context) {
                     val matchesPreference = matchesPreference(track, preference)
                     val isNewArtist = track.artists.none { it.id in processedArtists }
                     matchesPreference && isNewArtist
-                }.take(2)
+                }.take(0)
 
                 recommendations.addAll(matchingTracks)
                 uniqueTracks.removeAll(matchingTracks.toSet())
@@ -277,17 +277,17 @@ class SpotifyRepository(private val context: Context) {
                             calculateMoodScore(track, moodKeywordList) > 0.0
                 }
                 .sortedByDescending { calculateMoodScore(it, moodKeywordList) }
-                .take(5 - recommendations.size)
+                .take(3 - recommendations.size)
                 .toList()
 
             recommendations.addAll(moodBasedTracks)
 
             // If we still need more tracks, add random ones ensuring artist diversity
-            if (recommendations.size < 5) {
+            if (recommendations.size < 17) {
                 val remainingTracks = uniqueTracks
                     .filter { track -> track.artists.none { it.id in processedArtists } }
                     .shuffled()
-                    .take(5 - recommendations.size)
+                    .take(17 - recommendations.size)
 
                 recommendations.addAll(remainingTracks)
             }
