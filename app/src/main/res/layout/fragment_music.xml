@@ -23,7 +23,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Music Recommendations"
+                android:text="Music for You"
                 android:textColor="@android:color/black"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -34,8 +34,13 @@
                 android:layout_height="wrap_content"
                 android:text="Create"
                 android:enabled="false"
+                android:textColor="#FFFFFF"
                 app:icon="@drawable/ic_playlist_add"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+                app:iconTint="#FFFFFF"
+                app:strokeColor="#FFFFFF"
+                app:strokeWidth="2dp"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                app:rippleColor="#80FFFFFF" />
         </LinearLayout>
 
         <!-- Progress Bar -->
