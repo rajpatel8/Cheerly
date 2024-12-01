@@ -4,11 +4,38 @@ import android.content.Context
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
-class VideoRepository private constructor() {
+class VideoRepository private constructor(private val context: Context) {
     private val videoService = VideoService.getInstance()
     private val TAG = "VideoRepository"
-    private val API_KEY = "AIzaSyAKookqX3kZziARW8rTPNSk1SxGmS4iLtM"
+    private var currentApiKeyIndex = 0
+    private var apiKeys: List<String> = loadApiKeys()
+
+    private fun loadApiKeys(): List<String> {
+        return try {
+            context.assets.open("api.txt").use { inputStream ->
+                BufferedReader(InputStreamReader(inputStream)).readLines()
+                    .filter { it.isNotBlank() }
+                    .map { it.trim() }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to load API keys, using default key", e)
+            listOf("AIzaSyAR3bPNd6Sy0UiOe5HswSZVJktNhDaCEHY")
+        }
+    }
+
+    private fun getNextApiKey(): String {
+        synchronized(this) {
+            currentApiKeyIndex = (currentApiKeyIndex + 1) % apiKeys.size
+            return apiKeys[currentApiKeyIndex]
+        }
+    }
+
+    private fun getCurrentApiKey(): String {
+        return apiKeys[currentApiKeyIndex]
+    }
 
     private val moodChannels = mapOf(
         "happy" to listOf(
@@ -117,46 +144,73 @@ class VideoRepository private constructor() {
             val channels = moodChannels[mood.lowercase()] ?: moodChannels["happy"]!!
             val allVideos = mutableListOf<Video>()
 
-            // Select 5 random channels
-            val selectedChannels = channels.shuffled().take(5)
+            val selectedChannels = channels.shuffled()
+                .take(5)
+                .shuffled()
+
             Log.d(TAG, "Selected channels for $mood: $selectedChannels")
 
-            // Get one video from each channel
             selectedChannels.forEach { selectedChannel ->
-                try {
-                    val response = videoService.searchVideos(
-                        query = selectedChannel,
-                        maxResults = 5,
-                        apiKey = API_KEY,
-                        order = "relevance",
-                        videoDuration = "medium",
-                        relevanceLanguage = "en"
-                    )
+                var retryCount = 0
+                var success = false
 
-                    if (response.isSuccessful) {
-                        response.body()?.items?.firstOrNull { video ->
-                            videoMatchesChannel(video, selectedChannel)
-                        }?.let { video ->
-                            allVideos.add(
-                                Video(
-                                    id = video.id.videoId,
-                                    title = sanitizeTitle(video.snippet.title),
-                                    channelName = video.snippet.channelTitle,
-                                    thumbnailUrl = getBestThumbnail(video.snippet.thumbnails),
-                                    videoUrl = "https://www.youtube.com/watch?v=${video.id.videoId}"
-                                )
-                            )
-                            Log.d(TAG, "Added video from channel: ${video.snippet.channelTitle}")
+                while (retryCount < apiKeys.size && !success) {
+                    try {
+                        val response = videoService.searchVideos(
+                            query = selectedChannel,
+                            maxResults = 5,
+                            apiKey = getCurrentApiKey(),
+                            order = if (Math.random() < 0.3) "date" else "relevance",
+                            videoDuration = "medium",
+                            relevanceLanguage = "en"
+                        )
+
+                        when {
+                            response.isSuccessful -> {
+                                response.body()?.items
+                                    ?.filter { video -> videoMatchesChannel(video, selectedChannel) }
+                                    ?.shuffled()
+                                    ?.firstOrNull()
+                                    ?.let { video ->
+                                        allVideos.add(
+                                            Video(
+                                                id = video.id.videoId,
+                                                title = sanitizeTitle(video.snippet.title),
+                                                channelName = video.snippet.channelTitle,
+                                                thumbnailUrl = getBestThumbnail(video.snippet.thumbnails),
+                                                videoUrl = "https://www.youtube.com/watch?v=${video.id.videoId}"
+                                            )
+                                        )
+                                        Log.d(TAG, "Added video from channel: ${video.snippet.channelTitle}")
+                                        success = true
+                                    }
+                            }
+                            response.code() == 403 || response.code() == 429 -> {
+                                // Quota exceeded or rate limit - try next key
+                                Log.w(TAG, "API key quota exceeded or rate limited, trying next key")
+                                val nextKey = getNextApiKey()
+                                Log.d(TAG, "Switching to next API key: ${nextKey.take(10)}...")
+                                retryCount++
+                            }
+                            else -> {
+                                Log.e(TAG, "API error for $selectedChannel: ${response.code()}")
+                                success = true // Don't retry for other types of errors
+                            }
                         }
-                    } else {
-                        Log.e(TAG, "API error for $selectedChannel: ${response.code()}")
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error fetching from channel: $selectedChannel", e)
+                        if (retryCount < apiKeys.size - 1) {
+                            val nextKey = getNextApiKey()
+                            Log.d(TAG, "Error occurred, trying next API key: ${nextKey.take(10)}...")
+                            retryCount++
+                        } else {
+                            break
+                        }
                     }
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error fetching from channel: $selectedChannel", e)
                 }
             }
 
-            return@withContext allVideos.also { results ->
+            return@withContext allVideos.shuffled().also { results ->
                 Log.d(TAG, "Final recommendations for $mood: ${results.size} videos")
                 results.forEach { video ->
                     Log.d(TAG, "Recommending: ${video.title} by ${video.channelName}")
@@ -174,10 +228,7 @@ class VideoRepository private constructor() {
         val channelTitle = video.snippet.channelTitle.lowercase()
         val query = channelQuery.lowercase()
 
-        // Split query into words
         val queryWords = query.split(" ")
-
-        // Check if most of the query words appear in either title or channel name
         val matchCount = queryWords.count { word ->
             title.contains(word) || channelTitle.contains(word)
         }
@@ -201,9 +252,9 @@ class VideoRepository private constructor() {
         @Volatile
         private var instance: VideoRepository? = null
 
-        fun getInstance(requireContext: Context): VideoRepository {
+        fun getInstance(context: Context): VideoRepository {
             return instance ?: synchronized(this) {
-                instance ?: VideoRepository().also { instance = it }
+                instance ?: VideoRepository(context).also { instance = it }
             }
         }
     }

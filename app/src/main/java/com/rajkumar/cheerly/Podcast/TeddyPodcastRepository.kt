@@ -13,6 +13,8 @@ import java.util.concurrent.TimeUnit
 class TeddyPodcastRepository private constructor() {
     private val TAG = "TeddyPodcastRepo"
     private val API_KEY = "b09988f38897940d7023fc73c66f87eb3021306ef9b232c6522bfb120202040d0d726ec3d943779b2f19dde94b0637cd63"
+    //    New API Key
+    //    private val API_KEY = "a758031b2b236b3d39a0bb3aa1dfd37e1e97f91ba54e83424279810ab1a79496866cbd775b4db7f65348ccf9ef574620b0"
     private val USER_ID = "2031"
     private val BASE_URL = "https://api.taddy.org/graphql"
     private val CONTENT_TYPE = "application/json"

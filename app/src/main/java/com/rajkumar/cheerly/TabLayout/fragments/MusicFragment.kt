@@ -163,7 +163,7 @@ class MusicFragment : Fragment() {
 
         if (remainingTracks.isNotEmpty()) {
             displayTracks.add(createHeaderTrack("✧ Based on your $selectedMood mood"))
-            displayTracks.addAll(remainingTracks.take(13))
+            displayTracks.addAll(remainingTracks.take(7))
         }
 
         return displayTracks
