@@ -1,22 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    tools:context=".PromptFragment"
+    android:background="@android:color/transparent">
+    >
 
-    <EditText
-        android:id="@+id/etMoodDescription"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="How are you feeling today?"
-        android:inputType="textMultiLine"
-        android:minLines="3"
-        android:gravity="top|start"
-        android:padding="12dp"
-        android:background="@drawable/edit_text_background"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:gravity="center_horizontal">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <!-- Subscription layout with all subscription content -->
+        <LinearLayout
+            android:id="@+id/subscriptionLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <!-- Premium lock emoji -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🔒"
+                android:textSize="48sp"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Title for premium features -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Unlock Premium Features"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"
+                android:textColor="@android:color/white"
+                android:gravity="center" />
+
+            <!-- Description for premium features -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Get personalized AI-powered prompts to help you express your feelings more effectively. Premium members receive unlimited custom prompts tailored to their mood and situation."
+                android:textSize="14sp"
+                android:textColor="@android:color/white"
+                android:gravity="center"
+                android:layout_marginBottom="24dp" />
+
+            <!-- Subscription cost -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Only $10/month"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"
+                android:layout_marginBottom="16dp"
+                android:gravity="center" />
+
+            <!-- Loading Progress Bar -->
+            <ProgressBar
+                android:id="@+id/loadingProgressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Subscribe button -->
+            <Button
+                android:id="@+id/subscribeButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:backgroundTint="#FF5722"
+                android:text="SUBSCRIBE NOW"
+                android:textColor="#FFFFFF" />
+
+            <!-- List of benefits -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="✓ Unlimited AI-powered prompts\n✓ Personalized suggestions\n✓ Advanced emotion analysis\n✓ Priority support"
+                android:textSize="14sp"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:layout_marginBottom="16dp" />
+        </LinearLayout>
+
+        <!-- Message TextView to display success or other messages -->
+        <TextView
+            android:id="@+id/messageTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="16sp"
+            android:textColor="@android:color/white"
+            android:gravity="center"
+            android:visibility="gone"
+            android:layout_marginTop="24dp" />
+    </LinearLayout>
+</ScrollView>

@@ -10,43 +10,89 @@ interface SpotifyAuthService {
         @Header("Authorization") auth: String,
         @Field("grant_type") grantType: String = "client_credentials"
     ): Response<SpotifyTokenResponse>
+
+    @POST("api/token")
+    @FormUrlEncoded
+    suspend fun refreshToken(
+        @Header("Authorization") auth: String,
+        @Field("grant_type") grantType: String = "refresh_token",
+        @Field("refresh_token") refreshToken: String
+    ): Response<SpotifyTokenResponse>
 }
 
 interface SpotifyApiService {
-    @GET("recommendations")
-    suspend fun getRecommendations(
+    @GET("me/top/tracks")
+    suspend fun getTopTracks(
         @Header("Authorization") auth: String,
-        @Query("limit") limit: Int = 3, // Default to 3 songs
-        @Query("market") market: String = "US",
-        @Query("seed_genres") seedGenres: String,
-        @Query("target_valence") targetValence: Float,
-        @Query("target_energy") targetEnergy: Float
-    ): Response<SpotifyRecommendationsResponse>
+        @Query("limit") limit: Int = 50,
+        @Query("time_range") timeRange: String = "medium_term"
+    ): Response<TopTracksResponse>
 
-    @GET("recommendations/available-genre-seeds")
-    suspend fun getAvailableGenres(
+    @GET("me/player/recently-played")
+    suspend fun getRecentlyPlayed(
+        @Header("Authorization") auth: String,
+        @Query("limit") limit: Int = 50
+    ): Response<RecentlyPlayedResponse>
+
+    @GET("artists/{id}")
+    suspend fun getArtist(
+        @Header("Authorization") auth: String,
+        @Path("id") artistId: String
+    ): Response<Artist>
+
+    @POST("users/{user_id}/playlists")
+    suspend fun createPlaylist(
+        @Header("Authorization") auth: String,
+        @Path("user_id") userId: String,
+        @Body playlistRequest: CreatePlaylistRequest
+    ): Response<PlaylistResponse>
+
+    @POST("playlists/{playlist_id}/tracks")
+    suspend fun addTracksToPlaylist(
+        @Header("Authorization") auth: String,
+        @Path("playlist_id") playlistId: String,
+        @Body tracksRequest: AddTracksRequest
+    ): Response<AddTracksResponse>
+
+    @GET("me")
+    suspend fun getCurrentUser(
         @Header("Authorization") auth: String
-    ): Response<GenreSeedsResponse>
+    ): Response<UserProfile>
+
+    @GET("me/playlists")
+    suspend fun getUserPlaylists(
+        @Header("Authorization") auth: String,
+        @Query("limit") limit: Int = 50
+    ): Response<PlaylistsResponse>
+
+    @GET("playlists/{playlist_id}/tracks")
+    suspend fun getPlaylistTracks(
+        @Header("Authorization") auth: String,
+        @Path("playlist_id") playlistId: String
+    ): Response<PlaylistTracksResponse>
 }
 
-// Response Data Classes remain the same
+// Response Data Classes
 data class SpotifyTokenResponse(
     val access_token: String,
     val token_type: String,
-    val expires_in: Int
+    val expires_in: Int,
+    val refresh_token: String? = null,
+    val scope: String? = null
 )
 
-data class SpotifyRecommendationsResponse(
-    val tracks: List<Track>,
-    val seeds: List<RecommendationSeed>
+data class TopTracksResponse(
+    val items: List<Track>,
+    val total: Int,
+    val limit: Int,
+    val offset: Int
 )
 
-data class RecommendationSeed(
-    val id: String,
-    val type: String,
-    val href: String
+data class RecentlyPlayedResponse(
+    val items: List<PlayHistoryObject>
 )
 
-data class GenreSeedsResponse(
-    val genres: List<String>
+data class PlayHistoryObject(
+    val track: Track,
+    val played_at: String
 )

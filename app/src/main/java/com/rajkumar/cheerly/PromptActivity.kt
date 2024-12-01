@@ -13,6 +13,9 @@ class PromptActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_prompt)
 
+        window.statusBarColor = ContextCompat.getColor(this, R.color.orange_dark)
+        window.navigationBarColor = ContextCompat.getColor(this, R.color.Cheerly_Pink)
+
         val btnMoods: Button = findViewById(R.id.btnMoods)
         val btnPrompt: Button = findViewById(R.id.btnPrompt)
 
@@ -29,7 +32,7 @@ class PromptActivity : FragmentActivity() {
         }
     }
 
-    @SuppressLint("MissingSuperCall") //we are not using super.onBackPressed() because it is invoking the default behavior of the back button not necessary in this case
+    @SuppressLint("MissingSuperCall")
     override fun onBackPressed() {
         finishAffinity()
     }

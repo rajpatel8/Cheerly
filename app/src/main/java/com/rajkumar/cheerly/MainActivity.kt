@@ -19,10 +19,8 @@ class MainActivity : ComponentActivity() {
             // Redirect to UserPreference if it's the first time
             startActivity(Intent(this, UserPrefrence::class.java))
         }
-
     }
-
-    }
+}
 
 
 

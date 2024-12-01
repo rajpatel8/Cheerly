@@ -1,12 +1,27 @@
+import java.io.FileInputStream
+import java.util.Properties
+
+val keystoreProperties = Properties().apply {
+    val keystorePropertiesFile = rootProject.file("keystore.properties")
+    if (keystorePropertiesFile.exists()) {
+        load(FileInputStream(keystorePropertiesFile))
+    }
+}
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.google.firebase.crashlytics)
+    id("kotlin-parcelize")
 }
 
 android {
+    lint {
+        baseline = file("lint-baseline.xml")
+    }
+
     namespace = "com.rajkumar.cheerly"
     compileSdk = 34
 
@@ -18,10 +33,38 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        manifestPlaceholders["appAuthRedirectScheme"] = "cheerly"
+        manifestPlaceholders["appAuthRedirectUri"] = "cheerly"
+    }
+
+    signingConfigs {
+        getByName("debug") {
+            if (keystoreProperties.containsKey("storeFile")) {
+                storeFile = rootProject.file(keystoreProperties["storeFile"]!!)
+                storePassword = keystoreProperties["storePassword"].toString()
+                keyAlias = keystoreProperties["keyAlias"].toString()
+                keyPassword = keystoreProperties["keyPassword"].toString()
+            }
+        }
+
+        create("release") {
+            if (keystoreProperties.containsKey("storeFile")) {
+                storeFile = rootProject.file(keystoreProperties["storeFile"]!!)
+                storePassword = keystoreProperties["storePassword"].toString()
+                keyAlias = keystoreProperties["keyAlias"].toString()
+                keyPassword = keystoreProperties["keyPassword"].toString()
+            }
+        }
     }
 
     buildTypes {
+        debug {
+            signingConfig = signingConfigs.getByName("debug")
+            isDebuggable = true
+        }
+
         release {
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -29,65 +72,124 @@ android {
             )
         }
     }
+
+    packaging {
+        resources {
+            excludes += listOf(
+                "META-INF/DEPENDENCIES",
+                "META-INF/LICENSE",
+                "META-INF/LICENSE.txt",
+                "META-INF/NOTICE",
+                "META-INF/NOTICE.txt",
+                "META-INF/INDEX.LIST",
+                "META-INF/*.kotlin_module",
+                "META-INF/MANIFEST.MF",
+                "META-INF/AL2.0",
+                "META-INF/LGPL2.1"
+            )
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlinOptions {
         jvmTarget = "11"
     }
+
     buildFeatures {
         compose = true
     }
 }
 
 dependencies {
-    implementation ("com.google.android.material:material:1.9.0")
+    // Location
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.1")
 
-    implementation ("io.coil-kt:coil:2.4.0")
+    // For OpenStreetMap API
+    implementation("org.osmdroid:osmdroid-android:6.1.16")
+    implementation(libs.androidx.rules)
+    implementation(libs.espresso.core)
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
 
-    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    // YouTube & Google APIs
+    implementation("com.google.apis:google-api-services-youtube:v3-rev20231011-2.0.0") {
+        exclude(group = "commons-logging", module = "commons-logging")
+        exclude(group = "org.apache.httpcomponents", module = "httpclient")
+    }
+    implementation("com.google.api-client:google-api-client-android:2.2.0") {
+        exclude(group = "commons-logging", module = "commons-logging")
+        exclude(group = "org.apache.httpcomponents", module = "httpclient")
+    }
+    implementation("com.google.oauth-client:google-oauth-client:1.34.1") {
+        exclude(group = "commons-logging", module = "commons-logging")
+        exclude(group = "org.apache.httpcomponents", module = "httpclient")
+    }
 
-    // OkHttp logging
-    implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
+    // Google Sign In
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
 
-    // Coroutines
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
+    // Network & JSON
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
 
-        implementation ("androidx.constraintlayout:constraintlayout:2.1.4")
-        implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
-        implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
-        implementation ("io.coil-kt:coil:2.4.0")
-        implementation (libs.material.v190)
-    implementation( libs.converter.gson.v200beta4)
+    // JSON parsing
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
 
-
-    // Existing dependencies
+    // Core dependencies
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.fragment.ktx)
+    implementation(libs.androidx.recyclerview)
+    implementation(libs.androidx.cardview)
+
+    // Compose
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.constraintlayout)
+
+    // Google Services & Auth
+    implementation("com.google.android.gms:play-services-auth:20.7.0") {
+        exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib-jdk8")
+    }
+    implementation("com.google.android.gms:play-services-base:18.3.0")
+
+    // OAuth
+    implementation("net.openid:appauth:0.11.1")
+    implementation(libs.androidx.browser)
+
+    // Network
+    implementation(libs.retrofit)
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    // UI Components
+    implementation(libs.material)
+    implementation("com.google.android.material:material:1.10.0")
+
+    // Image Loading
+    implementation("io.coil-kt:coil:2.4.0")
+
+    // Firebase
     implementation(libs.firebase.crashlytics)
 
-    // Added dependencies for Spotify integration
-    implementation(libs.androidx.fragment.ktx)
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.retrofit)
-//    implementation(libs.retrofit.converter.gson)
+    // Coroutines
     implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.androidx.recyclerview)
-    implementation(libs.androidx.cardview)
-    implementation(libs.material)
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
+    implementation(libs.androidx.gridlayout)
 
-    // Testing dependencies
+    // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -95,4 +197,10 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.inline)
+    testImplementation(libs.androidx.core)
+    testImplementation(libs.androidx.junit.v113)
+    testImplementation(libs.robolectric)
 }

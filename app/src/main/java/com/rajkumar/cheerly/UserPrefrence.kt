@@ -1,7 +1,6 @@
 package com.rajkumar.cheerly
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -9,6 +8,7 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
+import androidx.core.content.ContextCompat
 
 class UserPrefrence : ComponentActivity() {
 
@@ -26,6 +26,10 @@ class UserPrefrence : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.user_prefrence)
+
+        window.statusBarColor = ContextCompat.getColor(this, R.color.orange_dark)
+        window.navigationBarColor = ContextCompat.getColor(this, R.color.Cheerly_Pink)
+
         setupButtons()
         setupNextButton()
     }
@@ -40,16 +44,19 @@ class UserPrefrence : ComponentActivity() {
         btnNext.setBackgroundResource(R.color.grey)
         btnNext.setOnClickListener {
             if (visibility) {
+                // Create EncryptedSharedPreferences
                 val sharedPreferences: SharedPreferences = getSharedPreferences("AppPrefs", MODE_PRIVATE)
+
+                // Write user preferences to EncryptedSharedPreferences
                 val editor = sharedPreferences.edit()
                 editor.putBoolean("isUserPreferenceSet", true)
-                // TODO : add the preference selected by user and update the SPF file
-                // writing the options selected by user to the shared preference file
                 editor.putStringSet("selectedMusicOptions", selectedOptionsMap["Music"]?.toSet())
                 editor.putStringSet("selectedVideoOptions", selectedOptionsMap["Videos"]?.toSet())
                 editor.putStringSet("selectedPodcastOptions", selectedOptionsMap["Podcasts"]?.toSet())
                 editor.putStringSet("selectedActivityOptions", selectedOptionsMap["Activities"]?.toSet())
                 editor.apply()
+
+                // Navigate to PromptActivity
                 startActivity(Intent(this, PromptActivity::class.java))
             } else {
                 Toast.makeText(this, "Please select an option from each group", Toast.LENGTH_SHORT).show()

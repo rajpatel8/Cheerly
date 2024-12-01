@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="@drawable/background_gradient">
+
+    <!-- App Logo/Title -->
+    <TextView
+        android:id="@+id/tvAppTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/app_name"
+        android:textColor="@color/white"
+        android:textSize="64sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="24dp"
+        app:layout_constraintBottom_toTopOf="@id/tvWelcomeMessage"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <!-- Welcome Message -->
+    <TextView
+        android:id="@+id/tvWelcomeMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="20dp"
+        android:textColor="@color/white"
+        android:text="@string/welcome_message"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@id/cardSpotify"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvAppTitle" />
+
+    <!-- Spotify Card -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardSpotify"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="4dp"
+        app:layout_constraintBottom_toTopOf="@id/cardYouTube"
+        app:layout_constraintTop_toBottomOf="@id/tvWelcomeMessage">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+
+            <ImageView
+                android:id="@+id/ivSpotifyLogo"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/spotify_icon"
+                app:layout_constraintBottom_toBottomOf="@id/btnSpotifyLogin"
+                app:layout_constraintEnd_toStartOf="@+id/btnSpotifyLogin"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/btnSpotifyLogin" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSpotifyLogin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/connect_spotify"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/progressSpotify"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="16dp"
+                android:indeterminate="true"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@id/btnSpotifyLogin"
+                app:layout_constraintEnd_toStartOf="@id/btnSpotifyLogin"
+                app:layout_constraintTop_toTopOf="@id/btnSpotifyLogin" />
+
+            <TextView
+                android:id="@+id/tvSpotifyStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="× Spotify Not Connected"
+                android:textSize="14sp"
+                app:layout_constraintStart_toStartOf="@id/ivSpotifyLogo"
+                app:layout_constraintTop_toBottomOf="@id/btnSpotifyLogin" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- YouTube Card -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardYouTube"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="4dp"
+        app:layout_constraintBottom_toTopOf="@id/btnContinue"
+        app:layout_constraintTop_toBottomOf="@id/cardSpotify">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+
+            <ImageView
+                android:id="@+id/ivYouTubeLogo"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/youtube_icon"
+                app:layout_constraintBottom_toBottomOf="@id/btnYouTubeLogin"
+                app:layout_constraintEnd_toStartOf="@+id/btnYouTubeLogin"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/btnYouTubeLogin" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnYouTubeLogin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/connect_youtube"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/progressYouTube"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="16dp"
+                android:indeterminate="true"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@id/btnYouTubeLogin"
+                app:layout_constraintEnd_toStartOf="@id/btnYouTubeLogin"
+                app:layout_constraintTop_toTopOf="@id/btnYouTubeLogin" />
+
+            <TextView
+                android:id="@+id/tvYouTubeStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="× YouTube Not Connected"
+                android:textSize="14sp"
+                app:layout_constraintStart_toStartOf="@id/ivYouTubeLogo"
+                app:layout_constraintTop_toBottomOf="@id/btnYouTubeLogin" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Continue Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnContinue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:textColor="@color/white"
+        android:enabled="false"
+        android:padding="16dp"
+        android:text="@string/continue_text"
+        android:textSize="16sp"
+        app:cornerRadius="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cardYouTube" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

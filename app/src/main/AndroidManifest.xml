@@ -2,9 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Add Internet Permission for Spotify API -->
+    <!-- Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
     <application
         android:allowBackup="true"
@@ -17,29 +19,7 @@
         android:theme="@style/Theme.Cheerly"
         tools:targetApi="31">
 
-        <!-- Mood Recommendation Activity -->
-        <activity
-        android:name=".MoodRecommendationActivity"
-        android:exported="false"
-        android:theme="@style/Theme.Cheerly" />
-
-        <!-- Remove .kt extension from activity name -->
-        <activity
-            android:name=".Premium.PremiumManager"
-            android:exported="false"
-            android:theme="@style/Theme.Cheerly"
-            tools:ignore="Instantiatable" />
-
-        <activity
-            android:name=".PromptActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Cheerly" />
-
-        <activity
-            android:name=".UserPrefrence"
-            android:exported="false"
-            android:theme="@style/Theme.Cheerly" />
-
+        <!-- Splash Activity as launcher -->
         <activity
             android:name=".SplashActivity"
             android:exported="true"
@@ -50,10 +30,57 @@
             </intent-filter>
         </activity>
 
+        <!-- Login Activity -->
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Cheerly" />
+
+        <!-- Main Activity -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.Cheerly" />
+
+        <!-- User Preference Activity -->
+        <activity
+            android:name=".UserPrefrence"
+            android:exported="false"
+            android:theme="@style/Theme.Cheerly" />
+
+        <!-- Prompt Activity -->
+        <activity
+            android:name=".PromptActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Cheerly" />
+
+        <!-- Mood Recommendation Activity -->
+        <activity
+            android:name=".MoodRecommendationActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Cheerly" />
+
+        <!-- Premium Manager -->
+        <activity
+            android:name=".Premium.PremiumManager"
+            android:exported="false"
+            android:theme="@style/Theme.Cheerly"
+            tools:ignore="Instantiatable" />
+
+        <!-- Spotify Authentication Activity -->
+        <activity
+            android:name="com.spotify.sdk.android.auth.LoginActivity"
+            android:exported="true"
+            tools:ignore="MissingClass">
+        </activity>
+
+        <!-- Google/YouTube Sign-in Activity -->
+        <activity
+            android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            tools:ignore="MissingClass" />
 
     </application>
 

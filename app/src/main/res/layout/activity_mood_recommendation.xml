@@ -1,74 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/background_gradient">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <!-- Title Section -->
+    <TextView
+        android:id="@+id/titleText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:background="@android:color/transparent"
+        android:padding="16dp"
+        android:text="Cheerly"
+        android:textAlignment="center"
+        android:textColor="@android:color/white"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif-medium" />
 
-        <TextView
-            android:id="@+id/titleText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="@color/Cheerly_Orange"
-            android:layout_marginBottom="16dp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+    <!-- TabLayout for navigation -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/Cheerly_Orange_Light"
+        app:tabTextColor="@android:color/white"
+        app:tabSelectedTextColor="@android:color/white"
+        app:tabIndicatorColor="@android:color/white"
+        app:tabGravity="fill"
+        app:tabMode="fixed">
 
-        <TextView
-            android:id="@+id/musicSectionTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Music Recommendations"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp"
-            android:textColor="@android:color/black"
-            app:layout_constraintTop_toBottomOf="@id/titleText" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/musicRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:nestedScrollingEnabled="false"
-            app:layout_constraintTop_toBottomOf="@id/musicSectionTitle" />
-
-        <!-- Video Section -->
-        <TextView
-            android:id="@+id/videoSectionTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Video Recommendations"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_marginTop="24dp"
-            android:textColor="@android:color/black"
-            app:layout_constraintTop_toBottomOf="@id/musicRecyclerView" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/videoRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:nestedScrollingEnabled="false"
-            app:layout_constraintTop_toBottomOf="@id/videoSectionTitle" />
-
-        <ProgressBar
-            android:id="@+id/progressBar"
+        <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:layout_marginTop="32dp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            android:text="Music" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Videos" />
 
-</androidx.core.widget.NestedScrollView>
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Podcasts" />
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Activities" />
+
+    </com.google.android.material.tabs.TabLayout>
+
+    <!-- ViewPager2 for swipeable content -->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Main Progress Bar -->
+    <ProgressBar
+        android:id="@+id/mainProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
+</LinearLayout>

@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Cheerly</string>
-    <string name="tag_line">Uplift Your Mood in a Tap</string>
+    <string name="tag_line">Your Personal Mood-Based Content Curator</string>
     <string name="title_activity_splash">SplashActivity</string>
     <string name="title_activity_user_preference">UserPreference</string>
     <string name="title_activity_user_prefrence">UserPrefrence</string>
@@ -22,4 +22,15 @@
     <string name="education">Education</string>
     <string name="gym">Gym</string>
     <string name="title_activity_premium_manager.kt">PremiumManager.kt</string>
+    <string name="welcome_to_cheerly">Welcome to Cheerly!</string>
+    <string name="connect_services_description">Connect your Spotify and YouTube accounts to get personalized mood-based recommendations.</string>
+    <string name="welcome_message">Connect your music and video services to get started</string>
+    <string name="connect_spotify">Connect Spotify</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="connect_youtube">Connect YouTube</string>
+<!--    <string name="disconnect_youtube">Disconnect YouTube</string>-->
+    <string name="continue_text">Continue</string>
+    <!-- res/values/strings.xml -->
+    <string name="default_web_client_id">575113949986-1dvgtitrltdk8gmceouq68p0p5b3l7t2.apps.googleusercontent.com</string>
+
 </resources>

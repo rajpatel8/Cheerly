@@ -1,88 +1,124 @@
 package com.rajkumar.cheerly
 
 import android.os.Bundle
-import android.view.View
-import android.widget.ProgressBar
-import android.widget.TextView
-import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.rajkumar.cheerly.Music.SongAdapter
-import com.rajkumar.cheerly.Music.SpotifyRepository
-import com.rajkumar.cheerly.Video.VideoAdapter
-import com.rajkumar.cheerly.Video.YouTubeRepository
-import kotlinx.coroutines.launch
+import androidx.fragment.app.FragmentActivity  // Changed from ComponentActivity
+import androidx.core.content.ContextCompat
+import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
+import com.rajkumar.cheerly.TabLayout.adapters.ViewPagerAdapter
+import com.rajkumar.cheerly.TabLayout.interfaces.TabChangeListener
 
-class MoodRecommendationActivity : ComponentActivity() {
-
-    private lateinit var musicRecyclerView: RecyclerView
-    private lateinit var videoRecyclerView: RecyclerView
-    private lateinit var progressBar: ProgressBar
-    private lateinit var titleText: TextView
-    private lateinit var musicSectionTitle: TextView
-    private lateinit var videoSectionTitle: TextView
-
-    private val spotifyRepository = SpotifyRepository.getInstance()
-    private val youtubeRepository = YouTubeRepository.getInstance()
+class MoodRecommendationActivity : FragmentActivity(), TabChangeListener {  // Changed parent class
+    private lateinit var viewPager: ViewPager2
+    private lateinit var tabLayout: TabLayout
+    private lateinit var pagerAdapter: ViewPagerAdapter
+    private var selectedMood: String = "Happy"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_mood_recommendation)
 
-        // Initialize views
-        musicRecyclerView = findViewById(R.id.musicRecyclerView)
-        videoRecyclerView = findViewById(R.id.videoRecyclerView)
-        progressBar = findViewById(R.id.progressBar)
-        titleText = findViewById(R.id.titleText)
-        musicSectionTitle = findViewById(R.id.musicSectionTitle)
-        videoSectionTitle = findViewById(R.id.videoSectionTitle)
-
-        // Initially hide video section
-        videoSectionTitle.visibility = View.GONE
-        videoRecyclerView.visibility = View.GONE
+        // Set status bar and navigation bar colors
+        window.statusBarColor = ContextCompat.getColor(this, R.color.orange_dark)
+        window.navigationBarColor = ContextCompat.getColor(this, R.color.Cheerly_Pink)
 
         // Get selected mood from intent
-        val selectedMood = intent.getStringExtra("selectedMood") ?: "Happy"
+        intent.getStringExtra("selectedMood")?.let {
+            selectedMood = it
+        }
 
-        // Set title text
-        titleText.text = "Recommendations for ${selectedMood.lowercase()} mood"
-
-        // Setup RecyclerViews
-        musicRecyclerView.layoutManager = LinearLayoutManager(this)
-        videoRecyclerView.layoutManager = LinearLayoutManager(this)
-
-        // Load recommendations
-        loadRecommendations(selectedMood)
+        // Initialize views
+        initializeViews()
+        setupViewPager()
+        setupTabLayout()
     }
 
-    private fun loadRecommendations(mood: String) {
-        progressBar.visibility = View.VISIBLE
+    private fun initializeViews() {
+        viewPager = findViewById(R.id.viewPager)
+        tabLayout = findViewById(R.id.tabLayout)
+    }
 
-        lifecycleScope.launch {
-            try {
-                // First load music recommendations
-                val tracks = spotifyRepository.getRecommendations(mood)
-                musicRecyclerView.adapter = SongAdapter(tracks)
 
-                // After music is loaded, show and load videos
-                videoSectionTitle.visibility = View.VISIBLE
-                videoRecyclerView.visibility = View.VISIBLE
 
-                // Load video recommendations
-                val videos = youtubeRepository.getVideoRecommendations(mood)
-                videoRecyclerView.adapter = VideoAdapter(videos)
+    private fun setupViewPager() {
+        // Initialize the adapter
+        pagerAdapter = ViewPagerAdapter(this, selectedMood)
+        viewPager.adapter = pagerAdapter
 
-            } catch (e: Exception) {
-                Toast.makeText(
-                    this@MoodRecommendationActivity,
-                    "Error: ${e.message}",
-                    Toast.LENGTH_LONG
-                ).show()
-            } finally {
-                progressBar.visibility = View.GONE
+        // Configure ViewPager2
+        viewPager.apply {
+            adapter = pagerAdapter
+            // Optional: Set the number of pages to keep loaded on each side
+            offscreenPageLimit = 1
+
+            // Register page change callback if needed
+            registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    super.onPageSelected(position)
+                    onTabSelected(position)
+                }
+            })
+        }
+    }
+
+    private fun setupTabLayout() {
+        // Connect TabLayout with ViewPager2
+        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+            tab.text = when (position) {
+                ViewPagerAdapter.MUSIC_PAGE -> "Music"
+                ViewPagerAdapter.VIDEOS_PAGE -> "Videos"
+                ViewPagerAdapter.PODCASTS_PAGE -> "Podcasts"
+                ViewPagerAdapter.ACTIVITIES_PAGE -> "Activities"
+                else -> ""
+            }
+        }.attach()
+
+        // Add tab selected listener
+        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                tab?.position?.let { onTabSelected(it) }
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {}
+            override fun onTabReselected(tab: TabLayout.Tab?) {}
+        })
+    }
+
+    // TabChangeListener implementation
+    override fun onTabSelected(position: Int) {
+        // Handle tab selection if needed
+        when (position) {
+            ViewPagerAdapter.MUSIC_PAGE -> {
+                // Handle music tab selected
+            }
+            ViewPagerAdapter.VIDEOS_PAGE -> {
+                // Handle videos tab selected
+            }
+            ViewPagerAdapter.PODCASTS_PAGE -> {
+                // Handle podcasts tab selected
+            }
+            ViewPagerAdapter.ACTIVITIES_PAGE -> {
+                // Handle activities tab selected
             }
         }
+    }
+
+    override fun refreshContent(mood: String) {
+        selectedMood = mood
+        // Update title
+        findViewById<android.widget.TextView>(R.id.titleText).apply {
+            text = "Recommendations for ${selectedMood.lowercase()} mood"
+        }
+        // Refresh all fragments with new mood
+        pagerAdapter.refreshAllFragments(selectedMood)
+    }
+
+    // Public method to get selected mood (used by fragments)
+    fun getSelectedMood(): String = selectedMood
+
+
+    companion object {
+        private const val TAG = "MoodRecommendation"
     }
 }

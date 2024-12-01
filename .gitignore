@@ -7,9 +7,41 @@
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
+/.idea/compiler.xml
+/.idea/gradle.xml
+/.idea/misc.xml
+/.idea/deploymentTargetDropDown.xml
 .DS_Store
 /build
 /captures
 .externalNativeBuild
 .cxx
 local.properties
+
+# Signing configs and keystores
+/keystore/
+*.jks
+*.keystore
+*.p12
+*.pepk
+
+# Debug/Release
+app/debug/
+app/release/
+
+# Google Services (e.g. APIs or Firebase)
+google-services.json
+GoogleService-Info.plist
+
+# Crashlytics
+crashlytics.properties
+crashlytics-build.properties
+com_crashlytics_export_strings.xml
+fabric.properties
+
+# OS specific
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
